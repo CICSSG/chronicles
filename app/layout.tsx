@@ -29,7 +29,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={geistSans.className} suppressHydrationWarning>
+    <html lang="en" data-theme="light" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
           <main className="min-h-screen flex flex-col items-center">
             <div className="flex-1 w-full flex flex-col gap-5 items-center">
@@ -48,7 +48,7 @@ export default function RootLayout({
                   {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
                 </div>
               </nav>
-              <div className="flex flex-col gap-5 max-w-5xl p-2 main-content">
+              <div className="flex flex-col gap-5 w-full max-w-7xl p-2 main-content">
                 {children}
               </div>
 
