@@ -59,6 +59,10 @@
   }
 }
 
+.main-content {
+  flex-grow: 1
+}
+
 @layer base {
   * {
     @apply border-border;
