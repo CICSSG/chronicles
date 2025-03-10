@@ -1,60 +1,58 @@
 import { createClient } from '@/utils/supabase/server'
+import { off } from 'process';
 import React from 'react'
+
+interface Slate {
+    Name: string; 
+    Position: string;
+}
 
 interface Officer {
     id: number;
     YearFrom: string;
     YearTo: string;
-    Slate: JSON;
+    Slate: any[];
 }
 
 const Officers = async () => {
-    
+
     const supabase = await createClient()
 
-    const { data: officers } = await supabase
-    .from('officers')
-    .select('')
-            
+    const { data: slate } = await supabase
+        .from('officers')
+        .select('*')
+        .order('id', { ascending: false })
+
     return (
         <>
-            <div className="collapse collapse-arrow bg-base-100 border border-base-300 max-w-full">
-                <input type="radio" name="my-accordion-2" defaultChecked />
-                <div className="collapse-title font-semibold">2024 - 2025</div>
-                <div className="overflow-x-auto">
-                    <table className="table table-zebra">
-                        {/* head */}
-                        <thead>
-                            <tr>
-                                <th>Name</th>
-                                <th>Position</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {/* row 1 */}
-                            <tr>
-                                <td>Jake Ryan P. Olase</td>
-                                <td>Governor</td>
-                            </tr>
-                            {/* row 2 */}
-                            <tr>
-                                <td>Giannina R. Ruidera</td>
-                                <td>Vice Governor</td>
-                            </tr>
-                            {/* row 3 */}
-                            <tr>
-                                <td>Ivan Yke R. Cadag</td>
-                                <td>Chief of Staff</td>
-                            </tr>
-                        </tbody>
-                    </table>
+            <div className="flex flex-col gap-4 w-full">{slate?.map((data: Officer, i) =>
+                <div className="collapse collapse-arrow bg-base-100 border border-base-300 max-w-full" key={data.id}>
+                    {i == 0 ? 
+                    <input type="radio" name="my-accordion-2" defaultChecked/>:
+                    <input type="radio" name="my-accordion-2"/>
+                    }
+                    <div className="collapse-title font-semibold">{data.YearFrom} - {data.YearTo} {i == 0 ? "(Current)" : null}</div>
+                    <div className="overflow-x-auto overflow-y-hidden">
+                        <table className="table table-zebra">
+                            {/* head */}
+                            <thead>
+                                <tr>
+                                    <th>Name</th>
+                                    <th>Position</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {data.Slate.map((officer: Slate) => 
+                                <tr key={officer.Name}>
+                                    <td className="w-1/2">{officer.Name}</td>
+                                    <td className="w-1/2">{officer.Position}</td>
+                                </tr>
+                            )}
+                            </tbody>
+                        </table>
+                    </div>
                 </div>
-            </div>
-            <div className="collapse collapse-arrow bg-base-100 border border-base-300">
-                <input type="radio" name="my-accordion-2" />
-                <div className="collapse-title font-semibold">I forgot my password. What should I do?</div>
-                <div className="collapse-content text-sm">Click on "Forgot Password" on the login page and follow the instructions sent to your email.</div>
-            </div>
+            )}</div>
         </>
     )
 }

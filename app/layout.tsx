@@ -7,6 +7,7 @@ import { ThemeProvider } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
+import { createClient } from "@/utils/supabase/server";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -23,12 +24,20 @@ const geistSans = Geist({
   subsets: ["latin"],
 });
 
-export default function RootLayout({
+
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  return (
+
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return !user ? (
     <html lang="en" data-theme="light" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
           <main className="min-h-screen flex flex-col items-center">
@@ -48,7 +57,7 @@ export default function RootLayout({
                   {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
                 </div>
               </nav>
-              <div className="flex flex-col gap-5 w-full max-w-7xl p-2 main-content">
+              <div className="flex flex-col flex-grow items-center gap-5 w-full max-w-7xl p-2">
                 {children}
               </div>
 
@@ -69,5 +78,32 @@ export default function RootLayout({
           </main>
       </body>
     </html>
-  );
+  ) : (
+    <html lang="en" data-theme="light" className={geistSans.className} suppressHydrationWarning>
+      <body className="bg-background text-foreground">
+          <main className="min-h-screen flex flex-row">
+            <div className="flex-1 w-full flex flex-row gap-5 items-center">
+              <nav className="h-full flex-col flex justify-center border-r border-r-foreground/10 bg-neutral">
+                <div className="w-full max-w-5xl flex flex-col justify-between items-center p-3 px-5 text-sm h-full">
+                  <div className="flex flex-col gap-5 items-center text-lg font-semibold">
+                    <Image
+                      src="/images/CICSSG.png"
+                      width={80}
+                      height={80}
+                      alt="Picture of the author"
+
+                    />
+                    <Link href={"/"}>Chronicles</Link>
+                  </div>
+                  {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
+                </div>
+              </nav>
+              <div className="flex flex-col flex-grow items-center gap-5 w-full max-w-7xl p-2">
+                {children}
+              </div>
+            </div>
+          </main>
+      </body>
+    </html>
+  )
 }
