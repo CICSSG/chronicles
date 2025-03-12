@@ -1,15 +1,16 @@
-import ConnectSupabaseSteps from "@/components/tutorial/connect-supabase-steps";
-import SignUpUserSteps from "@/components/tutorial/sign-up-user-steps";
-import { hasEnvVars } from "@/utils/supabase/check-env-vars";
+import Image from "next/image";
 
 export default async function Home() {
+
+  const bgImage = <Image
+    src="/images/CICSSG-White-Full.png"
+    width={280}
+    height={80}
+    alt="Picture of the author"
+  />
   return (
     <>
-      <div
-        className="hero min-h-screen"
-        style={{
-          backgroundImage: "url(https://img.daisyui.com/images/stock/photo-1507358522600-9f71e620c44e.webp)",
-        }}>
+      <div>
         <div className="hero-overlay"></div>
         <div className="hero-content text-neutral-content text-center">
           <div className="max-w-md">
@@ -22,6 +23,8 @@ export default async function Home() {
           </div>
         </div>
       </div>
+
+
     </>
   );
 }
