@@ -8,6 +8,8 @@ import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
 import { createClient } from "@/utils/supabase/server";
+import Announcement from "@/components/header-announcement";
+import Footer from "@/components/footer";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -40,69 +42,59 @@ export default async function RootLayout({
   return !user ? (
     <html lang="en" data-theme="light" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
-          <main className="min-h-screen flex flex-col items-center">
-            <div className="flex-1 w-full flex flex-col gap-5 items-center">
-              <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-                <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
-                  <div className="flex gap-5 items-center text-lg font-semibold">
-                    <Image
-                      src="/images/CICSSG.png"
-                      width={40}
-                      height={40}
-                      alt="Picture of the author"
+        <main className="min-h-screen flex flex-col items-center">
+          <Announcement />
+          <div className="flex-1 w-full flex flex-col gap-5 items-center">
+            <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
+              <div className="w-full max-w-5xl flex justify-between items-center p-3 px-5 text-sm">
+                <div className="flex gap-5 items-center text-lg font-semibold">
+                  <Image
+                    src="/images/CICSSG.png"
+                    width={40}
+                    height={40}
+                    alt="Picture of the author"
 
-                    />
-                    <Link href={"/"}>Chronicles</Link>
-                  </div>
-                  {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
+                  />
+                  <Link href={"/"}>Chronicles</Link>
                 </div>
-              </nav>
-              <div className="flex flex-col flex-grow items-center gap-5 w-full max-w-7xl p-2">
-                {children}
+                {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
               </div>
-
-              <footer className="w-full flex items-center justify-center border-t mx-auto text-center text-lg gap-8 py-4">
-                <p>
-                  Developed by {" "}
-                  <a
-                    href="https://www.facebook.com/DLSUD.CICSSG"
-                    target="_blank"
-                    className="font-bold hover:underline"
-                    rel="noreferrer"
-                  >
-                    CICSSG
-                  </a>
-                </p>
-              </footer>
+            </nav>
+            
+            <div className="flex flex-col flex-grow items-center gap-5 w-full p-2">
+              {children}
             </div>
-          </main>
+
+            <Footer />
+          </div>
+        </main>
       </body>
     </html>
   ) : (
     <html lang="en" data-theme="light" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
-          <main className="min-h-screen flex flex-row">
-            <div className="flex-1 w-full flex flex-row gap-5 items-center">
-              <nav className="h-full flex-col flex justify-center border-r border-r-foreground/10 bg-neutral">
-                <div className="w-full max-w-5xl flex flex-col justify-between items-center p-3 px-5 text-sm h-full">
-                  <div className="flex flex-col gap-5 items-center text-lg font-semibold">
-                    <Image
-                      src="/images/CICSSG.png"
-                      width={80}
-                      height={80}
-                      alt="Picture of the author"
+        <main className="min-h-screen flex flex-row">
+          <div className="flex-1 w-full flex flex-row gap-5 items-center">
+            <nav className="h-full flex-col flex justify-center border-r border-r-foreground/10 bg-neutral">
+              <div className="w-full max-w-5xl flex flex-col justify-between items-center p-3 px-5 text-sm h-full">
+                <div className="flex flex-col gap-5 items-center text-lg font-semibold">
+                  <Image
+                    src="/images/CICSSG.png"
+                    width={80}
+                    height={80}
+                    alt="Picture of the author"
 
-                    />
-                    <Link href={"/"}>Chronicles</Link>
-                  </div>
-                  {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
+                  />
+                  <Link href={"/"}>Chronicles</Link>
                 </div>
-              </nav>
-              <div className="flex flex-col flex-grow items-center gap-5 w-full max-w-7xl p-2">
-                {children}
+                {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
               </div>
+            </nav>
+            <div className="flex flex-col flex-grow items-center gap-5 w-full max-w-7xl p-2">
+              {children}
             </div>
-          </main>
+          </div>
+        </main>
       </body>
     </html>
   )
