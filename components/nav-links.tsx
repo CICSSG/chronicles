@@ -17,6 +17,9 @@ export default function NavLinks() {
       <Button asChild size="sm" variant={pathname == "/officers" ? "secondary" : "ghost"}>
         <Link href="/officers">Officers</Link>
       </Button>
+      <Button asChild size="sm" variant={pathname == "/announcements" ? "secondary" : "ghost"}>
+        <Link href="/announcements">Announcements</Link>
+      </Button>
       <Button asChild size="sm" variant={pathname == "/events" ? "secondary" : "ghost"}>
         <Link href="/events">Events</Link>
       </Button>
