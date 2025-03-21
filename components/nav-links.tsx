@@ -8,7 +8,66 @@ export default function NavLinks() {
   const pathname = usePathname()
   return (
     <>
-      <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+      <div className="">
+        <div className="flex-none">
+          <ul className="menu menu-horizontal px-1 py-0">
+            <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+              <Link href="/">Home</Link>
+            </Button>
+            <Button asChild size="sm" variant={pathname == "/faculty" ? "secondary" : "ghost"}>
+              <Link href="/faculty">The CICS</Link>
+            </Button>
+            <Button asChild size="sm" variant={pathname == "/officers" ? "secondary" : "ghost"}>
+              <Link href="/officers">Student Government</Link>
+            </Button>
+            <Button asChild size="sm" variant={pathname == "/announcements" ? "secondary" : "ghost"}>
+              <Link href="/announcements">Announcements</Link>
+            </Button>
+            <li>
+              <details>
+                <summary className='textarea-md p-2 font-medium'>Documents</summary>
+                <ul className="bg-base-100 rounded-t-none">
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/executive-orders" ? "secondary" : "ghost"}>
+                    <Link href="/documents/executive-orders">Executive Orders</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/resolutions" ? "secondary" : "ghost"}>
+                    <Link href="/documents/resolutions">Resolutions</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/transparency-reports" ? "secondary" : "ghost"}>
+                    <Link href="/documents/transparency-reports">Transparency Reports</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/ordinances" ? "secondary" : "ghost"}>
+                    <Link href="/documents/ordinances">Ordinances</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/formal-documents" ? "secondary" : "ghost"}>
+                    <Link href="/documents/formal-documents">Formal Documents</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/expenses" ? "secondary" : "ghost"}>
+                    <Link href="/documents/expenses">Expenses</Link>
+                  </Button>
+                  </li>
+                </ul>
+              </details>
+            </li>
+
+            <Button asChild size="sm" variant={pathname == "/events" ? "secondary" : "ghost"}>
+              <Link href="/events">Events</Link>
+            </Button>
+          </ul>
+        </div>
+      </div>
+      {/* <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
         <Link href="/">Home</Link>
       </Button>
       <Button asChild size="sm" variant={pathname == "/faculty" ? "secondary" : "ghost"}>
@@ -25,7 +84,7 @@ export default function NavLinks() {
       </Button>
       <Button asChild size="sm" variant={pathname == "/events" ? "secondary" : "ghost"}>
         <Link href="/events">Events</Link>
-      </Button>
+      </Button> */}
       {/* <div className="flex-none">
           <ul className="menu menu-horizontal px-1">
             <li>
