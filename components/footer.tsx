@@ -4,7 +4,7 @@ import Image from "next/image";
 const Footer = () => {
     return (
         <>
-            <footer className="footer sm:footer-horizontal bg-neutral text-neutral-content p-10">
+            <footer className="footer justify-center justify-items-center sm:footer-horizontal sm:justify-around bg-neutral text-neutral-content p-10 ">
                 <aside className='flex flex-col text-center items-center'>
                     <Image
                         src="/images/CICSSG-White-Full.png"
@@ -19,7 +19,7 @@ const Footer = () => {
                         Copyright © 2025 - All right reserved
                     </p>
                 </aside>
-                <nav>
+                <nav className='w-full flex flex-col items-center'>
                     <h6 className="footer-title">Company</h6>
                     <a className="link link-hover">About us</a>
                     <a className="link link-hover">Faculty</a>
@@ -27,13 +27,13 @@ const Footer = () => {
                     <a className="link link-hover">Events</a>
                     <a className="link link-hover">Documents</a>
                 </nav>
-                <nav>
+                <nav className='w-full flex flex-col items-center'>
                     <h6 className="footer-title">DLSU-D</h6>
                     <a className="link link-hover">Official Website</a>
                     <a className="link link-hover">Portal</a>
                     <a className="link link-hover">Schoolbook</a>
                 </nav>
-                <nav>
+                <nav className='w-full flex flex-col items-center'>
                     <h6 className="footer-title">Social</h6>
                     <div className="grid grid-flow-col gap-4">
                         <a>

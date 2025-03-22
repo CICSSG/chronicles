@@ -14,11 +14,11 @@ export default function NavLinks() {
             <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
               <Link href="/">Home</Link>
             </Button>
-            <Button asChild size="sm" variant={pathname == "/faculty" ? "secondary" : "ghost"}>
-              <Link href="/faculty">The CICS</Link>
+            <Button asChild size="sm" variant={pathname == "/cics" ? "secondary" : "ghost"}>
+              <Link href="/cics">The CICS</Link>
             </Button>
-            <Button asChild size="sm" variant={pathname == "/officers" ? "secondary" : "ghost"}>
-              <Link href="/officers">Student Government</Link>
+            <Button asChild size="sm" variant={pathname == "/student-government" ? "secondary" : "ghost"}>
+              <Link href="/student-government">Student Government</Link>
             </Button>
             <Button asChild size="sm" variant={pathname == "/announcements" ? "secondary" : "ghost"}>
               <Link href="/announcements">Announcements</Link>

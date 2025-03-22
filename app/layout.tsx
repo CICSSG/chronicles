@@ -1,9 +1,4 @@
-import { EnvVarWarning } from "@/components/env-var-warning";
-import HeaderAuth from "@/components/header-auth";
-import { ThemeSwitcher } from "@/components/theme-switcher";
-import { hasEnvVars } from "@/utils/supabase/check-env-vars";
 import { Geist } from "next/font/google";
-import { ThemeProvider } from "next-themes";
 import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
@@ -43,37 +38,11 @@ export default async function RootLayout({
   return !user ? (
     <html lang="en" data-theme="cicssg" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground min-h-screen flex flex-col justify-between">
-        {/* <main className="min-h-screen flex flex-col items-center">
-          <Announcement />
-          <div className="flex-1 w-full flex flex-col gap-5 items-center">
-            <nav className="w-full flex justify-center border-b border-b-foreground/10 h-16">
-              <div className="w-full max-w-7xl flex justify-between items-center p-3 px-5 text-sm">
-                <div className="flex gap-5 items-center text-lg font-semibold">
-                  <Image
-                    src="/images/CICSSG.png"
-                    width={40}
-                    height={40}
-                    alt="Picture of the author"
-
-                  />
-                  <Link href={"/"}>Chronicles</Link>
-                </div>
-                {!hasEnvVars ? <EnvVarWarning /> : <HeaderAuth />}
-              </div>
-            </nav>
-            
-            <div className="flex flex-col flex-grow items-center gap-5 w-full p-2">
-              {children}
-            </div>
-
-            <Footer />
-          </div>
-        </main> */}
         <div className="drawer">
           <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col">
             {/* Navbar */}
-            <div className="navbar bg-base-300 w-full">
+            <div className="navbar bg-base-300 w-full sticky top-0 z-999">
               <div className="flex-none lg:hidden">
                 <label htmlFor="my-drawer-3" aria-label="open sidebar" className="btn btn-square btn-ghost">
                   <svg
