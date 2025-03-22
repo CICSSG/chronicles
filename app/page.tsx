@@ -11,7 +11,7 @@ export default async function Home() {
   return (
     <>
       {/* Hero Section */}
-      <div className="hero place-items-end mb-10">
+      <div className="hero place-items-end">
         <div className="hero-overlay">{bgImage}</div>
         <div className="hero-content text-neutral-50 text-center">
           <div className="max-w-md pr-3 lg:pr-20 lg:pb-5">
@@ -23,8 +23,9 @@ export default async function Home() {
         </div>
       </div>
 
-      {/* The CICS */}
-      <div className="flex w-10/12 lg:w-8/12 mb-10">
+
+      <div className="flex flex-col w-10/12 lg:w-8/12 my-10 gap-8">
+        {/* The CICS */}
         <div className="flex flex-col md:flex-row">
           <div className="mb-4 md:mr-10 md:mb-0">
             <h1 className="font-bold text-3xl mb-4">The CICS</h1>
@@ -32,10 +33,8 @@ export default async function Home() {
           </div>
           <img src="https://placehold.co/400x250" alt="" className="rounded-2xl h-full object-cover md:w-2/4" />
         </div>
-      </div>
 
-      {/* The CICSSG */}
-      <div className="flex w-10/12 lg:w-8/12 mb-10">
+        {/* The CICSSG */}
         <div className="flex flex-col md:flex-row">
           <div className="mb-4 md:mr-10 md:mb-0">
             <h1 className="font-bold text-3xl mb-4">The CICSSG</h1>
