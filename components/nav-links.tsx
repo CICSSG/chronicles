@@ -10,7 +10,7 @@ export default function NavLinks() {
     <>
       <div className="">
         <div className="flex-none">
-          <ul className="menu menu-horizontal px-1 py-0">
+          <ul className="menu menu-horizontal px-1 py-0 gap-1">
             <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
               <Link href="/">Home</Link>
             </Button>
