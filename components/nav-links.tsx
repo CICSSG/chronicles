@@ -14,15 +14,61 @@ export default function NavLinks() {
             <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
               <Link href="/">Home</Link>
             </Button>
-            <Button asChild size="sm" variant={pathname == "/cics" ? "secondary" : "ghost"}>
-              <Link href="/cics">The CICS</Link>
-            </Button>
-            <Button asChild size="sm" variant={pathname == "/student-government" ? "secondary" : "ghost"}>
-              <Link href="/student-government">Student Government</Link>
-            </Button>
+            <li>
+              <details>
+                <summary className='textarea-md p-2 font-medium'>The CICS</summary>
+                <ul className="bg-base-100 rounded-t-none">
+                  {/* Need to update href */}
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/cics" ? "secondary" : "ghost"}>
+                    <Link href="/cics">About</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+                    <Link href="/">Programs</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+                    <Link href="/">Departments</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+                    <Link href="/">Student Organization</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+                    <Link href="/">Faculty</Link>
+                  </Button>
+                  </li>
+                </ul>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary className='textarea-md p-2 font-medium'>The CICSSG</summary>
+                <ul className="bg-base-100 rounded-t-none">
+                  {/* Need to update href */}
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+                    <Link href="/">About</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/student-government" ? "secondary" : "ghost"}>
+                    <Link href="/student-government">Slate</Link>
+                  </Button>
+                  </li>
+                </ul>
+              </details>
+            </li>
             <Button asChild size="sm" variant={pathname == "/announcements" ? "secondary" : "ghost"}>
               <Link href="/announcements">Announcements</Link>
             </Button>
+
             <li>
               <details>
                 <summary className='textarea-md p-2 font-medium'>Documents</summary>
@@ -63,6 +109,9 @@ export default function NavLinks() {
 
             <Button asChild size="sm" variant={pathname == "/events" ? "secondary" : "ghost"}>
               <Link href="/events">Events</Link>
+            </Button>
+            <Button asChild size="sm" variant={pathname == "/events" ? "secondary" : "ghost"}>
+              <Link href="/events">Contact Us</Link>
             </Button>
           </ul>
         </div>

@@ -6,6 +6,8 @@ import { createClient } from "@/utils/supabase/server";
 import Announcement from "@/components/header-announcement";
 import Footer from "@/components/footer";
 import NavLinks from "@/components/nav-links";
+import { House } from "lucide-react";
+
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -42,7 +44,7 @@ export default async function RootLayout({
           <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col">
             {/* Navbar */}
-            <div className="navbar bg-base-300 w-full sticky top-0 z-999">
+            <div className="navbar bg-neutral text-neutral-content w-full sticky top-0 z-999">
               <div className="flex-none lg:hidden">
                 <label htmlFor="my-drawer-3" aria-label="open sidebar" className="btn btn-square btn-ghost">
                   <svg
