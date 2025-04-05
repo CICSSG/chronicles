@@ -8,24 +8,152 @@ export default function NavLinks() {
   const pathname = usePathname()
   return (
     <>
-      <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+      <div className="">
+        <div className="flex-none">
+          <ul className="menu menu-horizontal px-1 py-0 gap-1">
+            <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+              <Link href="/">Home</Link>
+            </Button>
+            <li>
+              <details>
+                <summary className='textarea-md p-2 font-medium'>The CICS</summary>
+                <ul className="bg-base-100 rounded-t-none">
+                  {/* Need to update href */}
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/cics" ? "secondary" : "ghost"}>
+                    <Link href="/cics">About</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+                    <Link href="/">Programs</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+                    <Link href="/">Departments</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+                    <Link href="/">Student Organization</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+                    <Link href="/">Faculty</Link>
+                  </Button>
+                  </li>
+                </ul>
+              </details>
+            </li>
+            <li>
+              <details>
+                <summary className='textarea-md p-2 font-medium'>The CICSSG</summary>
+                <ul className="bg-base-100 rounded-t-none">
+                  {/* Need to update href */}
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
+                    <Link href="/">About</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/student-government" ? "secondary" : "ghost"}>
+                    <Link href="/student-government">Slate</Link>
+                  </Button>
+                  </li>
+                </ul>
+              </details>
+            </li>
+            <Button asChild size="sm" variant={pathname == "/announcements" ? "secondary" : "ghost"}>
+              <Link href="/announcements">Announcements</Link>
+            </Button>
+
+            <li>
+              <details>
+                <summary className='textarea-md p-2 font-medium'>Documents</summary>
+                <ul className="bg-base-100 rounded-t-none">
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/executive-orders" ? "secondary" : "ghost"}>
+                    <Link href="/documents/executive-orders">Executive Orders</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/resolutions" ? "secondary" : "ghost"}>
+                    <Link href="/documents/resolutions">Resolutions</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/transparency-reports" ? "secondary" : "ghost"}>
+                    <Link href="/documents/transparency-reports">Transparency Reports</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/ordinances" ? "secondary" : "ghost"}>
+                    <Link href="/documents/ordinances">Ordinances</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/formal-documents" ? "secondary" : "ghost"}>
+                    <Link href="/documents/formal-documents">Formal Documents</Link>
+                  </Button>
+                  </li>
+                  <li>
+                  <Button asChild size="sm" variant={pathname == "/documents/expenses" ? "secondary" : "ghost"}>
+                    <Link href="/documents/expenses">Expenses</Link>
+                  </Button>
+                  </li>
+                </ul>
+              </details>
+            </li>
+
+            <Button asChild size="sm" variant={pathname == "/events" ? "secondary" : "ghost"}>
+              <Link href="/events">Events</Link>
+            </Button>
+            <Button asChild size="sm" variant={pathname == "/events" ? "secondary" : "ghost"}>
+              <Link href="/events">Contact Us</Link>
+            </Button>
+          </ul>
+        </div>
+      </div>
+      {/* <Button asChild size="sm" variant={pathname == "/" ? "secondary" : "ghost"}>
         <Link href="/">Home</Link>
       </Button>
       <Button asChild size="sm" variant={pathname == "/faculty" ? "secondary" : "ghost"}>
-        <Link href="/faculty">Faculty</Link>
+        <Link href="/faculty">The CICS</Link>
       </Button>
       <Button asChild size="sm" variant={pathname == "/officers" ? "secondary" : "ghost"}>
-        <Link href="/officers">Officers</Link>
+        <Link href="/officers">Student Government</Link>
       </Button>
-      <Button asChild size="sm" variant={pathname == "/events" ? "secondary" : "ghost"}>
-        <Link href="/events">Events</Link>
+      <Button asChild size="sm" variant={pathname == "/announcements" ? "secondary" : "ghost"}>
+        <Link href="/announcements">Announcements</Link>
       </Button>
       <Button asChild size="sm" variant={pathname == "/documents" ? "secondary" : "ghost"}>
         <Link href="/documents">Documents</Link>
       </Button>
-      <Button asChild size="sm" variant={pathname == "/about" ? "secondary" : "ghost"}>
+      <Button asChild size="sm" variant={pathname == "/events" ? "secondary" : "ghost"}>
+        <Link href="/events">Events</Link>
+      </Button> */}
+      {/* <div className="flex-none">
+          <ul className="menu menu-horizontal px-1">
+            <li>
+              <details>
+                <summary>Documents</summary>
+                <ul className="bg-base-100 rounded-t-none p-2">
+                  <li><a>Executive Orders</a></li>
+                  <li><a>Resolutions</a></li>
+                  <li><a>Transparecy Reports</a></li>
+                  <li><a>Ordinances</a></li>
+                  <li><a>Formal Documents</a></li>
+                  <li><a>Expenses</a></li>
+                </ul>
+              </details>
+            </li>
+          </ul>
+        </div> */}
+      {/* <Button asChild size="sm" variant={pathname == "/about" ? "secondary" : "ghost"}>
         <Link href="/about">About</Link>
-      </Button>
+      </Button> */}
       {/* <Button asChild size="sm" variant={"outline"}>
         <Link href="/sign-in">Sign in</Link>
       </Button> */}

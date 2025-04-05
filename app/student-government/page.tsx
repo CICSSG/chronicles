@@ -26,7 +26,7 @@ const Officers = async () => {
 
     const PositionLimit = 2
     return (
-        <div className='max-w-7xl'>
+        <div className="flex flex-col w-10/12 lg:w-8/12 my-10 gap-8">
             <div className="flex flex-col gap-4 w-full">{slate?.map((data: Officers, i) =>
                 i == 0 ?
                     //Current Slate

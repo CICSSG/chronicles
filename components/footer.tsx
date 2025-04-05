@@ -1,10 +1,11 @@
 import React from 'react'
 import Image from "next/image";
+import Link from 'next/link';
 
 const Footer = () => {
     return (
         <>
-            <footer className="footer sm:footer-horizontal bg-neutral text-neutral-content p-10">
+            <footer className="footer justify-center justify-items-center sm:footer-horizontal sm:justify-around bg-neutral text-neutral-content p-10 ">
                 <aside className='flex flex-col text-center items-center'>
                     <Image
                         src="/images/CICSSG-White-Full.png"
@@ -19,24 +20,24 @@ const Footer = () => {
                         Copyright © 2025 - All right reserved
                     </p>
                 </aside>
-                <nav>
+                <nav className='w-full flex flex-col items-center'>
                     <h6 className="footer-title">Company</h6>
-                    <a className="link link-hover">About us</a>
-                    <a className="link link-hover">Faculty</a>
-                    <a className="link link-hover">Officers</a>
-                    <a className="link link-hover">Events</a>
-                    <a className="link link-hover">Documents</a>
+                    <Link className='link link-hover' href="/cics">The CICS</Link>
+                    <Link className='link link-hover' href="/student-government">Student Government</Link>
+                    <Link className='link link-hover' href="/announcements">Announcements</Link>
+                    <Link className='link link-hover' href="/events">Events</Link>
+                    <Link className='link link-hover' href="/documents">Documents</Link>
                 </nav>
-                <nav>
+                <nav className='w-full flex flex-col items-center'>
                     <h6 className="footer-title">DLSU-D</h6>
-                    <a className="link link-hover">Official Website</a>
-                    <a className="link link-hover">Portal</a>
-                    <a className="link link-hover">Schoolbook</a>
+                    <Link className='link link-hover' href="https://www.dlsud.edu.ph/" target='_blank'>Official Website</Link>
+                    <Link className='link link-hover' href="https://portal.dlsud.edu.ph/mydlsud" target='_blank'>Portal</Link>
+                    <Link className='link link-hover' href="https://dlsud.edu20.org/" target='_blank'>Schoolbook</Link>
                 </nav>
-                <nav>
-                    <h6 className="footer-title">Social</h6>
+                <nav className='w-full flex flex-col items-center'>
+                    <h6 className="footer-title">Socials</h6>
                     <div className="grid grid-flow-col gap-4">
-                        <a>
+                        <Link className='link link-hover' href="https://www.facebook.com/DLSUD.CICSSG" target='_blank'>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="24"
@@ -46,8 +47,8 @@ const Footer = () => {
                                 <path
                                     d="M9 8h-3v4h3v12h5v-12h3.642l.358-4h-4v-1.667c0-.955.192-1.333 1.115-1.333h2.885v-5h-3.808c-3.596 0-5.192 1.583-5.192 4.615v3.385z"></path>
                             </svg>
-                        </a>
-                        <a>
+                        </Link>
+                        <Link className='link link-hover' href="https://www.instagram.com/dlsud.cicssg/" target='_blank'>
                             <svg
                                 xmlns="http://www.w3.org/2000/svg"
                                 width="24"
@@ -58,7 +59,7 @@ const Footer = () => {
                                 <path d="M12,5.838c-3.403,0-6.162,2.759-6.162,6.162c0,3.403,2.759,6.162,6.162,6.162s6.162-2.759,6.162-6.162   C18.162,8.597,15.403,5.838,12,5.838z M12,16c-2.209,0-4-1.791-4-4s1.791-4,4-4s4,1.791,4,4S14.209,16,12,16z" />
                                 <circle cx="18.406" cy="5.594" r="1.44" />
                             </svg>
-                        </a>
+                        </Link>
                     </div>
                 </nav>
             </footer>

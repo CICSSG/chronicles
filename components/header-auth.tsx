@@ -52,7 +52,7 @@ export default async function AuthButton() {
       </form>
     </div>
   ) : (
-    <div className="flex gap-2">
+    <div className="flex">
         <NavLinks/>
     </div>
   );
