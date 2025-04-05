@@ -1,14 +1,18 @@
 'use client'
 import React, {useState } from "react";
 import {
-  FiBarChart,
-  FiDollarSign,
+  FiUserPlus,
   FiHome,
-  FiMonitor,
-  FiShoppingCart,
-  FiTag,
+  FiBell,
   FiUsers
 } from "react-icons/fi";
+import { 
+  FaChalkboardTeacher 
+}from "react-icons/fa";
+import { 
+  LuBookPlus,
+  LuCalendarPlus 
+} from "react-icons/lu";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Option from "./option";
@@ -38,44 +42,44 @@ const AdminSidebar = () => {
           href="/admin"
         />
         <Option
-          Icon={FiDollarSign}
-          title="Edit Officers"
+          Icon={FiUserPlus}
+          title="Officers"
           selected={selected}
           setSelected={setSelected}
           open={open}
           href="/edit-officers"
         />
         <Option
-          Icon={FiMonitor}
-          title="View Site"
+          Icon={FiBell}
+          title="Announcement"
           selected={selected}
           setSelected={setSelected}
           open={open}
-          href="/admin"
+          href="/edit-announcements"
         />
         <Option
-          Icon={FiShoppingCart}
-          title="Products"
+          Icon={FaChalkboardTeacher}
+          title="Faculty"
           selected={selected}
           setSelected={setSelected}
           open={open}
-          href="/admin"
+          href="/edit-faculty"
         />
         <Option
-          Icon={FiTag}
-          title="Tags"
+          Icon={LuBookPlus}
+          title="Documents"
           selected={selected}
           setSelected={setSelected}
           open={open}
-          href="/admin"
+          href="/edit-documents"
         />
         <Option
-          Icon={FiBarChart}
-          title="Analytics"
+          Icon={LuCalendarPlus}
+          title="Events"
           selected={selected}
           setSelected={setSelected}
           open={open}
-          href="/admin"
+          href="/edit-events"
         />
         <Option
           Icon={FiUsers}
@@ -83,7 +87,7 @@ const AdminSidebar = () => {
           selected={selected}
           setSelected={setSelected}
           open={open}
-          href="/admin"
+          href="/edit-members"
         />
       </div>
 
