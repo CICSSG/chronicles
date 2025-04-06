@@ -1,24 +1,26 @@
 'use client'
-import React, {useState } from "react";
+import React, { useState } from "react";
+import { FaChalkboardTeacher } from "react-icons/fa";
 import {
   FiUserPlus,
   FiHome,
   FiBell,
   FiUsers
 } from "react-icons/fi";
-import { 
-  FaChalkboardTeacher 
-}from "react-icons/fa";
-import { 
+import {
   LuBookPlus,
-  LuCalendarPlus 
+  LuCalendarPlus
 } from "react-icons/lu";
 import { motion } from "framer-motion";
 import Image from "next/image";
 import Option from "./option";
 import NavFooter from "./navfooter";
 
-const AdminSidebar = () => {
+const AdminSidebar = ({
+  children,
+}: {
+  children: React.ReactNode,
+}) => {
   const [open, setOpen] = useState(true);
   const [selected, setSelected] = useState("Dashboard");
 
@@ -30,7 +32,7 @@ const AdminSidebar = () => {
         width: open ? "225px" : "fit-content",
       }}
     >
-      <TitleSection open={open} />
+      <TitleSection open={open}>{children}</TitleSection>
 
       <div className="space-y-1">
         <Option
@@ -99,7 +101,13 @@ const AdminSidebar = () => {
 };
 
 
-const TitleSection = ({ open }: { open: boolean }) => {
+const TitleSection = ({
+  children,
+  open
+}: {
+  children: React.ReactNode,
+  open: boolean
+}) => {
   return (
     <div className="mb-3 border-b border-slate-300 pb-3">
       <div className="flex cursor-pointer items-center justify-between rounded-md transition-colors hover:bg-slate-100">
@@ -112,8 +120,7 @@ const TitleSection = ({ open }: { open: boolean }) => {
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.125 }}
             >
-              <span className="block text-xs font-semibold">Tech</span>
-              <span className="block text-xs text-slate-500">Administrator</span>
+              {children}
             </motion.div>
           )}
         </div>

@@ -1,3 +1,4 @@
+import AdminProfile from "@/components/admin/profile";
 import AdminSidebar from "@/components/admin/sidebar";
 import SignOut from "@/components/admin/signout";
 import { createClient } from "@/utils/supabase/server";
@@ -20,11 +21,22 @@ export default async function Layout({
 
   return (
     <div className="flex">
-      <AdminSidebar />
-      
+      <AdminSidebar>
+        <AdminProfile />
+      </AdminSidebar>
+
       <div className="w-full">
-        <div className="float-right mr-8 mt-4"><SignOut/></div>
+        <div className="float-right mr-8 mt-4"><SignOut /></div>
         {children}
+
+        {/* <div className="toast toast-end">
+          <div className="alert alert-info">
+            <span>New mail arrived.</span>
+          </div>
+          <div className="alert alert-success">
+            <span>Message sent successfully.</span>
+          </div>
+        </div> */}
       </div>
     </div>
   );
