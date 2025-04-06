@@ -66,9 +66,7 @@ export default async function RootLayout({
                     src="/images/CICSSG.png"
                     width={40}
                     height={40}
-                    alt="Picture of the author"
-
-                  />
+                    alt="Picture of the author"/>
                   <Link href={"/"}>Chronicles</Link>
                 </div>
               </div>
@@ -93,34 +91,11 @@ export default async function RootLayout({
           <Footer />
         </div>
       </body>
-
     </html>
   ) : (
     <html lang="en" data-theme="light" className={geistSans.className} suppressHydrationWarning>
       <body className="bg-background text-foreground">
-        {/* <main className="min-h-screen flex flex-row">
-          <div className="flex-1 w-full flex flex-row gap-5 items-center">
-            <nav className="h-screen flex-col flex justify-center border-r border-r-foreground/10 bg-neutral top-0 fixed z-1">
-              <div className="w-14 max-w-5xl flex flex-col justify-between items-center p-3 px-5 text-sm h-full hover:w-50 transition-[width]">
-                <div className="flex flex-col gap-5 items-center text-lg font-semibold">
-                  <Image
-                    src="/images/CICSSG.png"
-                    width={80}
-                    height={400}
-                    alt="Picture of the author"
-                    className="w-fit h-auto"
-                  />
-                  <Link href={"/"}>Chronicles</Link>
-                </div>
-              </div>
-            </nav>
-            <div className="flex flex-col flex-grow items-center gap-5 w-full max-w-7xl p-2 ml-14">
-              {children}
-            </div>
-          </div>
-        </main> */}
         {children}
-
       </body>
     </html>
   )
