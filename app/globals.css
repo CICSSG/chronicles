@@ -1,6 +1,13 @@
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@700&display=swap');
 @import "tailwindcss";
 @plugin "daisyui";
 @tailwind utilities;
+
+@font-face {
+  font-family: "space-grotesk-700";
+  src: url("/font/SpaceGrotesk-Bold.ttf") format("truetype");
+  font-weight: 700;
+}
 
 @plugin "daisyui/theme" {
   name: "cicssg";
