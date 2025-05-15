@@ -44,7 +44,7 @@ export default async function RootLayout({
           <input id="my-drawer-3" type="checkbox" className="drawer-toggle" />
           <div className="drawer-content flex flex-col">
             {/* Navbar */}
-            <div className="navbar bg-neutral text-neutral-content w-full sticky top-0 z-999">
+            {/* <div className="navbar bg-neutral text-neutral-content w-full sticky top-0 z-999">
               <div className="flex-none lg:hidden">
                 <label htmlFor="my-drawer-3" aria-label="open sidebar" className="btn btn-square btn-ghost">
                   <svg
@@ -73,9 +73,9 @@ export default async function RootLayout({
               <div className="hidden flex-none lg:block h-10">
                 <NavLinks />
               </div>
-            </div>
+            </div> */}
             {/* Page content here */}
-            <div className="flex flex-col flex-grow items-center gap-5 w-full pb-6">
+            <div className="flex flex-col flex-grow items-center gap-5 w-full">
               {children}
             </div>
           </div>
@@ -87,9 +87,9 @@ export default async function RootLayout({
             </ul>
           </div>
         </div>
-        <div className="">
+        {/* <div className="">
           <Footer />
-        </div>
+        </div> */}
       </body>
     </html>
   ) : (
