@@ -156,7 +156,7 @@ export default async function Home() {
               {/* Contact Us */}
               <Link
                 href={""}
-                className="relative flex min-h-fit grow-1 basis-0 flex-col overflow-hidden rounded-2xl bg-neutral-500 p-5 text-white transition-all hover:scale-102"
+                className="relative flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-hidden rounded-2xl bg-neutral-500 p-5 text-white transition-all hover:scale-102"
               >
                 <span className="absolute -top-5 -left-5 z-0 -rotate-12 text-9xl">
                   @

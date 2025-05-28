@@ -6,7 +6,8 @@ import { createClient } from "@/utils/supabase/server";
 import Announcement from "@/components/header-announcement";
 import Footer from "@/components/footer";
 import NavLinks from "@/components/nav-links";
-import { House } from "lucide-react";
+import { Edit, House } from "lucide-react";
+import { SignedIn } from "@clerk/nextjs";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -29,13 +30,7 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  return !user ? (
+  return (
     <html
       lang="en"
       data-theme="cicssg"
@@ -43,6 +38,9 @@ export default async function RootLayout({
       suppressHydrationWarning
     >
       <body className="bg-background text-foreground flex min-h-screen flex-col justify-between overflow-x-hidden">
+        <SignedIn>
+          <Link href={"/admin"} className="fixed bottom-4 right-4 bg-neutral-100 p-4 rounded-full hover:bg-neutral-200 hover:cursor-pointer"><Edit/></Link>
+        </SignedIn>
         <div className="flex w-full flex-col items-center gap-5">
           <div className="font-space flex min-h-dvh min-w-dvw flex-col items-center bg-neutral-800 font-semibold">
             <div className="my-10 flex max-w-11/12 flex-col gap-5 xl:max-w-9/12 w-full h-full">
@@ -61,14 +59,5 @@ export default async function RootLayout({
         </div>
       </body>
     </html>
-  ) : (
-    <html
-      lang="en"
-      data-theme="light"
-      className={geistSans.className}
-      suppressHydrationWarning
-    >
-      <body className="bg-background text-foreground">{children}</body>
-    </html>
-  );
+  )
 }

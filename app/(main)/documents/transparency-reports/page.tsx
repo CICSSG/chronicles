@@ -15,7 +15,7 @@ const TransparencyReports = () => {
           <NavDocuments />
         </div>
       </div>
-      <div className="grid grow-3 basis-0 grid-cols-3 gap-4 bg-gray-200 p-6 *:rounded *:bg-white *:p-4">
+      <div className="grid grow-3 basis-0 grid-cols-3 gap-4 bg-gray-200 p-6 *:rounded-xl *:bg-white *:p-4">
         {/* Card */}
         <DocumentCard
           Title=""
