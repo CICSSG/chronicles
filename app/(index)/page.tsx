@@ -1,7 +1,7 @@
+import Footer from "@/components/footer";
 import NavLinks from "@/components/nav-links";
 import Image from "next/image";
 import Link from "next/link";
-import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 export default async function Home() {
   const bgImage = (
@@ -14,12 +14,7 @@ export default async function Home() {
   );
   return (
     <>
-      <div className="font-space flex h-full w-full flex-col items-center bg-neutral-800 font-semibold">
-        <div className="my-10 flex max-w-11/12 flex-col gap-5 xl:max-w-9/12">
-          <div className="flex w-full flex-row justify-between px-10 py-2 text-xl text-white">
-            <NavLinks />
-          </div>
-          <div className="flex grow flex-col gap-5 text-2xl lg:flex-row">
+      <div className="flex grow flex-col gap-5 text-2xl lg:flex-row">
             {/* Left 2 Columns */}
             <div className="flex grow-6 basis-0 flex-col gap-5">
               <div className="flex grow flex-col justify-between overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 transition-all hover:scale-102 md:flex-row md:items-center md:p-1">
@@ -176,37 +171,6 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-
-          {/* Footer */}
-          <div className="flex flex-col gap-12 justify-around overflow-hidden rounded-2xl bg-neutral-100 p-8 py-12 text-2xl">
-            <div className="flex flex-col gap-6">
-              <h1 className="font-extrabold text-3xl">[Chronicles]</h1>
-              <div>
-                <h2 className="text-xl">Address</h2>
-                <h3 className="font-medium text-lg">PCH 102, Paolo Campus Hall, DBB-B, 4115 West Ave, Dasmariñas, Cavite</h3>
-              </div>
-              <div>
-                <h2 className="text-xl">Email us at:</h2>
-                <h3 className="font-medium text-lg underline">cicssg@dlsud.edu.ph</h3>
-              </div>
-              <div className="flex flex-row gap-4">
-                <a href=""><FaFacebook/></a>
-                <a href=""><FaInstagram/></a>
-                <a href=""><FaLinkedin/></a>
-              </div>
-            </div>
-
-            <div className="flex flex-row justify-between text-sm font-normal">
-              <div>@2025 CICSSG. All rights reserved.</div>
-              <div className="flex flex-row gap-4 *:underline">
-                <a href="">Privacy Policy</a>
-                <a href="">Terms of Service</a>
-                <a href="">Cookies Settings</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </>
   );
 }

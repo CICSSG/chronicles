@@ -1,0 +1,74 @@
+import { Geist, Space_Grotesk } from "next/font/google";
+import Image from "next/image";
+import Link from "next/link";
+import "/app/globals.css";
+import { createClient } from "@/utils/supabase/server";
+import Announcement from "@/components/header-announcement";
+import Footer from "@/components/footer";
+import NavLinks from "@/components/nav-links";
+import { House } from "lucide-react";
+
+const defaultUrl = process.env.VERCEL_URL
+  ? `https://${process.env.VERCEL_URL}`
+  : "http://localhost:3000";
+
+export const metadata = {
+  metadataBase: new URL(defaultUrl),
+  title: "Chronicles",
+  description:
+    "The archival website for the College of Information and Computer Studies Student Government (CICSSG)",
+};
+
+const geistSans = Space_Grotesk({
+  display: "swap",
+  subsets: ["latin"],
+});
+
+export default async function RootLayout({
+  children,
+}: Readonly<{
+  children: React.ReactNode;
+}>) {
+  const supabase = await createClient();
+
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  return !user ? (
+    <html
+      lang="en"
+      data-theme="cicssg"
+      className={geistSans.className}
+      suppressHydrationWarning
+    >
+      <body className="bg-background text-foreground flex min-h-screen flex-col justify-between overflow-x-hidden">
+        <div className="flex w-full flex-col items-center gap-5">
+          <div className="font-space flex min-h-dvh min-w-dvw flex-col items-center bg-neutral-800 font-semibold">
+            <div className="my-10 flex max-w-11/12 flex-col gap-5 xl:max-w-9/12 w-full h-full">
+              <div className="flex w-full flex-row justify-between px-10 py-2 text-xl text-white">
+                <NavLinks />
+              </div>
+
+              <div className="grow-1 basis-0">
+                {children}
+              </div>
+
+              {/* Footer */}
+              <Footer />
+            </div>
+          </div>
+        </div>
+      </body>
+    </html>
+  ) : (
+    <html
+      lang="en"
+      data-theme="light"
+      className={geistSans.className}
+      suppressHydrationWarning
+    >
+      <body className="bg-background text-foreground">{children}</body>
+    </html>
+  );
+}

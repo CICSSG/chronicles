@@ -23,18 +23,6 @@ import {
 import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
 
-const products = [
-  { name: 'Analytics', description: 'Get a better understanding of your traffic', href: '#', icon: DocumentArrowUpIcon },
-  { name: 'Engagement', description: 'Speak directly to your customers', href: '#', icon: DocumentArrowUpIcon },
-  { name: 'Security', description: 'Your customers’ data will be safe and secure', href: '#', icon: DocumentArrowUpIcon },
-  { name: 'Integrations', description: 'Connect with third-party tools', href: '#', icon: DocumentArrowUpIcon },
-  { name: 'Automations', description: 'Build strategic funnels that will convert', href: '#', icon: DocumentArrowUpIcon },
-]
-const callsToAction = [
-  { name: 'Watch demo', href: '#', icon: PlayCircleIcon },
-  { name: 'Contact sales', href: '#', icon: PhoneIcon },
-]
-
 const documents = [
   { name: 'Executive Orders', description: 'Executive Orders made by CICSSG', href: '/documents/executive-orders', icon: DocumentTextIcon },
   { name: 'Transparency Reports', description: 'Transparency Reports made by CICSSG', href: '/documents/transparency-reports', icon: DocumentArrowUpIcon },
@@ -47,10 +35,10 @@ export default function NavLinks() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className="w-full text-white">
+    <header className="w-full">
       <nav aria-label="Global" className="mx-auto flex max-w-8xl items-center justify-between p-6 lg:px-8">
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5">
+          <a href="/" className="-m-1.5 p-1.5">
             <span className="">[Chronicles]</span>
             
           </a>
