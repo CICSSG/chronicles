@@ -128,7 +128,7 @@ export default async function Home() {
                 className="flex flex-col min-h-fit grow-3 basis-0 gap-5 overflow-hidden rounded-2xl bg-neutral-200 p-5 transition-all hover:scale-102"
               >
                 <h2 className="lg:text-right">Events</h2>
-                <div className="carousel carousel-center rounded-box min-h-fit gap-4 m-auto shadow-2xl">
+                <div className="carousel carousel-center rounded-box min-h-fit gap-4 m-auto">
                   <div className="carousel-item">
                     <Image
                       src="/images/TextImage.jpg"
