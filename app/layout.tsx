@@ -1,4 +1,4 @@
-import { Geist } from "next/font/google";
+import { Geist, Space_Grotesk } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
 import "./globals.css";
@@ -19,7 +19,7 @@ export const metadata = {
   description: "The archival website for the College of Information and Computer Studies Student Government (CICSSG)",
 };
 
-const geistSans = Geist({
+const geistSans = Space_Grotesk({
   display: "swap",
   subsets: ["latin"],
 });
