@@ -6,7 +6,8 @@ import { createClient } from "@/utils/supabase/server";
 import Announcement from "@/components/header-announcement";
 import Footer from "@/components/footer";
 import NavLinks from "@/components/nav-links";
-import { House } from "lucide-react";
+import { Edit, House } from "lucide-react";
+import { SignedIn } from "@clerk/nextjs";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -29,42 +30,33 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const supabase = await createClient();
-
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-
-  return !user ? (
-    <html
-      lang="en"
-      data-theme="cicssg"
-      className={geistSans.className}
-      suppressHydrationWarning
-    >
-      <body className="bg-background text-foreground flex flex-col justify-between overflow-x-hidden">
-        <div className="flex flex-col min-h-dvh w-dvw items-center">
-          <div className="grow my-10 w-full flex max-w-11/12 flex-col items-center gap-5 xl:max-w-9/12">
-            <div className="m-auto flex w-full flex-row justify-between px-10 py-2 text-xl text-black">
-              <NavLinks />
-            </div>
-
-            <div className="grow-1 basis-0 w-full">{children}</div>
-
-            {/* Footer */}
-            <Footer />
+  <html
+    lang="en"
+    data-theme="cicssg"
+    className={geistSans.className}
+    suppressHydrationWarning
+  >
+    <body className="bg-background text-foreground flex flex-col justify-between overflow-x-hidden">
+      <SignedIn>
+        <Link
+          href={"/admin"}
+          className="fixed right-4 bottom-4 rounded-full bg-neutral-100 p-4 hover:cursor-pointer hover:bg-neutral-200"
+        >
+          <Edit />
+        </Link>
+      </SignedIn>
+      <div className="flex min-h-dvh w-dvw flex-col items-center">
+        <div className="my-10 flex w-full max-w-11/12 grow flex-col items-center gap-5 xl:max-w-9/12">
+          <div className="m-auto flex w-full flex-row justify-between px-10 py-2 text-xl text-black">
+            <NavLinks />
           </div>
+
+          <div className="w-full grow-1 basis-0">{children}</div>
+
+          {/* Footer */}
+          <Footer />
         </div>
-      </body>
-    </html>
-  ) : (
-    <html
-      lang="en"
-      data-theme="light"
-      className={geistSans.className}
-      suppressHydrationWarning
-    >
-      <body className="bg-background text-foreground">{children}</body>
-    </html>
-  );
+      </div>
+    </body>
+  </html>;
 }

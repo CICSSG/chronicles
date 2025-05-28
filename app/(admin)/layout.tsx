@@ -12,6 +12,10 @@ import '/app/globals.css'
 import { currentUser } from '@clerk/nextjs/server'
 import { permanentRedirect } from 'next/navigation'
 import NavLinksAdmin from '@/components/navlinksadmin'
+import Link from 'next/link'
+import { PersonStandingIcon } from 'lucide-react'
+import { RiProfileLine } from 'react-icons/ri'
+import { IoIosPerson } from 'react-icons/io'
 
 const geistSans = Geist({
   variable: '--font-geist-sans',
@@ -44,6 +48,7 @@ export default async function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+          <Link href={"/"} className="fixed bottom-4 right-4 bg-neutral-100 p-4 rounded-full hover:bg-neutral-200 hover:cursor-pointer text-black"><IoIosPerson/></Link>
           <SignedIn>
             {/* Container */}
             <div className='flex flex-row w-full min-h-screen'>
@@ -66,5 +71,6 @@ export default async function RootLayout({
         </body>
       </html>
     </ClerkProvider>
+
   )
 }

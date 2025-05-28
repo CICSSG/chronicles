@@ -5,10 +5,11 @@ import React from 'react'
 
 import {
   RiDashboardLine,
-  RiBookLine,
-  RiCalendar2Line
 } from "react-icons/ri";
-import { FiUsers, FiLogOut, FiUser } from "react-icons/fi";
+import { FiLogOut, FiUser } from "react-icons/fi";
+import { IoDocuments } from "react-icons/io5";
+import { GiPoliceOfficerHead } from "react-icons/gi";
+import { PiUsersFill } from "react-icons/pi";
 
 async function NavLinksAdmin() {
   const user = await currentUser()
@@ -24,26 +25,27 @@ async function NavLinksAdmin() {
           </div>
           <li className='border-b text-center transition-opacity opacity-0 group-hover:opacity-100 group-hover:block'><a className='text-nowrap'>Welcome, {user?.username}</a></li>
           <li>
-            <Link href="/admin/dashboard" className='flex items-center flex-nowrap gap-2 w-fit'>
+            <Link href="/admin" className='flex items-center flex-nowrap gap-2 w-fit'>
               <RiDashboardLine className='text-3xl w-fit' />
               <span className='hidden group-hover:block'>Dashboard</span>
             </Link>
           </li>
           <li>
-            <Link href="/admin/subjects" className='flex items-center flex-nowrap gap-2 w-fit'>
-              <RiBookLine className='text-3xl' />
-              <span className='hidden group-hover:block'>Subjects</span>
+            <Link href="/admin/documents" className='flex items-center flex-nowrap gap-2 w-fit'>
+              <IoDocuments className='text-3xl' />
+              <span className='hidden group-hover:block'>Documents</span>
             </Link>
           </li>
           <li>
-            <Link href="/admin/appointments" className='flex items-center flex-nowrap gap-2 w-fit'>
-              <RiCalendar2Line className='text-3xl' />
-              <span className='hidden group-hover:block'>Appointments</span>
+            <Link href="/admin/officers" className='flex items-center flex-nowrap gap-2 w-fit'>
+              <GiPoliceOfficerHead className='text-3xl' />
+              <span className='hidden group-hover:block'>Slate</span>
             </Link>
           </li>
+          
           <li>
             <Link href="/admin/users" className='flex items-center flex-nowrap gap-2 w-fit'>
-              <FiUsers className='text-3xl' />
+              <PiUsersFill className='text-3xl' />
               <span className='hidden group-hover:block'>Users</span>
             </Link>
           </li>
