@@ -10,9 +10,6 @@ const config = {
   ],
   prefix: "",
   theme: {
-    fontFamily: {
-      spaceGrotesk: ["space-grotesk-bold", "sans-serif"],
-    },
     container: {
       center: true,
       padding: "2rem",
