@@ -333,14 +333,14 @@ export default function Documents() {
                             />
                           </Field>
                         </div>
-                        <div className="w-full max-w-md">
+                        {/* <div className="w-full max-w-md">
                           <Field className="flex flex-col gap-4 text-black">
                             <Label className="text-sm/6 font-medium text-black text-nowrap">
                               External Links
                             </Label>
                             <AddDynamicInputFields />
                           </Field>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
