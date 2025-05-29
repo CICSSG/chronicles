@@ -1,7 +1,7 @@
+import Footer from "@/components/footer";
 import NavLinks from "@/components/nav-links";
 import Image from "next/image";
 import Link from "next/link";
-import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 export default async function Home() {
   const bgImage = (
@@ -14,12 +14,7 @@ export default async function Home() {
   );
   return (
     <>
-      <div className="font-space flex h-full w-full flex-col items-center bg-neutral-800 font-semibold">
-        <div className="my-10 flex max-w-11/12 flex-col gap-5 xl:max-w-9/12">
-          <div className="flex w-full flex-row justify-between px-10 py-2 text-xl text-white">
-            <NavLinks />
-          </div>
-          <div className="flex grow flex-col gap-5 text-2xl lg:flex-row">
+      <div className="flex grow flex-col gap-5 text-2xl lg:flex-row">
             {/* Left 2 Columns */}
             <div className="flex grow-6 basis-0 flex-col gap-5">
               <div className="flex grow flex-col justify-between overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 transition-all hover:scale-102 md:flex-row md:items-center md:p-1">
@@ -46,7 +41,7 @@ export default async function Home() {
                 {/* The CICS */}
                 <Link
                   href={""}
-                  className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-neutral-200 transition-all hover:scale-102"
+                  className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 transition-all hover:scale-102"
                 >
                   <h2 className="absolute top-6 left-6 z-2">The CICS</h2>
                   <Image
@@ -60,7 +55,7 @@ export default async function Home() {
                 {/* The CICSSG */}
                 <Link
                   href={""}
-                  className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-neutral-200 transition-all hover:scale-102"
+                  className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 transition-all hover:scale-102"
                 >
                   <h2 className="absolute top-6 left-6 z-2 md:right-6 md:left-auto">
                     The CICS&#123;SG&#125;
@@ -77,20 +72,20 @@ export default async function Home() {
               {/* Documents */}
               <Link
                 href={""}
-                className="h-64 overflow-hidden rounded-2xl bg-neutral-200 p-5 transition-all"
+                className="h-64 overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 transition-all"
               >
-                <h2>Documents</h2>
-                <div className="relative text-white *:absolute *:aspect-[9/16] *:w-3xs *:rounded-2xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:p-4 *:transition-all *:hover:scale-102 *:md:w-xs">
-                  <div className="top-28 left-12 z-4 -rotate-12">
+                <h2 className="pl-5 pt-5">Documents</h2>
+                <div className="relative left-0 mx-auto text-white max-w-4xl *:absolute *:aspect-[9/16] *:w-3xs *:rounded-2xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:p-4 *:transition-all *:hover:scale-102 *:md:w-xs *md:text-2xl">
+                  <div className="top-20 text-center sm:scale-80 md:text-left -rotate-18 md:top-24 -left-4 md:left-12 z-4 md:-rotate-12 scale-70 md:scale-90 xl:scale-100 xl:top-26">
                     Resolutions
                   </div>
-                  <div className="top-8 left-2/12 z-2 -rotate-8">
+                  <div className="top-4 left-4 sm:scale-80 sm:left-1/12 md:top-8 md:left-2/12 z-2 -rotate-8 scale-70 md:scale-90 xl:scale-100 xl:left-1/5 xl:top-6">
                     Executive Orders
                   </div>
-                  <div className="-top-8 right-2/12 z-1 rotate-3">
+                  <div className="-top-8 -right-2 sm:scale-80 sm:right-2/12 md:right-1/6 lg:right-1/12 xl:right-2/12 lg:-top-7 z-1 rotate-3 scale-70 md:scale-90 xl:scale-100">
                     Ordinances
                   </div>
-                  <div className="top-20 -right-0 z-3 rotate-12 md:-right-12">
+                  <div className="top-16 -right-10 sm:scale-80 sm:-right-2 z-3 rotate-12 md:-right-12 scale-70 md:scale-90 xl:scale-100 xl:-right-8">
                     Formal Documents
                   </div>
                 </div>
@@ -101,7 +96,7 @@ export default async function Home() {
               {/* Announcements */}
               <Link
                 href={""}
-                className="flex min-h-fit grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-neutral-200 p-5 pb-12 transition-all hover:scale-102"
+                className="flex min-h-fit grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 pb-12 transition-all hover:scale-102"
               >
                 <h2 className="lg:text-right">Announcements</h2>
                 <div className="m-auto flex h-fit w-11/12 flex-col overflow-hidden rounded-2xl shadow-2xl">
@@ -125,7 +120,7 @@ export default async function Home() {
               {/* Events */}
               <Link
                 href={""}
-                className="flex flex-col min-h-fit grow-3 basis-0 gap-5 overflow-hidden rounded-2xl bg-neutral-200 p-5 transition-all hover:scale-102"
+                className="flex flex-col min-h-fit grow-3 basis-0 gap-5 overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 transition-all hover:scale-102"
               >
                 <h2 className="lg:text-right">Events</h2>
                 <div className="carousel carousel-center rounded-box min-h-fit gap-4 m-auto">
@@ -161,7 +156,7 @@ export default async function Home() {
               {/* Contact Us */}
               <Link
                 href={""}
-                className="relative flex min-h-fit grow-1 basis-0 flex-col overflow-hidden rounded-2xl bg-neutral-500 p-5 text-white transition-all hover:scale-102"
+                className="relative flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-hidden rounded-2xl bg-neutral-500 p-5 text-white transition-all hover:scale-102"
               >
                 <span className="absolute -top-5 -left-5 z-0 -rotate-12 text-9xl">
                   @
@@ -176,37 +171,6 @@ export default async function Home() {
               </Link>
             </div>
           </div>
-
-          {/* Footer */}
-          <div className="flex flex-col gap-12 justify-around overflow-hidden rounded-2xl bg-neutral-100 p-8 py-12 text-2xl">
-            <div className="flex flex-col gap-6">
-              <h1 className="font-extrabold text-3xl">[Chronicles]</h1>
-              <div>
-                <h2 className="text-xl">Address</h2>
-                <h3 className="font-medium text-lg">PCH 102, Paolo Campus Hall, DBB-B, 4115 West Ave, Dasmariñas, Cavite</h3>
-              </div>
-              <div>
-                <h2 className="text-xl">Email us at:</h2>
-                <h3 className="font-medium text-lg underline">cicssg@dlsud.edu.ph</h3>
-              </div>
-              <div className="flex flex-row gap-4">
-                <a href=""><FaFacebook/></a>
-                <a href=""><FaInstagram/></a>
-                <a href=""><FaLinkedin/></a>
-              </div>
-            </div>
-
-            <div className="flex flex-row justify-between text-sm font-normal">
-              <div>@2025 CICSSG. All rights reserved.</div>
-              <div className="flex flex-row gap-4 *:underline">
-                <a href="">Privacy Policy</a>
-                <a href="">Terms of Service</a>
-                <a href="">Cookies Settings</a>
-              </div>
-            </div>
-          </div>
-        </div>
-      </div>
     </>
   );
 }

@@ -22,18 +22,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, PhoneIcon, PlayCircleIcon } from '@heroicons/react/20/solid'
 import Image from 'next/image'
-
-const products = [
-  { name: 'Analytics', description: 'Get a better understanding of your traffic', href: '#', icon: DocumentArrowUpIcon },
-  { name: 'Engagement', description: 'Speak directly to your customers', href: '#', icon: DocumentArrowUpIcon },
-  { name: 'Security', description: 'Your customers’ data will be safe and secure', href: '#', icon: DocumentArrowUpIcon },
-  { name: 'Integrations', description: 'Connect with third-party tools', href: '#', icon: DocumentArrowUpIcon },
-  { name: 'Automations', description: 'Build strategic funnels that will convert', href: '#', icon: DocumentArrowUpIcon },
-]
-const callsToAction = [
-  { name: 'Watch demo', href: '#', icon: PlayCircleIcon },
-  { name: 'Contact sales', href: '#', icon: PhoneIcon },
-]
+import Link from 'next/link'
 
 const documents = [
   { name: 'Executive Orders', description: 'Executive Orders made by CICSSG', href: '/documents/executive-orders', icon: DocumentTextIcon },
@@ -47,12 +36,11 @@ export default function NavLinks() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
 
   return (
-    <header className="w-full text-white">
-      <nav aria-label="Global" className="mx-auto flex max-w-8xl items-center justify-between p-6 lg:px-8">
+    <header className="w-full">
+      <nav aria-label="Global" className="mx-auto flex max-w-8xl items-center justify-between lg:p-6 lg:px-8">
         <div className="flex lg:flex-1">
-          <a href="#" className="-m-1.5 p-1.5">
+          <a href="/" className="-m-1.5 p-1.5">
             <span className="">[Chronicles]</span>
-            
           </a>
         </div>
         <div className="flex lg:hidden">
@@ -66,15 +54,15 @@ export default function NavLinks() {
           </button>
         </div>
         <PopoverGroup className="hidden lg:flex lg:gap-x-6">
-          <a href="#" className="text-sm/6 font-semibold ">
+          <Link href={"/cics"} className="text-sm/6 font-semibold ">
             The CICS
-          </a>
-          <a href="#" className="text-sm/6 font-semibold ">
+          </Link>
+          <Link href={"/cicssg"} className="text-sm/6 font-semibold ">
             The CICSSG
-          </a>
-          <a href="#" className="text-sm/6 font-semibold ">
+          </Link>
+          <Link href={"/announcements"} className="text-sm/6 font-semibold ">
             Announcements
-          </a>
+          </Link>
 
           <Popover className="relative">
             <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold ">
@@ -92,7 +80,7 @@ export default function NavLinks() {
                     className="group relative flex items-center gap-x-6 rounded-lg p-4 text-sm/6 hover:bg-gray-50"
                   >
                     <div className="flex size-11 flex-none items-center justify-center rounded-lg bg-gray-50 group-hover:bg-white">
-                      <item.icon aria-hidden="true" className="size-6 text-gray-600 group-hover:text-indigo-600" />
+                      <item.icon aria-hidden="true" className="size-6 text-gray-600 group-hover:text-blue-600" />
                     </div>
                     <div className="flex-auto">
                       <a href={item.href} className="block font-semibold text-gray-900">
@@ -107,12 +95,12 @@ export default function NavLinks() {
             </PopoverPanel>
           </Popover>
 
-          <a href="#" className="text-sm/6 font-semibold ">
+          <Link href={"/events"} className="text-sm/6 font-semibold ">
             Events
-          </a>
-          <a href="#" className="text-sm/6 font-semibold ">
+          </Link>
+          <Link href={"/contact-us"} className="text-sm/6 font-semibold ">
             Contact Us
-          </a>
+          </Link>
         </PopoverGroup>
 
       </nav>
