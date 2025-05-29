@@ -1,43 +1,86 @@
 "use client";
 import DocumentRadioDropdown from "@/components/admin/documenttypes";
-import SearchBar from "@/components/admin/searchbar";
 import {
   Button,
   Dialog,
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
+  Select,
   Textarea,
 } from "@headlessui/react";
 import { DocumentIcon } from "@heroicons/react/20/solid";
-import { Search } from "lucide-react";
+import { ChevronDownIcon, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
-import DocumentData from "@/components/admin/documents-data";
+import DocumentData, { DocumentSearch } from "@/components/admin/documents-data";
 import AddDynamicInputFields from "@/components/admin/dynamic-input-field";
-import { createNewDocument, editDocumentPOST } from "@/app/actions";
+import {
+  createNewDocument,
+  deleteDocumentPOST,
+  editDocumentPOST,
+} from "@/app/actions";
+import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { parseAsInteger, useQueryState } from "nuqs";
+
+import { createClient } from "@supabase/supabase-js";
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+);
+
+const options = [
+  { option: "Executive Order", value: "executive-order" },
+  { option: "Transparency Report", value: "transparency-report" },
+  { option: "Ordinance", value: "ordinance" },
+  { option: "Formal Document", value: "formal-document" },
+  { option: "Resolution", value: "resolution" },
+];
 
 export default function Documents() {
   const pathname = usePathname();
-  const [currentPage, setCurrentPage] = useState(1);
+  const [page, setPage] = useQueryState("page", parseAsInteger);
+  const [title, setTitle] = useQueryState("title");
+  const [documentType, setDocumentType] = useQueryState("documentType");
   const [createForm, setCreateForm] = useState(false);
-  const [deleteForm, setDeleteForm] = useState("");
-  const [documents, setDocuments] = useState<any[] | null>(null);
+  const [deleteForm, setDeleteForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
+  const [documents, setDocuments] = useState<any[] | null>(null);
   const [editFormId, setEditFormId] = useState("");
   const [editDocument, setEditDocument] = useState<any | null>(null);
+  const [deleteDocumentId, setDeleteDocumentId] = useState("");
+  const [deleteDocumentName, setDeleteDocumentName] = useState("");
 
   const setCurrentPageHandler = (value: number) => {
-    setCurrentPage(value);
+    setPage(value);
   };
 
   useEffect(() => {
     DocumentData().then((docs) => {
-      setDocuments(docs);
+      setDocuments(docs ?? null);
     });
+
+    const taskListener = supabase
+      .channel("public:data")
+      .on(
+        "postgres_changes",
+        { event: "*", schema: "public", table: "documents" },
+        (payload) => {
+          DocumentData().then((docs) => {
+            setDocuments(docs);
+          });
+          // console.log("Change received!", payload);
+        },
+      )
+      .subscribe();
+
+    return () => {
+      taskListener.unsubscribe();
+    };
   }, []);
 
   useEffect(() => {
@@ -56,8 +99,31 @@ export default function Documents() {
     }
   };
 
+  const handleDeleteDocument = (id: string, name: string, open: boolean) => {
+    setDeleteDocumentId(id);
+    setDeleteDocumentName(name);
+    setDeleteForm(open);
+  };
+
+  const handleSearch = () => {
+    setPage(1)
+    DocumentSearch(title ?? undefined, documentType ?? undefined).then((docs) => {
+      setDocuments(docs ?? null);
+    })
+  };
+
+  const clearFilters = () => {
+    setPage(1)
+    setTitle(null)
+    setDocumentType(null)
+
+    DocumentData().then((docs) => {
+      setDocuments(docs ?? null);
+    });
+  }
+
   return (
-    <div className="mx-auto flex w-11/12 flex-col gap-5 text-neutral-700">
+    <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
       <div className="flex grow-0 basis-0 flex-row items-center justify-between">
         <div className="">
           <h1 className="text-4xl font-bold">Documents</h1>
@@ -74,18 +140,74 @@ export default function Documents() {
         </Button>
 
         <div className="flex flex-row">
-          <SearchBar />
-          <DocumentRadioDropdown />
-          <div className="mx-2 mt-auto rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black hover:cursor-pointer hover:bg-black/10">
-            <Search />
+          <div className="w-full max-w-2xs px-4">
+            <Field>
+              <Label className="text-sm/6 font-medium text-white">Title</Label>
+              <Input
+                name="title"
+                className={clsx(
+                  "mt-3 block w-full rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white",
+                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25",
+                )}
+                onChange={(e) => setTitle(e.target.value)}
+                value={title ?? ""}
+              />
+            </Field>
           </div>
+          <div className="max-w-1xs w-full px-4">
+            <Field>
+              <Label className="text-sm/6 font-medium text-nowrap text-white">
+                Document Type
+              </Label>
+              <div className="relative">
+                <Select
+                  name="document_type"
+                  value={documentType ?? ""}
+                  className={clsx(
+                    "mt-3 block w-full appearance-none rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white/45 focus:text-white",
+                    "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25",
+                    // Make the text of each option black on Windows
+                    "*:text-black",
+                  )}
+                  onChange={(e) => setDocumentType(e.target.value)}
+                >
+                  <option value="" disabled>
+                    Document Type
+                  </option>
+                  {options.map((data, i) => (
+                    <option key={i} value={data.value}>
+                      {data.option}
+                    </option>
+                  ))}
+                </Select>
+                <ChevronDownIcon
+                  className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
+                  aria-hidden="true"
+                />
+              </div>
+            </Field>
+          </div>
+          <button
+            type="button"
+            onClick={handleSearch}
+            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white hover:cursor-pointer hover:bg-white/10"
+          >
+            <Search />
+          </button>
+          <button
+            type="button"
+            onClick={clearFilters}
+            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white hover:cursor-pointer hover:bg-white/10 text-nowrap"
+          >
+            Clear Filters
+          </button>
         </div>
       </div>
 
-      <div className="flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-x-auto rounded-2xl border p-4 shadow-xl">
+      <div className="flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-x-auto rounded-2xl border bg-white/10 p-4 shadow-xl">
         <table className="table">
           {/* head */}
-          <thead className="text-black">
+          <thead className="text-white">
             <tr className="border-b border-b-black">
               <th>Title</th>
               <th>Date</th>
@@ -94,7 +216,7 @@ export default function Documents() {
               <th>Actions</th>
             </tr>
           </thead>
-          <tbody className="*:border-b *:border-b-black/30 *:hover:bg-neutral-100">
+          <tbody className="*:border-b *:border-b-black/30 *:hover:bg-white/10">
             {documents?.map((data, i) => (
               <tr className="w-full" key={i}>
                 <th className="text-nowrap">{data.title}</th>
@@ -116,9 +238,14 @@ export default function Documents() {
                   >
                     Edit
                   </Button>
-                  <a href="" className="grow-1 basis-0 bg-red-400 text-black">
+                  <Button
+                    onClick={() =>
+                      handleDeleteDocument(data.id, data.title, true)
+                    }
+                    className="grow-1 basis-0 bg-red-400 text-black"
+                  >
                     Delete
-                  </a>
+                  </Button>
                 </td>
               </tr>
             ))}
@@ -132,85 +259,85 @@ export default function Documents() {
           href={{
             pathname: pathname,
             query: {
-              page: currentPage <= 3 ? 1 : currentPage - 2,
+              page: (page ?? 1) <= 3 ? 1 : (page ?? 1) - 2,
             },
           }}
           passHref
           shallow
           replace
           onClick={() =>
-            setCurrentPageHandler(currentPage <= 3 ? 1 : currentPage - 2)
+            setCurrentPageHandler((page ?? 1) <= 3 ? 1 : (page ?? 1) - 2)
           }
         >
-          {currentPage <= 3 ? "1" : currentPage - 2}
+          {(page ?? 1) <= 3 ? "1" : (page ?? 1) - 2}
         </Link>
         <Link
           className="join-item btn"
           href={{
             pathname: pathname,
             query: {
-              page: currentPage <= 3 ? 2 : currentPage - 1,
+              page: (page ?? 1) <= 3 ? 2 : (page ?? 1) - 1,
             },
           }}
           passHref
           shallow
           replace
           onClick={() =>
-            setCurrentPageHandler(currentPage <= 3 ? 2 : currentPage - 1)
+            setCurrentPageHandler((page ?? 1) <= 3 ? 2 : (page ?? 1) - 1)
           }
         >
-          {currentPage <= 3 ? "2" : currentPage - 1}
+          {(page ?? 1) <= 3 ? "2" : (page ?? 1) - 1}
         </Link>
         <Link
           className="join-item btn"
           href={{
             pathname: pathname,
             query: {
-              page: currentPage <= 3 ? 3 : currentPage,
+              page: (page ?? 1) <= 3 ? 3 : page,
             },
           }}
           passHref
           shallow
           replace
           onClick={() =>
-            setCurrentPageHandler(currentPage <= 3 ? 3 : currentPage)
+            setCurrentPageHandler((page ?? 1) <= 3 ? 3 : (page ?? 1))
           }
         >
-          {currentPage <= 3 ? "3" : currentPage}
+          {(page ?? 1) <= 3 ? "3" : page}
         </Link>
         <Link
           className="join-item btn"
           href={{
             pathname: pathname,
             query: {
-              page: currentPage <= 3 ? 4 : currentPage + 1,
+              page: (page ?? 1) <= 3 ? 4 : (page ?? 1) + 1,
             },
           }}
           passHref
           shallow
           replace
           onClick={() =>
-            setCurrentPageHandler(currentPage <= 3 ? 4 : currentPage + 1)
+            setCurrentPageHandler((page ?? 1) <= 3 ? 4 : (page ?? 1) + 1)
           }
         >
-          {currentPage <= 3 ? "4" : currentPage + 1}
+          {(page ?? 1) <= 3 ? "4" : (page ?? 1) + 1}
         </Link>
         <Link
           className="join-item btn"
           href={{
             pathname: pathname,
             query: {
-              page: currentPage <= 3 ? 5 : currentPage + 2,
+              page: (page ?? 1) <= 3 ? 5 : (page ?? 1) + 2,
             },
           }}
           passHref
           shallow
           replace
           onClick={() =>
-            setCurrentPageHandler(currentPage <= 3 ? 5 : currentPage + 2)
+            setCurrentPageHandler((page ?? 1) <= 3 ? 5 : (page ?? 1) + 2)
           }
         >
-          {currentPage <= 3 ? "5" : currentPage + 2}
+          {(page ?? 1) <= 3 ? "5" : (page ?? 1) + 2}
         </Link>
       </div>
 
@@ -254,6 +381,7 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
+                              required
                             />
                           </Field>
                         </div>
@@ -269,6 +397,7 @@ export default function Documents() {
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                "scheme-light",
                               )}
                             />
                           </Field>
@@ -451,6 +580,7 @@ export default function Documents() {
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                "scheme-light",
                               )}
                               defaultValue={
                                 editDocument && editDocument[0].date
@@ -575,6 +705,80 @@ export default function Documents() {
                     type="button"
                     data-autofocus
                     onClick={() => handleEditDocument("")}
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Delete Form */}
+      <Dialog
+        open={deleteForm}
+        onClose={setDeleteForm}
+        className="relative z-10"
+      >
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+        />
+
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <DialogPanel
+              transition
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+            >
+              <form action={deleteDocumentPOST}>
+                <input
+                  type="text"
+                  name="id"
+                  className="hidden"
+                  defaultValue={deleteDocumentId}
+                />
+                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
+                      <ExclamationTriangleIcon
+                        aria-hidden="true"
+                        className="size-6 text-red-600"
+                      />
+                    </div>
+                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                      <DialogTitle
+                        as="h3"
+                        className="text-base font-semibold text-gray-900"
+                      >
+                        Deactivate account
+                      </DialogTitle>
+                      <div className="mt-2">
+                        <p className="text-sm text-gray-500">
+                          Are you sure you want to delete{" "}
+                          <span className="font-bold">
+                            {deleteDocumentName}
+                          </span>
+                          ?
+                        </p>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                  <button
+                    type="submit"
+                    onClick={() => handleDeleteDocument("", "", false)}
+                    className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto"
+                  >
+                    Delete
+                  </button>
+                  <button
+                    type="button"
+                    data-autofocus
+                    onClick={() => handleDeleteDocument("", "", false)}
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
                   >
                     Cancel
