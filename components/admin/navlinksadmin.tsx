@@ -31,7 +31,7 @@ async function NavLinksAdmin() {
             </Link>
           </li>
           <li>
-            <Link href="/admin/documents" className='flex items-center flex-nowrap gap-2 w-fit'>
+            <Link href="/admin/documents?page=1" className='flex items-center flex-nowrap gap-2 w-fit'>
               <IoDocuments className='text-3xl' />
               <span className='hidden group-hover:block'>Documents</span>
             </Link>

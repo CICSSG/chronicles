@@ -41,7 +41,7 @@ export default async function Home() {
                 {/* The CICS */}
                 <Link
                   href={""}
-                  className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-neutral-200 transition-all hover:scale-102"
+                  className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 transition-all hover:scale-102"
                 >
                   <h2 className="absolute top-6 left-6 z-2">The CICS</h2>
                   <Image
@@ -55,7 +55,7 @@ export default async function Home() {
                 {/* The CICSSG */}
                 <Link
                   href={""}
-                  className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-neutral-200 transition-all hover:scale-102"
+                  className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 transition-all hover:scale-102"
                 >
                   <h2 className="absolute top-6 left-6 z-2 md:right-6 md:left-auto">
                     The CICS&#123;SG&#125;
@@ -72,20 +72,20 @@ export default async function Home() {
               {/* Documents */}
               <Link
                 href={""}
-                className="h-64 overflow-hidden rounded-2xl bg-neutral-200 p-5 transition-all"
+                className="h-64 overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 transition-all"
               >
-                <h2>Documents</h2>
-                <div className="relative text-white *:absolute *:aspect-[9/16] *:w-3xs *:rounded-2xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:p-4 *:transition-all *:hover:scale-102 *:md:w-xs">
-                  <div className="top-28 left-12 z-4 -rotate-12">
+                <h2 className="pl-5 pt-5">Documents</h2>
+                <div className="relative left-0 mx-auto text-white max-w-4xl *:absolute *:aspect-[9/16] *:w-3xs *:rounded-2xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:p-4 *:transition-all *:hover:scale-102 *:md:w-xs *md:text-2xl">
+                  <div className="top-20 text-center sm:scale-80 md:text-left -rotate-18 md:top-24 -left-4 md:left-12 z-4 md:-rotate-12 scale-70 md:scale-90 xl:scale-100 xl:top-26">
                     Resolutions
                   </div>
-                  <div className="top-8 left-2/12 z-2 -rotate-8">
+                  <div className="top-4 left-4 sm:scale-80 sm:left-1/12 md:top-8 md:left-2/12 z-2 -rotate-8 scale-70 md:scale-90 xl:scale-100 xl:left-1/5 xl:top-6">
                     Executive Orders
                   </div>
-                  <div className="-top-8 right-2/12 z-1 rotate-3">
+                  <div className="-top-8 -right-2 sm:scale-80 sm:right-2/12 md:right-1/6 lg:right-1/12 xl:right-2/12 lg:-top-7 z-1 rotate-3 scale-70 md:scale-90 xl:scale-100">
                     Ordinances
                   </div>
-                  <div className="top-20 -right-0 z-3 rotate-12 md:-right-12">
+                  <div className="top-16 -right-10 sm:scale-80 sm:-right-2 z-3 rotate-12 md:-right-12 scale-70 md:scale-90 xl:scale-100 xl:-right-8">
                     Formal Documents
                   </div>
                 </div>
@@ -96,7 +96,7 @@ export default async function Home() {
               {/* Announcements */}
               <Link
                 href={""}
-                className="flex min-h-fit grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-neutral-200 p-5 pb-12 transition-all hover:scale-102"
+                className="flex min-h-fit grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 pb-12 transition-all hover:scale-102"
               >
                 <h2 className="lg:text-right">Announcements</h2>
                 <div className="m-auto flex h-fit w-11/12 flex-col overflow-hidden rounded-2xl shadow-2xl">
@@ -120,7 +120,7 @@ export default async function Home() {
               {/* Events */}
               <Link
                 href={""}
-                className="flex flex-col min-h-fit grow-3 basis-0 gap-5 overflow-hidden rounded-2xl bg-neutral-200 p-5 transition-all hover:scale-102"
+                className="flex flex-col min-h-fit grow-3 basis-0 gap-5 overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 transition-all hover:scale-102"
               >
                 <h2 className="lg:text-right">Events</h2>
                 <div className="carousel carousel-center rounded-box min-h-fit gap-4 m-auto">

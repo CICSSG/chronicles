@@ -37,11 +37,10 @@ export default function NavLinks() {
 
   return (
     <header className="w-full">
-      <nav aria-label="Global" className="mx-auto flex max-w-8xl items-center justify-between p-6 lg:px-8">
+      <nav aria-label="Global" className="mx-auto flex max-w-8xl items-center justify-between lg:p-6 lg:px-8">
         <div className="flex lg:flex-1">
           <a href="/" className="-m-1.5 p-1.5">
             <span className="">[Chronicles]</span>
-            
           </a>
         </div>
         <div className="flex lg:hidden">

@@ -35,11 +35,11 @@ const Footer = () => {
 
         <div className="flex flex-col-reverse md:flex-row gap-4 justify-between text-sm font-normal">
           <div className="text-center md:text-left">@2025 CICSSG. All rights reserved.</div>
-          <div className="flex flex-col md:flex-row items-center gap-4 *:underline">
+          {/* <div className="flex flex-col md:flex-row items-center gap-4 *:underline">
             <a href="">Privacy Policy</a>
             <a href="">Terms of Service</a>
             <a href="">Cookies Settings</a>
-          </div>
+          </div> */}
         </div>
       </div>
     </>

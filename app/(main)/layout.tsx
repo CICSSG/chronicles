@@ -30,7 +30,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  <html
+  return (
+    <html
     lang="en"
     data-theme="cicssg"
     className={geistSans.className}
@@ -47,7 +48,7 @@ export default async function RootLayout({
       </SignedIn>
       <div className="flex min-h-dvh w-dvw flex-col items-center">
         <div className="my-10 flex w-full max-w-11/12 grow flex-col items-center gap-5 xl:max-w-9/12">
-          <div className="m-auto flex w-full flex-row justify-between px-10 py-2 text-xl text-black">
+          <div className="m-auto flex w-full flex-row justify-between lg:px-10 py-2 text-xl text-black">
             <NavLinks />
           </div>
 
@@ -58,5 +59,6 @@ export default async function RootLayout({
         </div>
       </div>
     </body>
-  </html>;
+  </html>
+  )
 }

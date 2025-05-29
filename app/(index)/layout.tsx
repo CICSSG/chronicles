@@ -43,8 +43,8 @@ export default async function RootLayout({
         </SignedIn>
         <div className="flex w-full flex-col items-center gap-5">
           <div className="font-space flex min-h-dvh min-w-dvw flex-col items-center bg-neutral-800 font-semibold">
-            <div className="my-10 flex max-w-11/12 flex-col gap-5 xl:max-w-9/12 w-full h-full">
-              <div className="flex w-full flex-row justify-between px-10 py-2 text-xl text-white">
+            <div className="my-10 flex max-w-11/12 flex-col gap-5 xl:max-w-[1920px] px-10 w-full h-full">
+              <div className="flex w-full flex-row justify-between lg:px-8 py-2 text-xl text-white">
                 <NavLinks />
               </div>
 
