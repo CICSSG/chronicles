@@ -4,7 +4,9 @@ export default function Page() {
   return (
     <div className='flex grow p-10 pb-10'>
       <div className="m-auto w-fit">
-        <SignIn appearance={{
+        <SignIn
+        forceRedirectUrl={"/admin"}
+        appearance={{
           layout: {
             logoImageUrl: '/images/CICSSG.png',
             logoPlacement: 'inside',
