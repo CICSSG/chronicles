@@ -15,7 +15,7 @@ export async function createNewDocument(formData: FormData) {
   const author = formData.get("author")
   const postLink = formData.get("post_link")
   const image = formData.get("image")
-  const externalLinks = formData.get("external_links")
+  // const externalLinks = formData.get("external_links")
 
   
   const { data, error } = await supabase
