@@ -33,6 +33,7 @@ export default async function ExecutiveOrders() {
         {/* Card */}
         {documents?.map((data) => (
           <DocumentCard
+          key={data.id}
           Title={data.title}
           Date={data.date}
           URL={"/documents/executive-orders/" + data.id}

@@ -6,9 +6,24 @@ import { IoAdd } from "react-icons/io5";
 
 type InputField = { name: string; link: string };
 
-export default function AddDynamicInputFields() {
+import { useEffect } from "react";
+
+export default function AddDynamicInputFields({data} : {data?: any}) {
   const [inputs, setInputs] = useState<InputField[]>([]);
 
+  useEffect(() => {
+    if (data) {
+      try {
+        const parsed = typeof data === "string" ? JSON.parse(data) : data;
+        if (Array.isArray(parsed)) {
+          setInputs(parsed);
+        }
+      } catch (e) {
+        console.log(e)
+      }
+    }
+  }, [data]);
+    
   const handleAddInput = () => {
     setInputs([...inputs, { name: "", link: "" }]);
   };
@@ -30,7 +45,7 @@ export default function AddDynamicInputFields() {
   };
 
   return (
-    <div className="container">
+    <div className="container flex flex-col gap-2">
       {inputs.length === 0 ? (
         <button
           onClick={() => handleAddInput()}
@@ -39,7 +54,7 @@ export default function AddDynamicInputFields() {
           Add External Link
         </button>
       ) : (
-        <div className="flex flex-row justify-around gap-1">
+        <div className="flex flex-row justify-around gap-1 text-sm font-semibold">
           <span>Name</span>
           <span>URL</span>
           {inputs.length === 1 ? <span></span> : null}
@@ -85,7 +100,7 @@ export default function AddDynamicInputFields() {
           )}
         </div>
       ))}
-      <input name="external_links" type="text" value={JSON.stringify(inputs)} className="hidden" readOnly />
+      <input name="external_links" type="text" value={JSON.stringify(inputs)} className="invisible" readOnly />
     </div>
   );
 }

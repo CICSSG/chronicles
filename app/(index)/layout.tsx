@@ -39,7 +39,7 @@ export default async function RootLayout({
     >
       <body className="bg-background text-foreground flex min-h-screen flex-col justify-between overflow-x-hidden">
         <SignedIn>
-          <Link href={"/admin"} className="fixed bottom-4 right-4 bg-neutral-100 p-4 rounded-full hover:bg-neutral-200 hover:cursor-pointer"><Edit/></Link>
+          <Link href={"/admin"} className="fixed bottom-4 right-4 bg-neutral-100 p-4 rounded-full hover:bg-neutral-200 hover:cursor-pointer z-20"><Edit/></Link>
         </SignedIn>
         <div className="flex w-full flex-col items-center gap-5">
           <div className="font-space flex min-h-dvh min-w-dvw flex-col items-center bg-neutral-800 font-semibold">

@@ -48,7 +48,7 @@ export default async function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
-          <Link href={"/"} className="fixed bottom-4 right-4 bg-neutral-100 p-4 rounded-full hover:bg-neutral-200 hover:cursor-pointer text-black"><IoIosPerson/></Link>
+          <Link href={"/"} className="fixed bottom-4 right-4 bg-neutral-100 p-4 rounded-full hover:bg-neutral-200 hover:cursor-pointer text-black z-20"><IoIosPerson/></Link>
           <SignedIn>
             {/* Container */}
             <div className='flex flex-row w-full min-h-screen bg-white'>

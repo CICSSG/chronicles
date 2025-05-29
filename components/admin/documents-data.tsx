@@ -17,8 +17,7 @@ export default async function DocumentData(id?: string) {
         let { data: documents, error } = await supabase
         .from("documents")
         .select("*")
-        .eq('id', id)
-        .order("date", { ascending: true });
+        .eq('id', parseInt(id))
 
         return documents
     }
