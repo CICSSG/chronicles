@@ -18,15 +18,16 @@ import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
 import DocumentData from "@/components/admin/documents-data";
 import AddDynamicInputFields from "@/components/admin/dynamic-input-field";
-import { createNewDocument } from "@/app/actions";
+import { createNewDocument, editDocumentPOST } from "@/app/actions";
 
 export default function Documents() {
   const pathname = usePathname();
   const [currentPage, setCurrentPage] = useState(1);
   const [createForm, setCreateForm] = useState(false);
-  const [editForm, setEditForm] = useState("");
   const [deleteForm, setDeleteForm] = useState("");
   const [documents, setDocuments] = useState<any[] | null>(null);
+  const [editForm, setEditForm] = useState(false);
+  const [editFormId, setEditFormId] = useState("");
   const [editDocument, setEditDocument] = useState<any | null>(null);
 
   const setCurrentPageHandler = (value: number) => {
@@ -39,12 +40,21 @@ export default function Documents() {
     });
   }, []);
 
+  useEffect(() => {
+    editFormId != "" ? setEditForm(true) : setEditForm(false);
+  }, [editDocument]);
+
   const handleEditDocument = (id: string) => {
-    DocumentData(id).then((doc) => {
-      setEditForm(id);
-      setEditDocument(doc);
-    });
-  }
+    if (id == "") {
+      setEditFormId(id);
+      setEditForm(false);
+    } else {
+      DocumentData(id).then((doc) => {
+        setEditDocument(doc);
+        setEditFormId(id);
+      });
+    }
+  };
 
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-neutral-700">
@@ -72,7 +82,7 @@ export default function Documents() {
         </div>
       </div>
 
-      <div className="flex min-h-fit grow-1 basis-0 flex-col items-center justify-between overflow-x-hidden rounded-2xl border p-4 shadow-xl">
+      <div className="flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-x-auto rounded-2xl border p-4 shadow-xl">
         <table className="table">
           {/* head */}
           <thead className="text-black">
@@ -217,7 +227,7 @@ export default function Documents() {
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
               <form action={createNewDocument}>
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4 overflow-y-auto max-h-[800px]">
+                <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
                       <DocumentIcon
@@ -225,7 +235,7 @@ export default function Documents() {
                         className="size-6 text-green-600"
                       />
                     </div>
-                    <div className="mt-3 w-full text-center sm:mt-0 sm:ml-4 sm:text-left overflow-y-scroll">
+                    <div className="mt-3 w-full overflow-y-scroll text-center sm:mt-0 sm:ml-4 sm:text-left">
                       <DialogTitle
                         as="h3"
                         className="text-base font-semibold text-gray-900"
@@ -276,7 +286,7 @@ export default function Documents() {
                               Description
                             </Label>
                             <Textarea
-                            name="description"
+                              name="description"
                               className={clsx(
                                 "mt-3 block w-full resize-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -292,7 +302,7 @@ export default function Documents() {
                               Author/s
                             </Label>
                             <Input
-                            name="author"
+                              name="author"
                               type="text"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
@@ -308,7 +318,7 @@ export default function Documents() {
                               Post Link
                             </Label>
                             <Input
-                            name="post_link"
+                              name="post_link"
                               type="text"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
@@ -324,7 +334,7 @@ export default function Documents() {
                               Image
                             </Label>
                             <Input
-                            name="image"
+                              name="image"
                               type="text"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
@@ -333,14 +343,15 @@ export default function Documents() {
                             />
                           </Field>
                         </div>
-                        {/* <div className="w-full max-w-md">
+
+                        <div className="w-full max-w-md">
                           <Field className="flex flex-col gap-4 text-black">
-                            <Label className="text-sm/6 font-medium text-black text-nowrap">
+                            <Label className="text-sm/6 font-medium text-nowrap text-black">
                               External Links
                             </Label>
                             <AddDynamicInputFields />
                           </Field>
-                        </div> */}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -369,10 +380,7 @@ export default function Documents() {
       </Dialog>
 
       {/* Edit Form */}
-      <Dialog
-        open={editForm == "" ? false : true}
-        onClose={() => setEditForm("")}
-      >
+      <Dialog open={editForm} onClose={() => setEditForm(false)}>
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
@@ -383,8 +391,8 @@ export default function Documents() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action="">
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+              <form action={editDocumentPOST}>
+                <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-amber-100 sm:mx-0 sm:size-10">
                       <DocumentIcon
@@ -399,6 +407,22 @@ export default function Documents() {
                       >
                         Edit Document
                       </DialogTitle>
+
+                      <div className="flex w-full flex-col gap-4">
+                        <div className="hidden w-full max-w-md">
+                          <Field className="flex flex-row items-center gap-4">
+                            <Input
+                              className={clsx(
+                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                              )}
+                              defaultValue={editDocument && editDocument[0].id}
+                              name="id"
+                            ></Input>
+                          </Field>
+                        </div>
+                      </div>
+
                       <div className="mt-4 flex w-full flex-col gap-4">
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
@@ -410,8 +434,11 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              value={editDocument?.title || ""}
-                            >{editDocument?.title}</Input>
+                              defaultValue={
+                                editDocument && editDocument[0].title
+                              }
+                              name="title"
+                            ></Input>
                           </Field>
                         </div>
                         <div className="w-full max-w-md">
@@ -425,13 +452,22 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
+                              defaultValue={
+                                editDocument && editDocument[0].date
+                              }
+                              name="date"
                             />
                           </Field>
                         </div>
 
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
-                            <DocumentRadioDropdown left={true} />
+                            <DocumentRadioDropdown
+                              left={true}
+                              value={
+                                editDocument && editDocument[0].document_type
+                              }
+                            />
                           </Field>
                         </div>
 
@@ -446,6 +482,10 @@ export default function Documents() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
                               rows={8}
+                              defaultValue={
+                                editDocument && editDocument[0].description
+                              }
+                              name="description"
                             />
                           </Field>
                         </div>
@@ -461,6 +501,10 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
+                              defaultValue={
+                                editDocument && editDocument[0].author
+                              }
+                              name="author"
                             />
                           </Field>
                         </div>
@@ -476,6 +520,10 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
+                              defaultValue={
+                                editDocument && editDocument[0].link
+                              }
+                              name="post_link"
                             />
                           </Field>
                         </div>
@@ -491,6 +539,23 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
+                              defaultValue={
+                                editDocument && editDocument[0].image
+                              }
+                              name="image"
+                            />
+                          </Field>
+                        </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-col gap-4 text-black">
+                            <Label className="text-sm/6 font-medium text-nowrap text-black">
+                              External Links
+                            </Label>
+                            <AddDynamicInputFields
+                              data={
+                                editDocument && editDocument[0].external_links
+                              }
                             />
                           </Field>
                         </div>

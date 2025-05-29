@@ -53,19 +53,19 @@ export default function NavLinks() {
             <Bars3Icon aria-hidden="true" className="size-6" />
           </button>
         </div>
-        <PopoverGroup className="hidden lg:flex lg:gap-x-6">
-          <Link href={"/cics"} className="text-sm/6 font-semibold ">
+        <PopoverGroup className="hidden lg:flex lg:gap-x-6 ">
+          <Link href={"/cics"} className="text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
             The CICS
           </Link>
-          <Link href={"/cicssg"} className="text-sm/6 font-semibold ">
+          <Link href={"/cicssg"} className="text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
             The CICSSG
           </Link>
-          <Link href={"/announcements"} className="text-sm/6 font-semibold ">
+          <Link href={"/announcements"} className="text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
             Announcements
           </Link>
 
           <Popover className="relative">
-            <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold ">
+            <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
               Documents
               <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
             </PopoverButton>
@@ -95,10 +95,10 @@ export default function NavLinks() {
             </PopoverPanel>
           </Popover>
 
-          <Link href={"/events"} className="text-sm/6 font-semibold ">
+          <Link href={"/events"} className="text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
             Events
           </Link>
-          <Link href={"/contact-us"} className="text-sm/6 font-semibold ">
+          <Link href={"/contact-us"} className="text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
             Contact Us
           </Link>
         </PopoverGroup>

@@ -27,7 +27,7 @@ function DocumentCard({ Title, Date, URL, Description, Author }: DocumentCard) {
       <p className="font-medium">
         {Description}
       </p>
-      {Author? (<div className="text-sm"><span className="font-bold">Author:</span> <span className="font-medium">{Author}</span></div>): null}
+      {Author? (<div className="text-sm"><span className="font-bold">Author/s:</span> <span className="font-medium">{Author}</span></div>): null}
     </div>
   );
 }
