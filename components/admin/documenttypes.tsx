@@ -13,6 +13,7 @@ export default function DocumentRadioDropdown({ left }: { left?: boolean }) {
         {/* <Description className="text-sm/6 text-black/50">This will be visible to clients on the project.</Description> */}
         <div className="relative">
           <Select
+            name="document_type"
             defaultValue={"none"}
             className={clsx(
               "mt-3 block w-full appearance-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black/45 focus:text-black",

@@ -1,0 +1,91 @@
+import { Input } from "@headlessui/react";
+import clsx from "clsx";
+import { Delete, Trash } from "lucide-react";
+import { useState } from "react";
+import { IoAdd } from "react-icons/io5";
+
+type InputField = { name: string; link: string };
+
+export default function AddDynamicInputFields() {
+  const [inputs, setInputs] = useState<InputField[]>([]);
+
+  const handleAddInput = () => {
+    setInputs([...inputs, { name: "", link: "" }]);
+  };
+
+  const handleChange = (
+    event: React.ChangeEvent<HTMLInputElement>,
+    index: number,
+  ) => {
+    let { name, value } = event.target;
+    let onChangeValue = [...inputs];
+    onChangeValue[index][name as keyof InputField] = value;
+    setInputs(onChangeValue);
+  };
+
+  const handleDeleteInput = (index: number) => {
+    const newArray = [...inputs];
+    newArray.splice(index, 1);
+    setInputs(newArray);
+  };
+
+  return (
+    <div className="container">
+      {inputs.length === 0 ? (
+        <button
+          onClick={() => handleAddInput()}
+          className="rounded-md bg-green-500 px-3 py-1.5 text-sm font-bold text-white"
+        >
+          Add External Link
+        </button>
+      ) : (
+        <div className="flex flex-row justify-around gap-1">
+          <span>Name</span>
+          <span>URL</span>
+          {inputs.length === 1 ? <span></span> : null}
+        </div>
+      )}
+      {inputs.map((item, index) => (
+        <div className="input_container flex flex-row gap-1" key={index}>
+          <Input
+            name="name"
+            type="text"
+            value={item.name}
+            className={clsx(
+              "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+              "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+            )}
+            onChange={(event) => handleChange(event, index)}
+          />
+          <Input
+            name="link"
+            type="text"
+            value={item.link}
+            className={clsx(
+              "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+              "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+            )}
+            onChange={(event) => handleChange(event, index)}
+          />
+          {index === inputs.length - 1 && (
+            <button
+              onClick={() => handleDeleteInput(index)}
+              className="rounded bg-red-500 px-1 text-black/70"
+            >
+              <Trash />
+            </button>
+          )}
+          {index === inputs.length - 1 && (
+            <button
+              onClick={() => handleAddInput()}
+              className="rounded bg-green-500 px-2 text-white"
+            >
+              <IoAdd />
+            </button>
+          )}
+        </div>
+      ))}
+      <input name="external_links" type="text" value={JSON.stringify(inputs)} className="hidden" readOnly />
+    </div>
+  );
+}

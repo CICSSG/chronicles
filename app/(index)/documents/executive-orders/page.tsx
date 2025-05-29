@@ -4,7 +4,19 @@ import Link from "next/link";
 import React from "react";
 import DocumentCard from "@/components/documentcard";
 
-const ExecutiveOrders = () => {
+import { createClient } from '@supabase/supabase-js';
+
+const supabase = createClient(
+  process.env.NEXT_PUBLIC_SUPABASE_URL!,
+  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
+);
+
+export default async function ExecutiveOrders() {
+  let { data: documents, error } = await supabase
+  .from('documents')
+  .select('*')
+  .eq('document_type', 'executive-order')
+
   return (
     <div className="flex w-full flex-col md:flex-row gap-4 *:rounded-2xl">
       <div className="sticky flex grow-1 basis-0 flex-col gap-4 text-black/60 *:rounded-2xl *:bg-neutral-300 *:px-6 *:py-8 *:shadow-xl ">
@@ -19,45 +31,16 @@ const ExecutiveOrders = () => {
       </div>
       <div className="grid grow-3 basis-0 grid-cols-1 lg:grid-cols-2 xl:grid-cols-3 gap-4 bg-neutral-300 p-6 *:rounded-xl *:bg-white/80 *:p-4 text-black/80 bg-[url(/images/noise.png)]">
         {/* Card */}
-        <DocumentCard
-          Title="Executive Order No. 001"
-          Date="August 1, 2025"
-          URL="123"
-          Description="An Executive Order Declaring the Creation of the Director of Audit, Director of Internal Affairs, Director of Data and Information, and the Associate Director of Creatives as the Directorates of the Governor of the CICS Student Government."
-          Author="Governor Jake Ryan P. Olase"
-        />
-
-        <DocumentCard
-          Title="Executive Order No. 001"
-          Date="August 1, 2025"
-          URL="123"
-          Description="An Executive Order Declaring the Creation of the Director of Audit, Director of Internal Affairs, Director of Data and Information, and the Associate Director of Creatives as the Directorates of the Governor of the CICS Student Government."
-          Author="Governor Jake Ryan P. Olase"
-        />
-        <DocumentCard
-          Title="Executive Order No. 001"
-          Date="August 1, 2025"
-          URL="123"
-          Description="An Executive Order Declaring the Creation of the Director of Audit, Director of Internal Affairs, Director of Data and Information, and the Associate Director of Creatives as the Directorates of the Governor of the CICS Student Government."
-          Author="Governor Jake Ryan P. Olase"
-        />
-        <DocumentCard
-          Title="Executive Order No. 001"
-          Date="August 1, 2025"
-          URL="123"
-          Description="An Executive Order Declaring the Creation of the Director of Audit, Director of Internal Affairs, Director of Data and Information, and the Associate Director of Creatives as the Directorates of the Governor of the CICS Student Government."
-          Author="Governor Jake Ryan P. Olase"
-        />
-        <DocumentCard
-          Title="Executive Order No. 001"
-          Date="August 1, 2025"
-          URL="123"
-          Description="An Executive Order Declaring the Creation of the Director of Audit, Director of Internal Affairs, Director of Data and Information, and the Associate Director of Creatives as the Directorates of the Governor of the CICS Student Government."
-          Author="Governor Jake Ryan P. Olase"
-        />
+        {documents?.map((data) => (
+          <DocumentCard
+          Title={data.title}
+          Date={data.date}
+          URL={"/documents/executive-orders/" + data.id}
+          Description={data.description}
+          Author={data.author}
+          />
+        ))}
       </div>
     </div>
   );
 };
-
-export default ExecutiveOrders;
