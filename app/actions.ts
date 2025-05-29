@@ -71,4 +71,13 @@ export async function editDocumentPOST(formData: FormData) {
   console.log(data)      
 }
 
-export async function deleteDocumentPOST(formData: FormData) {}
+export async function deleteDocumentPOST(formData: FormData) {
+  const id = formData.get("id")
+  
+  const { error } = await supabase
+  .from('documents')
+  .delete()
+  .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
+
+  console.log(error?.message)
+}
