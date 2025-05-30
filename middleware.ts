@@ -21,7 +21,7 @@ const isSignupRoute = createRouteMatcher([
 export default clerkMiddleware(async (auth, req) => {
   const { sessionClaims, userId } = await auth()
 
-  if (isSignupRoute(req) && userId) { 
+  if (isSignupRoute(req) && userId != null) { 
     return NextResponse.redirect(new URL('/admin', req.url))
   }
 
