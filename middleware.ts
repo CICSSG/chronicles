@@ -25,7 +25,7 @@ export default clerkMiddleware(async (auth, req) => {
 
   const { sessionClaims, userId } = await auth()
 
-  console.log(sessionClaims)
+  // console.log(sessionClaims)
   if (isSignupRoute(req) && userId != null) { 
     return NextResponse.redirect(new URL('/admin', req.url))
   }

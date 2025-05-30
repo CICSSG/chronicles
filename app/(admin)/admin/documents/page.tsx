@@ -16,7 +16,9 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
-import DocumentData, { DocumentSearch } from "@/components/admin/documents-data";
+import DocumentData, {
+  DocumentSearch,
+} from "@/components/admin/documents-data";
 import AddDynamicInputFields from "@/components/admin/dynamic-input-field";
 import {
   createNewDocument,
@@ -24,7 +26,7 @@ import {
   editDocumentPOST,
 } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -54,14 +56,18 @@ export default function Documents() {
   const [editDocument, setEditDocument] = useState<any | null>(null);
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
+  const [pagination, setPagination] = useState(1);
+
+  const ITEMS_PER_PAGE = 1;
 
   const setCurrentPageHandler = (value: number) => {
     setPage(value);
   };
 
   useEffect(() => {
-    DocumentData().then((docs) => {
-      setDocuments(docs ?? null);
+    DocumentData().then(({ documents, pagination }) => {
+      setDocuments(documents ?? null);
+      setPagination(pagination);
     });
 
     const taskListener = supabase
@@ -70,8 +76,9 @@ export default function Documents() {
         "postgres_changes",
         { event: "*", schema: "public", table: "documents" },
         (payload) => {
-          DocumentData().then((docs) => {
-            setDocuments(docs);
+          DocumentData().then(({ documents, pagination }) => {
+            setDocuments(documents ?? null);
+            setPagination(pagination);
           });
           // console.log("Change received!", payload);
         },
@@ -106,21 +113,37 @@ export default function Documents() {
   };
 
   const handleSearch = () => {
-    setPage(1)
-    DocumentSearch(title ?? undefined, documentType ?? undefined).then((docs) => {
-      setDocuments(docs ?? null);
-    })
+    setPage(1);
+    DocumentSearch(
+      title ?? undefined,
+      documentType ?? undefined,
+      page ?? undefined,
+    ).then(({ documents, pagination }) => {
+      setDocuments(documents ?? null);
+      setPagination(pagination);
+    });
   };
 
   const clearFilters = () => {
-    setPage(1)
-    setTitle(null)
-    setDocumentType(null)
+    setPage(1);
+    setTitle(null);
+    setDocumentType(null);
 
-    DocumentData().then((docs) => {
-      setDocuments(docs ?? null);
+    DocumentData().then(({ documents, pagination }) => {
+      setDocuments(documents ?? null);
+      setPagination(pagination);
     });
-  }
+  };
+
+  useEffect(() => {
+    DocumentSearch(
+      title ?? undefined,
+      documentType ?? undefined,
+      page ?? undefined,
+    ).then(({ documents }) => {
+      setDocuments(documents ?? null);
+    });
+  }, [page]);
 
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
@@ -197,14 +220,19 @@ export default function Documents() {
           <button
             type="button"
             onClick={clearFilters}
-            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white hover:cursor-pointer hover:bg-white/10 text-nowrap"
+            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-nowrap text-white hover:cursor-pointer hover:bg-white/10"
           >
             Clear Filters
           </button>
         </div>
       </div>
 
-      <div className="flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-x-auto rounded-2xl border bg-white/10 p-4 shadow-xl">
+      <div className="relative flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-x-auto overflow-y-auto rounded-2xl border bg-white/10 p-4 shadow-xl">
+        {!documents && (
+          <div className="absolute top-0 left-0 z-20 flex h-full w-full items-center justify-center bg-black/30">
+            No Data Found.
+          </div>
+        )}
         <table className="table">
           {/* head */}
           <thead className="text-white">
@@ -253,92 +281,102 @@ export default function Documents() {
         </table>
       </div>
 
-      <div className="join ml-auto">
-        <Link
-          className="join-item btn"
-          href={{
-            pathname: pathname,
-            query: {
-              page: (page ?? 1) <= 3 ? 1 : (page ?? 1) - 2,
-            },
-          }}
-          passHref
-          shallow
-          replace
-          onClick={() =>
-            setCurrentPageHandler((page ?? 1) <= 3 ? 1 : (page ?? 1) - 2)
-          }
-        >
-          {(page ?? 1) <= 3 ? "1" : (page ?? 1) - 2}
-        </Link>
-        <Link
-          className="join-item btn"
-          href={{
-            pathname: pathname,
-            query: {
-              page: (page ?? 1) <= 3 ? 2 : (page ?? 1) - 1,
-            },
-          }}
-          passHref
-          shallow
-          replace
-          onClick={() =>
-            setCurrentPageHandler((page ?? 1) <= 3 ? 2 : (page ?? 1) - 1)
-          }
-        >
-          {(page ?? 1) <= 3 ? "2" : (page ?? 1) - 1}
-        </Link>
-        <Link
-          className="join-item btn"
-          href={{
-            pathname: pathname,
-            query: {
-              page: (page ?? 1) <= 3 ? 3 : page,
-            },
-          }}
-          passHref
-          shallow
-          replace
-          onClick={() =>
-            setCurrentPageHandler((page ?? 1) <= 3 ? 3 : (page ?? 1))
-          }
-        >
-          {(page ?? 1) <= 3 ? "3" : page}
-        </Link>
-        <Link
-          className="join-item btn"
-          href={{
-            pathname: pathname,
-            query: {
-              page: (page ?? 1) <= 3 ? 4 : (page ?? 1) + 1,
-            },
-          }}
-          passHref
-          shallow
-          replace
-          onClick={() =>
-            setCurrentPageHandler((page ?? 1) <= 3 ? 4 : (page ?? 1) + 1)
-          }
-        >
-          {(page ?? 1) <= 3 ? "4" : (page ?? 1) + 1}
-        </Link>
-        <Link
-          className="join-item btn"
-          href={{
-            pathname: pathname,
-            query: {
-              page: (page ?? 1) <= 3 ? 5 : (page ?? 1) + 2,
-            },
-          }}
-          passHref
-          shallow
-          replace
-          onClick={() =>
-            setCurrentPageHandler((page ?? 1) <= 3 ? 5 : (page ?? 1) + 2)
-          }
-        >
-          {(page ?? 1) <= 3 ? "5" : (page ?? 1) + 2}
-        </Link>
+      <div className="join">
+        {pagination >= 2 && (
+          <>
+            <Link
+              className="join-item btn"
+              href={{
+                pathname: pathname,
+                query: {
+                  page: (page ?? 1) <= 3 ? 1 : (page ?? 1) - 2,
+                },
+              }}
+              passHref
+              shallow
+              replace
+              onClick={() =>
+                setCurrentPageHandler((page ?? 1) <= 3 ? 1 : (page ?? 1) - 2)
+              }
+            >
+              {(page ?? 1) <= 3 ? "1" : (page ?? 1) - 2}
+            </Link>
+            <Link
+              className="join-item btn"
+              href={{
+                pathname: pathname,
+                query: {
+                  page: (page ?? 1) <= 3 ? 2 : (page ?? 1) - 1,
+                },
+              }}
+              passHref
+              shallow
+              replace
+              onClick={() =>
+                setCurrentPageHandler((page ?? 1) <= 3 ? 2 : (page ?? 1) - 1)
+              }
+            >
+              {(page ?? 1) <= 3 ? "2" : (page ?? 1) - 1}
+            </Link>
+          </>
+        )}
+        {pagination >= 3 && (
+          <Link
+            className="join-item btn"
+            href={{
+              pathname: pathname,
+              query: {
+                page: (page ?? 1) <= 3 ? 3 : page,
+              },
+            }}
+            passHref
+            shallow
+            replace
+            onClick={() =>
+              setCurrentPageHandler((page ?? 1) <= 3 ? 3 : (page ?? 1))
+            }
+          >
+            {(page ?? 1) <= 3 ? "3" : page}
+          </Link>
+        )}
+        {pagination >= 4 && (
+          <Link
+            className="join-item btn"
+            href={{
+              pathname: pathname,
+              query: {
+                page: (page ?? 1) <= 3 ? 4 : (page ?? 1) + 1,
+              },
+            }}
+            passHref
+            shallow
+            replace
+            onClick={() =>
+              setCurrentPageHandler((page ?? 1) <= 3 ? 4 : (page ?? 1) + 1)
+            }
+          >
+            {(page ?? 1) <= 3 ? "4" : (page ?? 1) + 1}
+          </Link>
+        )}
+        {pagination >= 5 && (
+          <Link
+            className="join-item btn"
+            href={{
+              pathname: pathname,
+              query: {
+                page: (page ?? 1) <= 3 ? 5 : (page ?? 1) + 2,
+              },
+            }}
+            passHref
+            shallow
+            replace
+            onClick={() =>
+              setCurrentPageHandler((page ?? 1) <= 3 ? 5 : (page ?? 1) + 2)
+            }
+          >
+            {(page ?? 1) <= 3 ? "5" : (page ?? 1) + 2}
+          </Link>
+        )}
       </div>
 
       {/* Create Form */}
