@@ -49,8 +49,8 @@ export async function createNewDocument(formData: FormData) {
     ])
     .select()
 
-  console.log("a", error?.message)
-  console.log(data)      
+  // console.log("a", error?.message)
+  // console.log(data)      
 }
 
 export async function editDocumentPOST(formData: FormData) {
@@ -90,8 +90,8 @@ export async function editDocumentPOST(formData: FormData) {
   .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
   .select()
 
-  console.log(error?.message)
-  console.log(data)      
+  // console.log(error?.message)
+  // console.log(data)      
 }
 
 export async function deleteDocumentPOST(formData: FormData) {
@@ -111,5 +111,5 @@ export async function deleteDocumentPOST(formData: FormData) {
   .delete()
   .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
 
-  console.log(error?.message)
+  // console.log(error?.message)
 }

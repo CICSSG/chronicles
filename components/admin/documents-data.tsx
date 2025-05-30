@@ -5,63 +5,105 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 );
 
-export default async function DocumentData(id?: string) {
-  if (id == null) {
-    let { data: documents, error } = await supabase
-      .from("documents")
-      .select("*")
-      .order("date", { ascending: true });
+const ITEMS_PER_PAGE = 9;
 
-    return documents;
-  } else {
-    let { data: documents, error } = await supabase
+export const getPagination = (page: number, size: number) => {
+  const limit = size ? +size : 3;
+  const from = page ? page * limit + 1 : 0;
+  const to = page ? from + size : size;
+
+  return { from, to };
+};
+
+export default async function DocumentData(id?: string, page?: number) {
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  if (id == null) {
+    let { data: documents, count } = await supabase
       .from("documents")
-      .select("*")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .order("date", { ascending: false });
+
+    let pagination =
+      count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;
+    return { documents, pagination };
+  } else {
+    let { data: documents, count } = await supabase
+      .from("documents")
+      .select("*", { count: "exact", head: true })
+      .range(from, to)
       .eq("id", parseInt(id));
 
-    return documents;
+    let pagination =
+      count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;
+    return { documents, pagination };
   }
 }
 
-export async function DocumentSearch(title?: string, documentType?: string) {
-  title == "" || title == null ? (title = undefined) : (title = "%" + title + "%");
-  documentType == "" || documentType == null ? (documentType = undefined) : null;
+export async function DocumentSearch(
+  title?: string,
+  documentType?: string,
+  page?: number,
+) {
+  title == "" || title == null
+    ? (title = undefined)
+    : (title = "%" + title + "%");
+  documentType == "" || documentType == null
+    ? (documentType = undefined)
+    : null;
+
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
 
   if (title != undefined && documentType != undefined) {
-    let { data: documents } = await supabase
+    let { data: documents, count } = await supabase
       .from("documents")
-      .select("*")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
       .eq("document_type", documentType)
       .ilike("title", title)
-      .order("date", { ascending: true });
+      .order("date", { ascending: false });
 
-    return documents;
+    let pagination =
+      count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;
+    return { documents, pagination };
   }
 
   if (title != undefined) {
-    let { data: documents } = await supabase
+    let { data: documents, count } = await supabase
       .from("documents")
-      .select("*")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
       .ilike("title", title)
-      .order("date", { ascending: true });
+      .order("date", { ascending: false });
 
-    return documents;
+    let pagination =
+      count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;
+    return { documents, pagination };
   }
 
   if (documentType != undefined) {
-    let { data: documents } = await supabase
+    let { data: documents, count } = await supabase
       .from("documents")
-      .select("*")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
       .eq("document_type", documentType)
-      .order("date", { ascending: true });
+      .order("date", { ascending: false });
 
-    return documents;
+    let pagination =
+      count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;
+    return { documents, pagination };
   }
 
-  let { data: documents } = await supabase
+  let { data: documents, count } = await supabase
     .from("documents")
-    .select("*")
-    .order("date", { ascending: true });
+    .select("*", { count: "exact", head: false })
+    .range(from, to)
+    .order("date", { ascending: false });
 
-  return documents;
+  let pagination =
+      count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;
+    return { documents, pagination };
 }
