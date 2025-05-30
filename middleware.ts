@@ -13,13 +13,18 @@ const isPublicRoute = createRouteMatcher([
   '/sign-up(.*)'
 ])
 
+const isSignupRoute = createRouteMatcher([
+  '/sign-in(.*)',
+  '/sign-up(.*)'
+])
+
 export default clerkMiddleware(async (auth, req) => {
   const { sessionClaims, userId } = await auth()
 
-  if (isPublicRoute(req) && userId) { 
+  if (isSignupRoute(req) && userId) { 
     return NextResponse.redirect(new URL('/admin', req.url))
   }
-  
+
   if (!isPublicRoute(req)) {
     await auth.protect()
   }
