@@ -1,19 +1,8 @@
-import Footer from "@/components/footer";
-import NavLinks from "@/components/nav-links";
-import { ChevronDownIcon, ChevronUpDownIcon } from "@heroicons/react/20/solid";
-import { ArrowDownIcon } from "@heroicons/react/24/outline";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
 import Link from "next/link";
 
 export default async function Home() {
-  const bgImage = (
-    <Image
-      src="/images/HeroBG.jpg"
-      width={1600}
-      height={500}
-      alt="Picture of the author"
-    />
-  );
   return (
     <>
       <div className="flex grow flex-col gap-5 text-2xl lg:flex-row">

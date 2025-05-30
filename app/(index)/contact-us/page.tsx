@@ -1,16 +1,31 @@
 'use client'
-import { EnvelopeIcon, MapPinIcon, PhotoIcon, UserCircleIcon } from "@heroicons/react/20/solid";
+import { sendEmail } from "@/utils/send-email";
+import { EnvelopeIcon, MapPinIcon } from "@heroicons/react/20/solid";
 import { ChevronDownIcon } from "@heroicons/react/24/outline";
-import { Mail } from "lucide-react";
 import Image from "next/image";
 import React, { useState } from "react";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
+import { useForm } from 'react-hook-form';
 
 const CONCERN_CHARACTERS_MAX = 500
 
+export type FormData = {
+  name: string,
+  email: string,
+  phone?: string,
+  gender?: string,
+  person: string,
+  concern: string,
+  message: string
+};
+
 const ContactUs = () => {
   const [character, setCharacter] = useState(0)
+  const {register, handleSubmit} = useForm<FormData>()
 
+  function onSubmit(data: FormData){
+    sendEmail(data)
+  }
   return (
     <div className="*w-full flex flex-col gap-4 text-black/80 *:rounded-2xl *:bg-neutral-100">
       <div className="px-10 py-10 text-4xl">Contact Us</div>
@@ -54,7 +69,7 @@ const ContactUs = () => {
             with an answer or solution.
           </p>
 
-          <form action="" className="flex flex-col items-stretch gap-6 text-xl text-md/4 sm:text-lg/5 lg:text-xl/6">
+          <form onSubmit={handleSubmit(onSubmit)} className="flex flex-col items-stretch gap-6 text-xl text-md/4 sm:text-lg/5 lg:text-xl/6">
             <div>
               <label
                 htmlFor="name"
@@ -66,11 +81,11 @@ const ContactUs = () => {
                 <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-blue-300">
                   <input
                     id="name"
-                    name="name"
                     type="text"
                     placeholder="Juan Dela Cruz"
                     className="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none text-md/4 sm:text-lg/5 lg:text-xl/6"
                     required
+                    {...register('name', { required: true })}
                   />
                 </div>
               </div>
@@ -87,11 +102,11 @@ const ContactUs = () => {
                 <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-blue-300">
                   <input
                     id="email"
-                    name="email"
                     type="email"
                     placeholder="juandelacruz@gmail.com"
                     className="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none text-md/4 sm:text-lg/5 lg:text-xl/6"
                     required
+                    {...register('email', { required: true })}
                   />
                 </div>
               </div>
@@ -111,10 +126,10 @@ const ContactUs = () => {
                 <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-blue-300">
                   <input
                     id="phone"
-                    name="phone"
                     type=""
-                    placeholder="juandelacruz@gmail.com"
+                    placeholder="09xxxxxxxxx"
                     className="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none text-md/4 sm:text-lg/5 lg:text-xl/6"
+                    {...register('phone', { required: false })}
                   />
                 </div>
               </div>
@@ -134,9 +149,9 @@ const ContactUs = () => {
                 <div className="mt-2 grid grid-cols-1">
                   <select
                     id="gender"
-                    name="gender"
                     defaultValue=""
                     className="focus:blue-300 col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-3 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 text-md/4 sm:text-lg/5 lg:text-xl/6"
+                    {...register('gender', { required: false })}
                   >
                     <option value=""></option>
                     <option value="mr">Mr.</option>
@@ -159,14 +174,14 @@ const ContactUs = () => {
                 <div className="mt-2 grid grid-cols-1">
                   <select
                     id="person"
-                    name="person"
                     defaultValue=""
                     className="focus:blue-300 col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-3 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 text-md/4 sm:text-lg/5 lg:text-xl/6"
                     required
+                    {...register('person', { required: true })}
                   >
                     <option value=""></option>
-                    <option value=""></option>
-                    <option value=""></option>
+                    <option value="student">Student</option>
+                    <option value="faculty">Faculty</option>
                   </select>
                   <ChevronDownIcon
                     aria-hidden="true"
@@ -186,13 +201,13 @@ const ContactUs = () => {
               <div className="mt-2 grid grid-cols-1">
                 <select
                   id="concern"
-                  name="concern"
                   defaultValue=""
                   className="focus:blue-300 col-start-1 row-start-1 w-full appearance-none rounded-md bg-white py-3 pr-8 pl-3 text-base text-gray-900 outline-1 -outline-offset-1 outline-gray-300 focus:outline-2 focus:-outline-offset-2 text-md/4 sm:text-lg/5 lg:text-xl/6"
                   required
+                  {...register('concern', { required: true })}
                 >
                   <option value=""></option>
-                  <option value=""></option>
+                  <option value="enrollment">Enrollment</option>
                   <option value=""></option>
                 </select>
                 <ChevronDownIcon
@@ -205,7 +220,7 @@ const ContactUs = () => {
             <div>
               <div className="flex flex-row">
                   <label
-                htmlFor="email"
+                htmlFor="message"
                 className="block text-xl/6 font-medium text-gray-900"
               >
                 How can we help you? <span className="text-red-700">*</span>
@@ -216,14 +231,15 @@ const ContactUs = () => {
               <div className="mt-2">
                 <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-blue-300">
                   <textarea
-                    id="email"
-                    name="email"
+                    id="message"
                     maxLength={CONCERN_CHARACTERS_MAX}
                     rows={15}
-                    onChange={e => setCharacter(e.target.value.length)}
                     placeholder="Tell us about your concern..."
                     className="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none text-md/4 sm:text-lg/5 lg:text-xl/6"
                     required
+                    {...register('message', { 
+                      required: true,
+                    })}
                   />
                 </div>
               </div>
