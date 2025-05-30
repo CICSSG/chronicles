@@ -1,13 +1,27 @@
-"use server";
+'use server';
 import { createClient } from "@supabase/supabase-js";
-
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+import { auth } from "@clerk/nextjs/server";
+// const { session } = useSession()
+// const supabase = createClient(
+//   process.env.NEXT_PUBLIC_SUPABASE_URL!,
+//   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+//   {
+//       // Session accessed from Clerk SDK, either as Clerk.session (vanilla
+//       // JavaScript) or useSession (React)
+//       accessToken: async () => session?.getToken() ?? null,
+//     }
+// );
 
 export async function createNewDocument(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+  );
+
   const title = formData.get("title")
   const date = formData.get("date")
   const documentType = formData.get("document_type")
@@ -40,6 +54,15 @@ export async function createNewDocument(formData: FormData) {
 }
 
 export async function editDocumentPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+  );
+
   const id = formData.get("id")
   const title = formData.get("title")
   const date = formData.get("date")
@@ -51,7 +74,7 @@ export async function editDocumentPOST(formData: FormData) {
   const externalLinksRaw = formData.get("external_links");
   const externalLinks = externalLinksRaw ? JSON.parse(externalLinksRaw as string) : [];
 
-  console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
+  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
   const { data, error } = await supabase
   .from('documents')
   .update({ 
@@ -72,6 +95,15 @@ export async function editDocumentPOST(formData: FormData) {
 }
 
 export async function deleteDocumentPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+  );
+  
   const id = formData.get("id")
   
   const { error } = await supabase

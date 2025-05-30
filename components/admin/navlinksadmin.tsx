@@ -56,10 +56,12 @@ async function NavLinksAdmin() {
                 <span className='hidden group-hover:block'>Profile</span>
               </Link>
             </li>
-            <li className='flex items-center flex-nowrap gap-2 w-fit'>
-              <SignOutButton><FiLogOut className='text-3xl' /></SignOutButton>
-              <span className='hidden group-hover:block hover:cursor-pointer'><SignOutButton>Logout</SignOutButton></span>
-            </li>
+            <SignOutButton>
+              <div className='flex items-center flex-nowrap gap-2 w-fit hover:cursor-pointer'>
+                <FiLogOut className='text-3xl' />
+                <span className='hidden group-hover:block'>Logout</span>
+              </div>
+            </SignOutButton>
           </div>
         </ul>
       </div>
