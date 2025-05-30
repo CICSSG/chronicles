@@ -1,5 +1,6 @@
 @import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
 @import "tailwindcss";
+@import "tailwindcss-animated";
 @plugin "daisyui";
 @tailwind utilities;
 
@@ -75,4 +76,8 @@
 
 .main-content {
   @apply flex
+}
+
+@utility no-scrollbar {
+  @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }

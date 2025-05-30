@@ -1,6 +1,4 @@
 import NavDocuments from "@/components/nav-documents";
-import { IoIosArrowForward } from "react-icons/io";
-import Link from "next/link";
 import React from "react";
 import DocumentCard from "@/components/documentcard";
 
