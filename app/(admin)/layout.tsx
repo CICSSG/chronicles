@@ -1,3 +1,4 @@
+import { SpeedInsights } from "@vercel/speed-insights/next"
 import type { Metadata } from "next";
 import { ClerkProvider, SignedIn } from "@clerk/nextjs";
 import { Geist, Geist_Mono } from "next/font/google";
@@ -60,6 +61,7 @@ export default async function RootLayout({
               <div className="ml-13 w-full transition-all duration-500 peer-hover:pl-48">
                 <div className="flex min-h-full flex-wrap gap-2 p-5">
                   <NuqsAdapter>{children}</NuqsAdapter>
+                  <SpeedInsights />
                 </div>
               </div>
 
