@@ -1,15 +1,12 @@
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from '@vercel/analytics/next';
 
-import { Geist, Space_Grotesk } from "next/font/google";
-import Image from "next/image";
+import { Space_Grotesk } from "next/font/google";
 import Link from "next/link";
 import "/app/globals.css";
-import { createClient } from "@/utils/supabase/server";
-import Announcement from "@/components/header-announcement";
 import Footer from "@/components/footer";
 import NavLinks from "@/components/nav-links";
-import { Edit, House } from "lucide-react";
+import { Edit } from "lucide-react";
 import { SignedIn } from "@clerk/nextjs";
 
 const defaultUrl = process.env.VERCEL_URL

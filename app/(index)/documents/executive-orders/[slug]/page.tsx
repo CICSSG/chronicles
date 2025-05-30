@@ -1,6 +1,6 @@
 import NavDocuments from "@/components/nav-documents";
 import { createClient } from "@supabase/supabase-js";
-import { Link2Icon, LinkIcon } from "lucide-react";
+import { LinkIcon } from "lucide-react";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -15,7 +15,7 @@ export default async function Page({
   const { slug } = await params;
   const id = typeof slug === "string" ? parseInt(slug) : 0;
 
-  let { data: documents, error } = await supabase
+  let { data: documents } = await supabase
     .from("documents")
     .select("*")
     .eq("id", id)

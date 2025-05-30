@@ -1,6 +1,5 @@
 import Card from '@/components/card';
 import { createClient } from '@/utils/supabase/server'
-import { off } from 'process';
 import React from 'react'
 
 interface Officer {

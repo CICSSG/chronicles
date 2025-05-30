@@ -1,16 +1,6 @@
 'use server';
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
-// const { session } = useSession()
-// const supabase = createClient(
-//   process.env.NEXT_PUBLIC_SUPABASE_URL!,
-//   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-//   {
-//       // Session accessed from Clerk SDK, either as Clerk.session (vanilla
-//       // JavaScript) or useSession (React)
-//       accessToken: async () => session?.getToken() ?? null,
-//     }
-// );
 
 export async function createNewDocument(formData: FormData) {
   const { getToken } = await auth();
