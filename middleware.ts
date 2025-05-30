@@ -19,7 +19,7 @@ const isSignupRoute = createRouteMatcher([
 ])
 
 export default clerkMiddleware(async (auth, req) => {
-  if (req.nextUrl.pathname.startsWith('/sign-in/factor-one')) {
+  if (req.nextUrl.pathname.startsWith('/sign-in*')) {
   return NextResponse.next();
 }
 
