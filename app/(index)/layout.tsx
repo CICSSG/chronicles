@@ -1,4 +1,6 @@
 import { SpeedInsights } from "@vercel/speed-insights/next"
+import { Analytics } from '@vercel/analytics/next';
+
 import { Geist, Space_Grotesk } from "next/font/google";
 import Image from "next/image";
 import Link from "next/link";
@@ -52,6 +54,7 @@ export default async function RootLayout({
               <div className="grow-1 basis-0">
                 {children}
                 <SpeedInsights />
+                <Analytics />
               </div>
 
               {/* Footer */}
