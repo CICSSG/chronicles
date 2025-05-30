@@ -9,6 +9,7 @@ import NavLinksAdmin from "@/components/admin/navlinksadmin";
 import Link from "next/link";
 import { User } from "lucide-react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Analytics } from "@vercel/analytics/next";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -62,6 +63,7 @@ export default async function RootLayout({
                 <div className="flex min-h-full flex-wrap gap-2 p-5">
                   <NuqsAdapter>{children}</NuqsAdapter>
                   <SpeedInsights />
+                  <Analytics />
                 </div>
               </div>
 
