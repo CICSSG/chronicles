@@ -105,7 +105,7 @@ const ContactUs = () => {
                 >
                   Phone
                 </label>
-                <span className="ml-auto text-black/40 text-sm text-sm">Optional</span>
+                <span className="ml-auto text-black/40 text-sm">Optional</span>
               </div>
               <div className="mt-2">
                 <div className="flex items-center rounded-md bg-white pl-3 outline-1 -outline-offset-1 outline-gray-300 focus-within:outline-2 focus-within:-outline-offset-2 focus-within:outline-blue-300">
