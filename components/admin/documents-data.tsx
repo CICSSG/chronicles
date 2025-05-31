@@ -32,8 +32,7 @@ export default async function DocumentData(id?: string, page?: number) {
   } else {
     let { data: documents, count } = await supabase
       .from("documents")
-      .select("*", { count: "exact", head: true })
-      .range(from, to)
+      .select("*")
       .eq("id", parseInt(id));
 
     let pagination =
