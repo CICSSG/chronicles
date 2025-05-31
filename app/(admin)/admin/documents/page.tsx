@@ -99,8 +99,8 @@ export default function Documents() {
       setEditFormId(id);
       setEditForm(false);
     } else {
-      DocumentData(id).then((doc) => {
-        setEditDocument(doc);
+      DocumentData(id).then(({ documents, pagination }) => {
+        setEditDocument(documents);
         setEditFormId(id);
       });
     }
@@ -112,17 +112,17 @@ export default function Documents() {
     setDeleteForm(open);
   };
 
-  const handleSearch = () => {
-    setPage(1);
-    DocumentSearch(
-      title ?? undefined,
-      documentType ?? undefined,
-      page ?? undefined,
-    ).then(({ documents, pagination }) => {
-      setDocuments(documents ?? null);
-      setPagination(pagination);
-    });
-  };
+  // const handleSearch = () => {
+  //   setPage(1);
+  //   DocumentSearch(
+  //     title ?? undefined,
+  //     documentType ?? undefined,
+  //     page ?? undefined,
+  //   ).then(({ documents, pagination }) => {
+  //     setDocuments(documents ?? null);
+  //     setPagination(pagination);
+  //   });
+  // };
 
   const clearFilters = () => {
     setPage(1);
@@ -143,7 +143,7 @@ export default function Documents() {
     ).then(({ documents }) => {
       setDocuments(documents ?? null);
     });
-  }, [page]);
+  }, [page, title, documentType]);
 
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
@@ -210,13 +210,13 @@ export default function Documents() {
               </div>
             </Field>
           </div>
-          <button
+          {/* <button
             type="button"
             onClick={handleSearch}
             className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white hover:cursor-pointer hover:bg-white/10"
           >
             <Search />
-          </button>
+          </button> */}
           <button
             type="button"
             onClick={clearFilters}
