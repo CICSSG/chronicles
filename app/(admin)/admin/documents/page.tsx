@@ -142,6 +142,7 @@ export default function Documents() {
       page ?? undefined,
     ).then(({ documents }) => {
       setDocuments(documents ?? null);
+      console.log(documents)
     });
   }, [page, title, documentType]);
 
@@ -228,7 +229,7 @@ export default function Documents() {
       </div>
 
       <div className="relative flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-x-auto overflow-y-auto rounded-2xl border bg-white/10 p-4 shadow-xl">
-        {!documents && (
+        {documents?.length == 0 && (
           <div className="absolute top-0 left-0 z-20 flex h-full w-full items-center justify-center bg-black/30">
             No Data Found.
           </div>
@@ -249,13 +250,7 @@ export default function Documents() {
               <tr className="w-full" key={i}>
                 <th className="text-nowrap">{data.title}</th>
                 <td className="text-nowrap">
-                  {data.date
-                    ? new Date(data.date).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })
-                    : ""}
+                  {data.date}
                 </td>
                 <td className="text-nowrap">{data.document_type}</td>
                 <td className="max-w-2xl truncate">{data.description}</td>
@@ -431,7 +426,7 @@ export default function Documents() {
                             </Label>
                             <Input
                               name="date"
-                              type="date"
+                              type="text"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -482,41 +477,16 @@ export default function Documents() {
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
                             <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              Post Link
+                              File Link
                             </Label>
                             <Input
-                              name="post_link"
+                              name="file_link"
                               type="text"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
                             />
-                          </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Image
-                            </Label>
-                            <Input
-                              name="image"
-                              type="text"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                            />
-                          </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-col gap-4 text-black">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              External Links
-                            </Label>
-                            <AddDynamicInputFields />
                           </Field>
                         </div>
                       </div>
@@ -614,7 +584,7 @@ export default function Documents() {
                               Date
                             </Label>
                             <Input
-                              type="date"
+                              type="text"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -680,10 +650,10 @@ export default function Documents() {
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
                             <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              Post Link
+                              File Link
                             </Label>
                             <Input
-                              type="url"
+                              type="text"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -691,42 +661,11 @@ export default function Documents() {
                               defaultValue={
                                 editDocument && editDocument[0].link
                               }
-                              name="post_link"
+                              name="file_link"
                             />
                           </Field>
                         </div>
 
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Image
-                            </Label>
-                            <Input
-                              type="url"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              defaultValue={
-                                editDocument && editDocument[0].image
-                              }
-                              name="image"
-                            />
-                          </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-col gap-4 text-black">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              External Links
-                            </Label>
-                            <AddDynamicInputFields
-                              data={
-                                editDocument && editDocument[0].external_links
-                              }
-                            />
-                          </Field>
-                        </div>
                       </div>
                     </div>
                   </div>
