@@ -24,7 +24,7 @@ export default async function DocumentData(id?: string, page?: number) {
       .from("documents")
       .select("*", { count: "exact", head: false })
       .range(from, to)
-      .order("date", { ascending: false });
+      .order("created_at", { ascending: false });
 
     let pagination =
       count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;
@@ -63,7 +63,7 @@ export async function DocumentSearch(
       .range(from, to)
       .eq("document_type", documentType)
       .ilike("title", title)
-      .order("date", { ascending: false });
+      .order("created_at", { ascending: false });
 
     let pagination =
       count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;
@@ -76,7 +76,7 @@ export async function DocumentSearch(
       .select("*", { count: "exact", head: false })
       .range(from, to)
       .ilike("title", title)
-      .order("date", { ascending: false });
+      .order("created_at", { ascending: false });
 
     let pagination =
       count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;
@@ -89,7 +89,7 @@ export async function DocumentSearch(
       .select("*", { count: "exact", head: false })
       .range(from, to)
       .eq("document_type", documentType)
-      .order("date", { ascending: false });
+      .order("created_at", { ascending: false });
 
     let pagination =
       count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;
@@ -100,7 +100,7 @@ export async function DocumentSearch(
     .from("documents")
     .select("*", { count: "exact", head: false })
     .range(from, to)
-    .order("date", { ascending: false });
+    .order("created_at", { ascending: false });
 
   let pagination =
       count != null ? Math.ceil((count - 1) / ITEMS_PER_PAGE) : 1;

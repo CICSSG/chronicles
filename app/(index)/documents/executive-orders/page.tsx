@@ -14,6 +14,7 @@ export default async function ExecutiveOrders() {
   .from('documents')
   .select('*')
   .eq('document_type', 'executive-order')
+  .order("created_at", { ascending: false });
 
   return (
     <div className="flex w-full flex-col md:flex-row gap-4 *:rounded-2xl">
@@ -34,7 +35,7 @@ export default async function ExecutiveOrders() {
           key={data.id}
           Title={data.title}
           Date={data.date}
-          URL={"/documents/executive-orders/" + data.id}
+          URL={data.link}
           Description={data.description}
           Author={data.author}
           />

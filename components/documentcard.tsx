@@ -20,6 +20,7 @@ function DocumentCard({ Title, Date, URL, Description, Author }: DocumentCard) {
         <Link
           href={URL}
           className="rounded-md flex flex-row items-center gap-1 bg-black/70 px-4 py-2 text-white/90"
+          target="_blank"
         >
           Read More <IoIosArrowForward />{" "}
         </Link>
