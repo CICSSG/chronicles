@@ -16,7 +16,8 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
-import DocumentData, {
+import {
+  DocumentData,
   DocumentSearch,
 } from "@/components/admin/documents-data";
 import AddDynamicInputFields from "@/components/admin/dynamic-input-field";
@@ -26,7 +27,7 @@ import {
   editDocumentPOST,
 } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
 
@@ -43,8 +44,8 @@ const options = [
   { option: "Resolution", value: "resolution" },
 ];
 
+
 export default function Documents() {
-  const pathname = usePathname();
   const [page, setPage] = useQueryState("page", parseAsInteger);
   const [title, setTitle] = useQueryState("title");
   const [documentType, setDocumentType] = useQueryState("documentType");
@@ -58,7 +59,13 @@ export default function Documents() {
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
   const [pagination, setPagination] = useState(1);
 
-  const ITEMS_PER_PAGE = 1;
+  const pages = [
+    (page ?? 1) <= 3 ? 1 : (page ?? 1) > pagination - 2 ? pagination - 4 : (page ?? 1) - 2,
+    (page ?? 1) <= 3 ? 2 : (page ?? 1) > pagination - 2 ? pagination - 3 : (page ?? 1) - 1,
+    (page ?? 1) <= 3 ? 3 : (page ?? 1) > pagination - 2 ? pagination - 2 : (page ?? 1),
+    (page ?? 1) <= 3 ? 4 : (page ?? 1) > pagination - 2? pagination - 1 : (page ?? 1) + 1,
+    (page ?? 1) <= 3 ? 5 : (page ?? 1) > pagination - 2? pagination : (page ?? 1) + 2,
+  ];
 
   const setCurrentPageHandler = (value: number) => {
     setPage(value);
@@ -79,6 +86,9 @@ export default function Documents() {
           DocumentData().then(({ documents, pagination }) => {
             setDocuments(documents ?? null);
             setPagination(pagination);
+            setPage(1)
+            setTitle(null);
+            setDocumentType(null);
           });
           // console.log("Change received!", payload);
         },
@@ -112,18 +122,6 @@ export default function Documents() {
     setDeleteForm(open);
   };
 
-  // const handleSearch = () => {
-  //   setPage(1);
-  //   DocumentSearch(
-  //     title ?? undefined,
-  //     documentType ?? undefined,
-  //     page ?? undefined,
-  //   ).then(({ documents, pagination }) => {
-  //     setDocuments(documents ?? null);
-  //     setPagination(pagination);
-  //   });
-  // };
-
   const clearFilters = () => {
     setPage(1);
     setTitle(null);
@@ -140,11 +138,16 @@ export default function Documents() {
       title ?? undefined,
       documentType ?? undefined,
       page ?? undefined,
-    ).then(({ documents }) => {
-      setDocuments(documents ?? null);
-      console.log(documents)
+    ).then(({ documents, pagination }) => {
+      setDocuments(documents);
+      setPagination(pagination);
     });
   }, [page, title, documentType]);
+
+  useEffect(() => {
+    setPage(1);
+  }, [title, documentType])
+  
 
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
@@ -281,95 +284,70 @@ export default function Documents() {
           <>
             <Link
               className="join-item btn"
-              href={{
-                pathname: pathname,
-                query: {
-                  page: (page ?? 1) <= 3 ? 1 : (page ?? 1) - 2,
-                },
-              }}
+              href={""}
               passHref
               shallow
               replace
               onClick={() =>
-                setCurrentPageHandler((page ?? 1) <= 3 ? 1 : (page ?? 1) - 2)
+                setCurrentPageHandler(pages[0])
               }
             >
-              {(page ?? 1) <= 3 ? "1" : (page ?? 1) - 2}
+              {pages[0]}
             </Link>
             <Link
               className="join-item btn"
-              href={{
-                pathname: pathname,
-                query: {
-                  page: (page ?? 1) <= 3 ? 2 : (page ?? 1) - 1,
-                },
-              }}
+              href={""}
               passHref
               shallow
               replace
               onClick={() =>
-                setCurrentPageHandler((page ?? 1) <= 3 ? 2 : (page ?? 1) - 1)
+                setCurrentPageHandler(pages[1])
               }
             >
-              {(page ?? 1) <= 3 ? "2" : (page ?? 1) - 1}
+              {pages[1]}
             </Link>
           </>
         )}
         {pagination >= 3 && (
           <Link
             className="join-item btn"
-            href={{
-              pathname: pathname,
-              query: {
-                page: (page ?? 1) <= 3 ? 3 : page,
-              },
-            }}
+            href={""}
             passHref
             shallow
             replace
             onClick={() =>
-              setCurrentPageHandler((page ?? 1) <= 3 ? 3 : (page ?? 1))
+              setCurrentPageHandler(pages[2])
             }
           >
-            {(page ?? 1) <= 3 ? "3" : page}
+            {pages[2]}
           </Link>
         )}
         {pagination >= 4 && (
           <Link
             className="join-item btn"
-            href={{
-              pathname: pathname,
-              query: {
-                page: (page ?? 1) <= 3 ? 4 : (page ?? 1) + 1,
-              },
-            }}
+            href={""}
             passHref
             shallow
             replace
             onClick={() =>
-              setCurrentPageHandler((page ?? 1) <= 3 ? 4 : (page ?? 1) + 1)
+              setCurrentPageHandler(pages[3])
             }
           >
-            {(page ?? 1) <= 3 ? "4" : (page ?? 1) + 1}
+            {pages[3]}
           </Link>
         )}
         {pagination >= 5 && (
           <Link
             className="join-item btn"
-            href={{
-              pathname: pathname,
-              query: {
-                page: (page ?? 1) <= 3 ? 5 : (page ?? 1) + 2,
-              },
-            }}
+            href={""}
             passHref
             shallow
             replace
             onClick={() =>
-              setCurrentPageHandler((page ?? 1) <= 3 ? 5 : (page ?? 1) + 2)
+              setCurrentPageHandler(pages[4])
             }
           >
-            {(page ?? 1) <= 3 ? "5" : (page ?? 1) + 2}
+            {pages[4]}
           </Link>
         )}
       </div>
