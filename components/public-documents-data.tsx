@@ -23,3 +23,19 @@ export async function PublicDocumentData(document_type: string, page?: number | 
 
   return { documents, pagination };
 }
+
+
+export async function PublicAnnouncementData(page?: number | null) {
+  page == null && (page = 1);
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  let { data: documents, count } = await supabase
+    .from("announcements")
+    .select("*", { count: "exact", head: false })
+    .range(from, to)
+    .order("id", { ascending: false });
+
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+
+  return { documents, pagination };
+}
