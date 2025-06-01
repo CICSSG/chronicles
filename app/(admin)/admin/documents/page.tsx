@@ -12,15 +12,12 @@ import {
 import { DocumentIcon } from "@heroicons/react/20/solid";
 import { ChevronDownIcon, Search } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
-import {
-  DocumentData,
+import DocumentData, {
   DocumentSearch,
 } from "@/components/admin/documents-data";
-import AddDynamicInputFields from "@/components/admin/dynamic-input-field";
 import {
   createNewDocument,
   deleteDocumentPOST,
