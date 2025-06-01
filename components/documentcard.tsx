@@ -14,7 +14,7 @@ interface DocumentCard {
 function DocumentCard({ Image, Title, Date, URL, Description, Author }: DocumentCard) {
   return (
     <div className="flex flex-col gap-4">
-      {Image && (<img src={Image} alt="" className="rounded-lg object-cover" />)}
+      {Image && (<img src={Image} alt="" className="rounded-lg object-cover aspect-square" />)}
       <h1 className="text-2xl font-bold">{Title}</h1>
       <hr />
       <div className="flex min-h-12 flex-row items-center">
