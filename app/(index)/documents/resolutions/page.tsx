@@ -1,11 +1,10 @@
 "use client";
 import DocumentCard from "@/components/documentcard";
 import NavDocuments from "@/components/nav-documents";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { PublicDocumentData } from "@/components/public-documents-data";
 import Link from "next/link";
-
 
 function Resolutions() {
   const [documents, setDocuments] = useState<any[] | null>(null);
@@ -59,23 +58,23 @@ function Resolutions() {
           <NavDocuments />
         </div>
       </div>
-      <div className="flex flex-col grow-3 basis-0 gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80">
-        <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3">
-          {/* Card */}
-          {documents?.map((data) => (
-            <DocumentCard
-              key={data.id}
-              Title={data.title}
-              Date={data.date}
-              URL={data.link}
-              Description={data.description}
-              Author={data.author}
-            />
-          ))}    
-        </div>
+      <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80">
+        <Suspense>
+          <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3">
+            {/* Card */}
+            {documents?.map((data) => (
+              <DocumentCard
+                key={data.id}
+                Title={data.title}
+                Date={data.date}
+                URL={data.link}
+                Description={data.description}
+                Author={data.author}
+              />
+            ))}
+          </div>
 
-
-        <div className="join">
+          <div className="join">
             {pagination >= 2 && (
               <>
                 <Link
@@ -137,6 +136,7 @@ function Resolutions() {
               </Link>
             )}
           </div>
+        </Suspense>
       </div>
     </div>
   );

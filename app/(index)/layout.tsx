@@ -9,6 +9,7 @@ import NavLinks from "@/components/nav-links";
 import { Edit } from "lucide-react";
 import { SignedIn } from "@clerk/nextjs";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Suspense } from "react";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -50,7 +51,7 @@ export default async function RootLayout({
               </div>
 
               <div className="grow-1 basis-0">
-                <NuqsAdapter>{children}</NuqsAdapter>
+                <Suspense><NuqsAdapter>{children}</NuqsAdapter></Suspense>
                 <SpeedInsights />
                 <Analytics />
               </div>

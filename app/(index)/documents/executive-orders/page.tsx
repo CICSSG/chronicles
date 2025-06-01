@@ -1,6 +1,6 @@
 "use client";
 import NavDocuments from "@/components/nav-documents";
-import React, { useEffect, useState } from "react";
+import React, { Suspense, useEffect, useState } from "react";
 import DocumentCard from "@/components/documentcard";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { PublicDocumentData } from "@/components/public-documents-data";
@@ -61,82 +61,84 @@ export default function ExecutiveOrders() {
         </div>
       </div>
       <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80">
-        <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3">
-          {/* Card */}
-          {documents?.map((data) => (
-            <DocumentCard
-              key={data.id}
-              Title={data.title}
-              Date={data.date}
-              URL={data.link}
-              Description={data.description}
-              Author={data.author}
-            />
-          ))}
-        </div>
+        <Suspense>
+          <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3">
+            {/* Card */}
+            {documents?.map((data) => (
+              <DocumentCard
+                key={data.id}
+                Title={data.title}
+                Date={data.date}
+                URL={data.link}
+                Description={data.description}
+                Author={data.author}
+              />
+            ))}
+          </div>
 
-        <div className="join">
-          {pagination >= 2 && (
-            <>
+          <div className="join">
+            {pagination >= 2 && (
+              <>
+                <Link
+                  className="join-item btn"
+                  href={""}
+                  passHref
+                  shallow
+                  replace
+                  onClick={() => setPage(pages[0])}
+                >
+                  {pages[0]}
+                </Link>
+                <Link
+                  className="join-item btn"
+                  href={""}
+                  passHref
+                  shallow
+                  replace
+                  onClick={() => setPage(pages[1])}
+                >
+                  {pages[1]}
+                </Link>
+              </>
+            )}
+            {pagination >= 3 && (
               <Link
                 className="join-item btn"
                 href={""}
                 passHref
                 shallow
                 replace
-                onClick={() => setPage(pages[0])}
+                onClick={() => setPage(pages[2])}
               >
-                {pages[0]}
+                {pages[2]}
               </Link>
+            )}
+            {pagination >= 4 && (
               <Link
                 className="join-item btn"
                 href={""}
                 passHref
                 shallow
                 replace
-                onClick={() => setPage(pages[1])}
+                onClick={() => setPage(pages[3])}
               >
-                {pages[1]}
+                {pages[3]}
               </Link>
-            </>
-          )}
-          {pagination >= 3 && (
-            <Link
-              className="join-item btn"
-              href={""}
-              passHref
-              shallow
-              replace
-              onClick={() => setPage(pages[2])}
-            >
-              {pages[2]}
-            </Link>
-          )}
-          {pagination >= 4 && (
-            <Link
-              className="join-item btn"
-              href={""}
-              passHref
-              shallow
-              replace
-              onClick={() => setPage(pages[3])}
-            >
-              {pages[3]}
-            </Link>
-          )}
-          {pagination >= 5 && (
-            <Link
-              className="join-item btn"
-              href={""}
-              passHref
-              shallow
-              replace
-              onClick={() => setPage(pages[4])}
-            >
-              {pages[4]}
-            </Link>
-          )}
-        </div>
+            )}
+            {pagination >= 5 && (
+              <Link
+                className="join-item btn"
+                href={""}
+                passHref
+                shallow
+                replace
+                onClick={() => setPage(pages[4])}
+              >
+                {pages[4]}
+              </Link>
+            )}
+          </div>
+        </Suspense>
       </div>
     </div>
   );

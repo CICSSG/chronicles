@@ -9,7 +9,7 @@ const supabase = createClient(
 const ITEMS_PER_PAGE = 9;
 
 
-export async function DocumentData(id?: string, page?: number) {
+export default async function DocumentData(id?: string, page?: number) {
   if (page == null) page = 1;
   const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
 
