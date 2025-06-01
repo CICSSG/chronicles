@@ -6,48 +6,39 @@ import {
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
-  Select,
   Textarea,
 } from "@headlessui/react";
 import { DocumentIcon } from "@heroicons/react/20/solid";
-import { ChevronDownIcon, Search } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
 import DocumentData, {
-  DocumentSearch,
+  AnnouncementData,
+  AnnouncementSearch,
 } from "@/components/admin/documents-data";
 import AddDynamicInputFields from "@/components/admin/dynamic-input-field";
 import {
-  createNewDocument,
-  deleteDocumentPOST,
-  editDocumentPOST,
+  createAnnouncementPOST,
+  deleteAnnouncementPOST,
+  editAnnouncementPOST,
 } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
-import { parseAsInteger, parseAsString, useQueryState } from "nuqs";
+import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
+import { imgurUpload } from "@/utils/imgur-upload";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 );
 
-const options = [
-  { option: "Executive Order", value: "executive-order" },
-  { option: "Transparency Report", value: "transparency-report" },
-  { option: "Ordinance", value: "ordinance" },
-  { option: "Formal Document", value: "formal-document" },
-  { option: "Resolution", value: "resolution" },
-];
-
 export default function Documents() {
   const pathname = usePathname();
   const [page, setPage] = useQueryState("page", parseAsInteger);
   const [title, setTitle] = useQueryState("title");
-  const [documentType, setDocumentType] = useQueryState("documentType");
   const [createForm, setCreateForm] = useState(false);
   const [deleteForm, setDeleteForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
@@ -57,15 +48,36 @@ export default function Documents() {
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
   const [pagination, setPagination] = useState(1);
+  const [base64Image, setBase64Image] = useState<string>("");
+  const [image, setImage] = useState<string>("");
 
-  const ITEMS_PER_PAGE = 1;
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setBase64Image(reader.result as string);
+    reader.readAsDataURL(file);
+  };
 
+  useEffect(() => {
+    if (base64Image) {
+      imgurUpload(base64Image)
+        .then((result) => {
+          setImage(`${result.data.link}`);
+        })
+        .catch((err) => {
+          // handle error if needed
+        });
+    }
+  }, [base64Image]);
+
+  
   const setCurrentPageHandler = (value: number) => {
     setPage(value);
   };
 
   useEffect(() => {
-    DocumentData().then(({ documents, pagination }) => {
+    AnnouncementData().then(({ documents, pagination }) => {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
@@ -74,9 +86,9 @@ export default function Documents() {
       .channel("public:data")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "documents" },
+        { event: "*", schema: "public", table: "announcements" },
         (payload) => {
-          DocumentData().then(({ documents, pagination }) => {
+          AnnouncementData().then(({ documents, pagination }) => {
             setDocuments(documents ?? null);
             setPagination(pagination);
           });
@@ -96,10 +108,11 @@ export default function Documents() {
 
   const handleEditDocument = (id: string) => {
     if (id == "") {
+      setImage("")
       setEditFormId(id);
       setEditForm(false);
     } else {
-      DocumentData(id).then(({ documents, pagination }) => {
+      AnnouncementData(id).then(({ documents, pagination }) => {
         setEditDocument(documents);
         setEditFormId(id);
       });
@@ -112,38 +125,23 @@ export default function Documents() {
     setDeleteForm(open);
   };
 
-  // const handleSearch = () => {
-  //   setPage(1);
-  //   DocumentSearch(
-  //     title ?? undefined,
-  //     documentType ?? undefined,
-  //     page ?? undefined,
-  //   ).then(({ documents, pagination }) => {
-  //     setDocuments(documents ?? null);
-  //     setPagination(pagination);
-  //   });
-  // };
-
   const clearFilters = () => {
     setPage(1);
     setTitle(null);
-    setDocumentType(null);
 
-    DocumentData().then(({ documents, pagination }) => {
+    AnnouncementData().then(({ documents, pagination }) => {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
   };
 
   useEffect(() => {
-    DocumentSearch(
-      title ?? undefined,
-      documentType ?? undefined,
-      page ?? undefined,
-    ).then(({ documents }) => {
-      setDocuments(documents ?? null);
-    });
-  }, [page, title, documentType]);
+    AnnouncementSearch(title ?? undefined, page ?? undefined).then(
+      ({ documents }) => {
+        setDocuments(documents ?? null);
+      },
+    );
+  }, [page, title]);
 
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
@@ -156,7 +154,11 @@ export default function Documents() {
 
       <div className="flex flex-row justify-between align-bottom">
         <Button
-          onClick={() => setCreateForm(true)}
+          onClick={() => {
+            setImage("")
+            setBase64Image("")
+            setCreateForm(true)
+          }}
           className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-green-600 px-3 py-1.5 font-semibold text-white hover:bg-green-500"
         >
           Create Document
@@ -177,39 +179,7 @@ export default function Documents() {
               />
             </Field>
           </div>
-          <div className="max-w-1xs w-full px-4">
-            <Field>
-              <Label className="text-sm/6 font-medium text-nowrap text-white">
-                Document Type
-              </Label>
-              <div className="relative">
-                <Select
-                  name="document_type"
-                  value={documentType ?? ""}
-                  className={clsx(
-                    "mt-3 block w-full appearance-none rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white/45 focus:text-white",
-                    "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25",
-                    // Make the text of each option black on Windows
-                    "*:text-black",
-                  )}
-                  onChange={(e) => setDocumentType(e.target.value)}
-                >
-                  <option value="" disabled>
-                    Document Type
-                  </option>
-                  {options.map((data, i) => (
-                    <option key={i} value={data.value}>
-                      {data.option}
-                    </option>
-                  ))}
-                </Select>
-                <ChevronDownIcon
-                  className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
-                  aria-hidden="true"
-                />
-              </div>
-            </Field>
-          </div>
+
           {/* <button
             type="button"
             onClick={handleSearch}
@@ -222,7 +192,7 @@ export default function Documents() {
             onClick={clearFilters}
             className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-nowrap text-white hover:cursor-pointer hover:bg-white/10"
           >
-            Clear Filters
+            Clear Filter
           </button>
         </div>
       </div>
@@ -239,7 +209,6 @@ export default function Documents() {
             <tr className="border-b border-b-black">
               <th>Title</th>
               <th>Date</th>
-              <th>Document Type</th>
               <th>Description</th>
               <th>Actions</th>
             </tr>
@@ -249,15 +218,8 @@ export default function Documents() {
               <tr className="w-full" key={i}>
                 <th className="text-nowrap">{data.title}</th>
                 <td className="text-nowrap">
-                  {data.date
-                    ? new Date(data.date).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })
-                    : ""}
+                  {data.date}
                 </td>
-                <td className="text-nowrap">{data.document_type}</td>
                 <td className="max-w-2xl truncate">{data.description}</td>
                 <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                   <Button
@@ -391,7 +353,20 @@ export default function Documents() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={createNewDocument}>
+              <form 
+              onSubmit={(e) => {
+                  e.preventDefault();
+                  if (image == "") {
+                    alert("Image was not uploaded yet, try again");
+                  } else {
+                    const formData = new FormData(e.currentTarget);
+                    formData.set("image", image ?? "");
+                    createAnnouncementPOST(formData);
+                    setBase64Image("")
+                    setImage("")
+                    setCreateForm(false);
+                  }
+                }}>
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
@@ -431,19 +406,13 @@ export default function Documents() {
                             </Label>
                             <Input
                               name="date"
-                              type="date"
+                              type="text"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 "scheme-light",
                               )}
                             />
-                          </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <DocumentRadioDropdown left={true} />
                           </Field>
                         </div>
 
@@ -459,22 +428,6 @@ export default function Documents() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
                               rows={8}
-                            />
-                          </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              Author/s
-                            </Label>
-                            <Input
-                              name="author"
-                              type="text"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
                             />
                           </Field>
                         </div>
@@ -501,23 +454,22 @@ export default function Documents() {
                               Image
                             </Label>
                             <Input
-                              name="image"
-                              type="text"
+                              type="file"
+                              onChange={handleImageChange}
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
+                              accept=".png,.jpg,.jpeg"
                             />
                           </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-col gap-4 text-black">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              External Links
-                            </Label>
-                            <AddDynamicInputFields />
-                          </Field>
+                          <div className="text-xs font-bold">
+                            {!image && !base64Image ? (
+                              <div className="text-red-400">No image</div>
+                            ) : !image && base64Image ? (<div className="text-amber-300">Image uploading</div>) : (
+                              <div className="text-green-300">Image uploaded</div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -526,7 +478,6 @@ export default function Documents() {
                 <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                   <button
                     type="submit"
-                    onClick={() => setCreateForm(false)}
                     className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-green-500 sm:ml-3 sm:w-auto"
                   >
                     Submit
@@ -558,7 +509,22 @@ export default function Documents() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={editDocumentPOST}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  if (image == "" && base64Image != "") {
+                    alert("Image was not uploaded yet, try again");
+                  } else {
+                    const formData = new FormData(e.currentTarget);
+                    formData.set("image", image ?? "");
+                    editAnnouncementPOST(formData);
+                    setEditForm(false);
+                    setBase64Image("")
+                    setImage("")
+                    handleEditDocument("")
+                  }
+                }}
+              >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-amber-100 sm:mx-0 sm:size-10">
@@ -614,7 +580,7 @@ export default function Documents() {
                               Date
                             </Label>
                             <Input
-                              type="date"
+                              type="text"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -624,17 +590,6 @@ export default function Documents() {
                                 editDocument && editDocument[0].date
                               }
                               name="date"
-                            />
-                          </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <DocumentRadioDropdown
-                              left={true}
-                              value={
-                                editDocument && editDocument[0].document_type
-                              }
                             />
                           </Field>
                         </div>
@@ -661,29 +616,10 @@ export default function Documents() {
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
                             <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              Author/s
-                            </Label>
-                            <Input
-                              type="text"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              defaultValue={
-                                editDocument && editDocument[0].author
-                              }
-                              name="author"
-                            />
-                          </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
                               Post Link
                             </Label>
                             <Input
-                              type="url"
+                              type="text"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -702,30 +638,26 @@ export default function Documents() {
                               Image
                             </Label>
                             <Input
-                              type="url"
+                              type="file"
+                              onChange={handleImageChange}
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                "scheme-light",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].image
-                              }
-                              name="image"
+                              accept=".png,.jpg,.jpeg"
+                              // defaultValue={
+                              //   editDocument && editDocument[0].image
+                              // }
                             />
                           </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-col gap-4 text-black">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              External Links
-                            </Label>
-                            <AddDynamicInputFields
-                              data={
-                                editDocument && editDocument[0].external_links
-                              }
-                            />
-                          </Field>
+                          <div className="text-xs font-bold">
+                            {!image && !base64Image ? (
+                              <div className="text-red-400">Upload to change image</div>
+                            ) : !image && base64Image ? (<div className="text-amber-300">Image uploading</div>) : (
+                              <div className="text-green-300">Image uploaded</div>
+                            )}
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -734,7 +666,6 @@ export default function Documents() {
                 <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                   <button
                     type="submit"
-                    onClick={() => handleEditDocument("")}
                     className="inline-flex w-full justify-center rounded-md bg-amber-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-amber-500 sm:ml-3 sm:w-auto"
                   >
                     Edit File
@@ -771,7 +702,7 @@ export default function Documents() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={deleteDocumentPOST}>
+              <form action={deleteAnnouncementPOST}>
                 <input
                   type="text"
                   name="id"

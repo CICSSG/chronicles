@@ -3,6 +3,7 @@ import React from "react";
 import { IoIosArrowForward } from "react-icons/io";
 
 interface DocumentCard {
+  Image?: string;
   Title: string;
   Date: string;
   URL: string;
@@ -10,9 +11,10 @@ interface DocumentCard {
   Author?: string;
 }
 
-function DocumentCard({ Title, Date, URL, Description, Author }: DocumentCard) {
+function DocumentCard({ Image, Title, Date, URL, Description, Author }: DocumentCard) {
   return (
     <div className="flex flex-col gap-4">
+      {Image && (<img src={Image} alt="" className="rounded-lg object-cover" />)}
       <h1 className="text-2xl font-bold">{Title}</h1>
       <hr />
       <div className="flex min-h-12 flex-row items-center">
@@ -28,7 +30,7 @@ function DocumentCard({ Title, Date, URL, Description, Author }: DocumentCard) {
       <p className="font-medium">
         {Description}
       </p>
-      {Author? (<div className="text-sm mt-auto"><span className="font-bold">Author/s:</span> <span className="font-medium">{Author}</span></div>): null}
+      {Author && (<div className="text-sm mt-auto"><span className="font-bold">Author/s:</span> <span className="font-medium">{Author}</span></div>)}
     </div>
   );
 }
