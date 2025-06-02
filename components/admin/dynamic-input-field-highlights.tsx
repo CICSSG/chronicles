@@ -4,11 +4,11 @@ import { Delete, Trash } from "lucide-react";
 import { useState } from "react";
 import { IoAdd } from "react-icons/io5";
 
-type InputField = { name: string; link: string };
+type InputField = { highlight: string; description: string };
 
 import { useEffect } from "react";
 
-export default function AddDynamicInputFields({data} : {data?: any}) {
+export default function DynamicInputFieldsHighlights({data} : {data?: any}) {
   const [inputs, setInputs] = useState<InputField[]>([]);
 
   useEffect(() => {
@@ -25,14 +25,14 @@ export default function AddDynamicInputFields({data} : {data?: any}) {
   }, [data]);
     
   const handleAddInput = () => {
-    setInputs([...inputs, { name: "", link: "" }]);
+    setInputs([...inputs, { highlight: "", description: "" }]);
   };
 
   const handleChange = (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number,
   ) => {
-    let { name, value } = event.target;
+    const { name, value } = event.target;
     let onChangeValue = [...inputs];
     onChangeValue[index][name as keyof InputField] = value;
     setInputs(onChangeValue);
@@ -49,23 +49,23 @@ export default function AddDynamicInputFields({data} : {data?: any}) {
       {inputs.length === 0 ? (
         <button
           onClick={() => handleAddInput()}
-          className="rounded-md bg-green-500 px-3 py-1.5 text-sm font-bold text-white"
+          className="rounded-md bg-green-500 px-3 py-1.5 text-sm font-bold text-white text-nowrap"
         >
-          Add External Link
+          Add Highlight
         </button>
       ) : (
-        <div className="flex flex-row justify-around gap-1 text-sm font-semibold">
-          <span>Name</span>
-          <span>URL</span>
+        <div className="flex flex-row justify-around gap-1 text-sm font-semibold text-black">
+          <span>Focus</span>
+          <span>Description</span>
           {inputs.length === 1 ? <span></span> : null}
         </div>
       )}
       {inputs.map((item, index) => (
         <div className="input_container flex flex-row gap-1" key={index}>
           <Input
-            name="name"
+            name="highlight"
             type="text"
-            value={item.name}
+            value={item.highlight}
             className={clsx(
               "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
               "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -73,9 +73,9 @@ export default function AddDynamicInputFields({data} : {data?: any}) {
             onChange={(event) => handleChange(event, index)}
           />
           <Input
-            name="link"
+            name="description"
             type="text"
-            value={item.link}
+            value={item.description}
             className={clsx(
               "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
               "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -100,7 +100,7 @@ export default function AddDynamicInputFields({data} : {data?: any}) {
           )}
         </div>
       ))}
-      <input name="external_links" type="text" value={JSON.stringify(inputs)} className="invisible" readOnly />
+      <input name="highlights" type="text" value={JSON.stringify(inputs)} className="invisible sr-only" readOnly />
     </div>
   );
 }

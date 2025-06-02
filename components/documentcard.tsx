@@ -7,32 +7,82 @@ interface DocumentCard {
   Title: string;
   Date: string;
   URL: string;
-  Description: string;
+  Description?: string;
   Author?: string;
+  AcademicYear?: string;
+  Location?: string;
 }
 
-function DocumentCard({ Image, Title, Date, URL, Description, Author }: DocumentCard) {
+export function DocumentCard({
+  Image,
+  Title,
+  Date,
+  URL,
+  Description,
+  Author,
+}: DocumentCard) {
   return (
     <div className="flex flex-col gap-4">
-      {Image && (<img src={Image} alt="" className="rounded-lg object-cover aspect-square" />)}
+      {Image && (
+        <img
+          src={Image}
+          alt=""
+          className="aspect-square rounded-lg object-cover"
+        />
+      )}
       <h1 className="text-2xl font-bold">{Title}</h1>
-      <hr />
+      <hr className="rounded-2xl border-2 font-bold text-blue-300" />
       <div className="flex min-h-12 flex-row items-center">
         <p className="grow basis-0 font-medium">{Date}</p>
         <Link
           href={URL}
-          className="rounded-md flex flex-row items-center gap-1 bg-black/70 px-4 py-2 text-white/90"
+          className="flex flex-row items-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70"
           target="_blank"
         >
           Read More <IoIosArrowForward />{" "}
         </Link>
       </div>
-      <p className="font-medium">
-        {Description}
-      </p>
-      {Author && (<div className="text-sm mt-auto"><span className="font-bold">Author/s:</span> <span className="font-medium">{Author}</span></div>)}
+      <p className="font-medium">{Description}</p>
+      {Author && (
+        <div className="mt-auto text-sm">
+          <span className="font-bold">Author/s:</span>{" "}
+          <span className="font-medium">{Author}</span>
+        </div>
+      )}
     </div>
   );
 }
 
-export default DocumentCard;
+export default function EventCard({
+  Image,
+  Title,
+  Date,
+  AcademicYear,
+  URL,
+  Location
+}: DocumentCard) {
+  return (
+    <div className="flex flex-col gap-4">
+      {Image && (
+        <img
+          src={Image}
+          alt=""
+          className="aspect-square rounded-lg object-cover"
+        />
+      )}
+      <h1 className="text-2xl font-bold">{Title}</h1>
+      <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+      <div className="flex min-h-12 flex-col">
+        <p className="grow basis-0 font-medium">{Date}</p>
+        <p className="grow basis-0 font-medium">{AcademicYear}</p>
+        <p className="grow basis-0 font-medium">{Location}</p>
+      </div>
+      <Link
+        href={URL}
+        className="flex flex-row items-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 justify-center hover:bg-black/80 hover:text-white"
+      >
+        Read More <IoIosArrowForward />{" "}
+      </Link>
+    </div>
+  );
+}

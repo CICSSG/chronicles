@@ -3,22 +3,24 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 
 const paths = [
-  { href: "/executive-orders", text: "Executive Orders" },
-  { href: "/transparency-reports", text: "Transparency Reports" },
-  { href: "/ordinances", text: "Ordinances" },
-  { href: "/formal-documents", text: "Formal Documents" },
-  { href: "/resolutions", text: "Resolutions" },
+  { href: "/slate", text: "Slate" },
 ];
-
-export default function NavDocuments() {
+export default function NavCICSSG() {
   const pathname = usePathname();
 
   return (
     <>
+      <Link
+        href={"/cicssg"}
+        className={pathname.endsWith("/cicssg") ? "text-black underline" : ""}
+      >
+        About
+      </Link>
+
       {paths.map((item, i) => (
         <Link
         key={i}
-          href={"/documents" + item.href}
+          href={"/cicssg" + item.href}
           className={
             pathname.match(item.href)
               ? "text-black underline"
