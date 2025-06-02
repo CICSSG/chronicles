@@ -385,6 +385,7 @@ export default function Events() {
                       </DialogTitle>
                       <div className="mt-4 flex w-full flex-row gap-6">
                         <div className="flex flex-col gap-4 grow basis-0">
+
                           <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
@@ -421,7 +422,7 @@ export default function Events() {
                           <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                A.Y. Sem
+                                Academic Year
                               </Label>
                               <Input
                                 name="academic_year"
@@ -551,6 +552,7 @@ export default function Events() {
                             </Field>
                           </div>
                         </div>
+
                       </div>
                     </div>
                   </div>
@@ -618,7 +620,7 @@ export default function Events() {
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        Edit Announcement
+                        Edit Event
                       </DialogTitle>
 
                       <div className="flex w-full flex-col gap-4">
@@ -637,120 +639,179 @@ export default function Events() {
                       </div>
 
                       <div className="mt-4 flex w-full flex-col gap-4">
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Title
-                            </Label>
-                            <Input
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              defaultValue={
-                                editDocument && editDocument[0].title
-                              }
-                              name="title"
-                            ></Input>
-                          </Field>
-                        </div>
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Date
-                            </Label>
-                            <Input
-                              type="text"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                "scheme-light",
-                              )}
-                              defaultValue={
-                                editDocument && editDocument[0].date
-                              }
-                              name="date"
-                            />
-                          </Field>
-                        </div>
 
                         <div className="w-full max-w-md">
-                          <Field>
-                            <Label className="text-sm/6 font-medium text-black">
-                              Description
-                            </Label>
-                            <Textarea
-                              className={clsx(
-                                "mt-3 block w-full resize-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                            <Field className="flex flex-row items-center gap-4">
+                              <Label className="text-sm/6 font-medium text-black">
+                                Title
+                              </Label>
+                              <Input
+                                name="title"
+                                className={clsx(
+                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                )}
+                                defaultValue={editDocument && editDocument[0].title}
+                                required
+                              />
+                            </Field>
+                          </div>
+
+                          <div className="w-full max-w-md">
+                            <Field className="flex flex-row items-center gap-4">
+                              <Label className="text-sm/6 font-medium text-black">
+                                Date
+                              </Label>
+                              <Input
+                                name="date"
+                                type="text"
+                                className={clsx(
+                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                  "scheme-light",
+                                )}
+                                defaultValue={editDocument && editDocument[0].date}
+                              />
+                            </Field>
+                          </div>
+
+                          <div className="w-full max-w-md">
+                            <Field className="flex flex-row items-center gap-4">
+                              <Label className="text-sm/6 font-medium text-nowrap text-black">
+                                Academic Year
+                              </Label>
+                              <Input
+                                name="academic_year"
+                                type="text"
+                                className={clsx(
+                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                  "scheme-light",
+                                )}
+                                defaultValue={editDocument && editDocument[0].academic_year}
+                              />
+                            </Field>
+                          </div>
+
+                          <div className="w-full max-w-md">
+                            <Field className="flex flex-row items-center gap-4">
+                              <Label className="text-sm/6 font-medium text-black">
+                                Location
+                              </Label>
+                              <Input
+                                name="location"
+                                type="text"
+                                className={clsx(
+                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                  "scheme-light",
+                                )}
+                              />
+                            </Field>
+                          </div>
+
+                          <div className="w-full max-w-md">
+                            <Field>
+                              <Label className="text-sm/6 font-medium text-black">
+                                Description
+                              </Label>
+                              <Textarea
+                                name="description"
+                                className={clsx(
+                                  "mt-3 block w-full resize-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                )}
+                                rows={8}
+                              />
+                            </Field>
+                          </div>
+
+                          <div className="w-full max-w-md">
+                            <Field className="flex flex-row items-center gap-4">
+                              <Label className="text-sm/6 font-medium text-nowrap text-black">
+                                Expenses
+                              </Label>
+                              <Input
+                                name="expenses"
+                                placeholder="Optional"
+                                type="text"
+                                className={clsx(
+                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                )}
+                              />
+                            </Field>
+                          </div>
+
+                          <div className="w-full max-w-md">
+                            <Field className="flex flex-row items-center gap-4">
+                              <Label className="text-sm/6 font-medium text-nowrap text-black">
+                                Documentation Link
+                              </Label>
+                              <Input
+                                name="documentation_link"
+                                type="text"
+                                className={clsx(
+                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                )}
+                              />
+                            </Field>
+                          </div>
+
+                          <div className="w-full max-w-md">
+                            <Field className="flex flex-row items-center gap-4">
+                              <Label className="text-sm/6 font-medium text-black">
+                                Image
+                              </Label>
+                              <Input
+                                type="file"
+                                onChange={handleImageChange}
+                                className={clsx(
+                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                )}
+                                accept=".png,.jpg,.jpeg"
+                              />
+                            </Field>
+                            <div className="text-xs font-bold">
+                              {!image && !base64Image ? (
+                                <div className="text-red-400">No image</div>
+                              ) : !image && base64Image ? (
+                                <div className="text-amber-300">
+                                  Image uploading
+                                </div>
+                              ) : (
+                                <div className="text-green-300">
+                                  Image uploaded
+                                </div>
                               )}
-                              rows={8}
-                              defaultValue={
-                                editDocument && editDocument[0].description
-                              }
-                              name="description"
-                            />
-                          </Field>
+                            </div>
+                          </div>
                         </div>
 
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              Post Link
-                            </Label>
-                            <Input
-                              type="text"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              defaultValue={
-                                editDocument && editDocument[0].link
-                              }
-                              name="post_link"
-                            />
-                          </Field>
-                        </div>
+                        <div className="flex flex-col gap-4 grow basis-0">
+                          <div className="w-full max-w-md">
+                            <Field className="flex flex-col items-center gap-4">
+                              <Label className="text-sm/6 font-medium text-nowrap text-black">
+                                Project Head/s
+                              </Label>
+                              <DynamicInputFieldsProjectHead />
+                            </Field>
+                          </div>
 
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Image
-                            </Label>
-                            <Input
-                              type="file"
-                              onChange={handleImageChange}
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                "scheme-light",
-                              )}
-                              accept=".png,.jpg,.jpeg"
-                              // defaultValue={
-                              //   editDocument && editDocument[0].image
-                              // }
-                            />
-                          </Field>
-                          <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
-                              <div className="text-red-400">
-                                Upload to change image
-                              </div>
-                            ) : !image && base64Image ? (
-                              <div className="text-amber-300">
-                                Image uploading
-                              </div>
-                            ) : (
-                              <div className="text-green-300">
-                                Image uploaded
-                              </div>
-                            )}
+                          <div className="w-full max-w-md">
+                            <Field className="flex flex-col items-center gap-4">
+                              <Label className="text-sm/6 font-medium text-nowrap text-black">
+                                Highlight Information
+                              </Label>
+                              <DynamicInputFieldsHighlights />
+                            </Field>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
-                </div>
                 <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                   <button
                     type="submit"

@@ -1,5 +1,4 @@
 "use client";
-import NavDocuments from "@/components/nav-documents";
 import { PublicEventDataByID } from "@/components/public-documents-data";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -62,7 +61,7 @@ export default function Page() {
                   </span>
                 </h2>
               )}
-              {document.highlights.map((data) => (
+              {document.highlights.map((data: { highlight: string; description: string }) => (
                 <h2>
                   <span className="font-bold text-black/80">
                     {data.highlight}
@@ -81,7 +80,7 @@ export default function Page() {
 
           {document && (
             <>
-              {document.project_heads.map((data) => (
+              {document.project_heads.map((data: { name: string }) => (
                 <h2>{data.name}</h2>
               ))}
             </>

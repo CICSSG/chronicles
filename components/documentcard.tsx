@@ -2,7 +2,7 @@ import Link from "next/link";
 import React from "react";
 import { IoIosArrowForward } from "react-icons/io";
 
-interface DocumentCard {
+export interface DocumentCardData {
   Image?: string;
   Title: string;
   Date: string;
@@ -20,7 +20,7 @@ export function DocumentCard({
   URL,
   Description,
   Author,
-}: DocumentCard) {
+}: DocumentCardData) {
   return (
     <div className="flex flex-col gap-4">
       {Image && (
@@ -60,7 +60,7 @@ export default function EventCard({
   AcademicYear,
   URL,
   Location
-}: DocumentCard) {
+}: DocumentCardData) {
   return (
     <div className="flex flex-col gap-4">
       {Image && (
