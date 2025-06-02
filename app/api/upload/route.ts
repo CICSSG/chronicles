@@ -8,7 +8,7 @@ export async function POST(request: NextRequest) {
     const response = await fetch('https://api.imgur.com/3/image', {
         method: "POST",
         headers: {
-            Authorization: "Client-ID 26d5c715e812de2",
+            Authorization: "Client-ID " + process.env.IMGUR_ID1,
         },
         body: fd,
         redirect: 'follow',
@@ -21,7 +21,7 @@ export async function POST(request: NextRequest) {
         const response = await fetch('https://api.imgur.com/3/image', {
             method: "POST",
             headers: {
-                Authorization: "Client-ID 7324c50a109680f",
+                Authorization: "Client-ID " + process.env.IMGUR_ID2,
             },
             body: fd,
             redirect: 'follow',

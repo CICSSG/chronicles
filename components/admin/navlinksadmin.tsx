@@ -10,7 +10,7 @@ import { FiLogOut, FiUser } from "react-icons/fi";
 import { IoDocuments } from "react-icons/io5";
 import { GiPoliceOfficerHead } from "react-icons/gi";
 import { PiUsersFill } from "react-icons/pi";
-import { MegaphoneIcon } from '@heroicons/react/20/solid';
+import { CalendarDaysIcon, MegaphoneIcon } from '@heroicons/react/20/solid';
 
 async function NavLinksAdmin() {
   const user = await currentUser()
@@ -41,6 +41,12 @@ async function NavLinksAdmin() {
             <Link href="/admin/announcements" className='flex items-center flex-nowrap gap-2 w-fit'>
               <MegaphoneIcon className='text-3xl size-7' />
               <span className='hidden group-hover:block'>Announcements</span>
+            </Link>
+          </li>
+          <li>
+            <Link href="/admin/events" className='flex items-center flex-nowrap gap-2 w-fit'>
+              <CalendarDaysIcon className='text-3xl size-7' />
+              <span className='hidden group-hover:block'>Events</span>
             </Link>
           </li>
           <li>

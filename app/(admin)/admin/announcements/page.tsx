@@ -1,5 +1,4 @@
 "use client";
-import DocumentRadioDropdown from "@/components/admin/documenttypes";
 import {
   Button,
   Dialog,
@@ -14,11 +13,10 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
-import DocumentData, {
+import {
   AnnouncementData,
   AnnouncementSearch,
 } from "@/components/admin/documents-data";
-import AddDynamicInputFields from "@/components/admin/dynamic-input-field";
 import {
   createAnnouncementPOST,
   deleteAnnouncementPOST,
@@ -147,8 +145,8 @@ export default function Documents() {
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
       <div className="flex grow-0 basis-0 flex-row items-center justify-between">
         <div className="">
-          <h1 className="text-4xl font-bold">Documents</h1>
-          <p className="text-lg font-semibold">Edit Documents</p>
+          <h1 className="text-4xl font-bold">Announcements</h1>
+          <p className="text-lg font-semibold">Edit Announcements</p>
         </div>
       </div>
 
@@ -161,7 +159,7 @@ export default function Documents() {
           }}
           className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-green-600 px-3 py-1.5 font-semibold text-white hover:bg-green-500"
         >
-          Create Document
+          Create Announcement
         </Button>
 
         <div className="flex flex-row">
@@ -380,7 +378,7 @@ export default function Documents() {
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        New Document
+                        New Announcement
                       </DialogTitle>
                       <div className="mt-4 flex w-full flex-col gap-4">
                         <div className="w-full max-w-md">
@@ -538,7 +536,7 @@ export default function Documents() {
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        Edit Document
+                        Edit Announcement
                       </DialogTitle>
 
                       <div className="flex w-full flex-col gap-4">
@@ -722,7 +720,7 @@ export default function Documents() {
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        Deactivate account
+                        Delete announcement
                       </DialogTitle>
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">

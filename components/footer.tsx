@@ -1,10 +1,14 @@
+'use client'
+import { usePathname } from "next/navigation";
 import React from "react";
 import { FaFacebook, FaInstagram, FaLinkedin } from "react-icons/fa";
 
 const Footer = () => {
+  const pathname = usePathname()
+
   return (
     <>
-      <div className="w-full flex flex-col justify-around gap-12 overflow-hidden rounded-2xl bg-neutral-100 p-8 py-12 text-2xl border border-neutral-400">
+      <div className={`w-full flex flex-col justify-around gap-12 overflow-hidden rounded-2xl bg-linear-to-br from-neutral-100 via-neutral-100 via-70% to-blue-200 p-8 py-12 text-2xl border border-neutral-400 ${pathname == '/' ? 'max-w-full xl:max-w-10/12 2xl:max-w-full m-auto' : null}`}>
         <div className="flex flex-col gap-6">
           <h1 className="text-3xl font-extrabold text-center md:text-left">[Chronicles]</h1>
           <div className="text-center md:text-left">

@@ -1,5 +1,5 @@
 "use client";
-import DocumentCard from "@/components/documentcard";
+import {DocumentCard} from "@/components/documentcard";
 import NavDocuments from "@/components/nav-documents";
 import React, { Suspense, useEffect, useState } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";

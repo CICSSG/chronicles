@@ -39,3 +39,27 @@ export async function PublicAnnouncementData(page?: number | null) {
 
   return { documents, pagination };
 }
+
+export async function PublicEventsData(page?: number | null) {
+  page == null && (page = 1);
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  let { data: documents, count } = await supabase
+    .from("events")
+    .select("*", { count: "exact", head: false })
+    .range(from, to)
+    .order("id", { ascending: false });
+
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+
+  return { documents, pagination };
+}
+
+export async function PublicEventDataByID(id?: string) {
+  let { data: documents } = await supabase
+    .from("events")
+    .select("*")
+    .eq('id', id)
+
+  return { documents };
+}
