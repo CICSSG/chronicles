@@ -284,7 +284,7 @@ export async function editEventPOST(formData: FormData) {
 
   if(!image) {
 const { data, error } = await supabase
-  .from('announcements')
+  .from('events')
   .update({ 
         title: title,
         date: date,
@@ -299,7 +299,7 @@ const { data, error } = await supabase
 
   } else {
     const { data, error } = await supabase
-  .from('announcements')
+  .from('events')
   .update({ 
         title: title,
         date: date,
@@ -329,7 +329,7 @@ export async function deleteEventPOST(formData: FormData) {
   const id = formData.get("id")
   
   const { error } = await supabase
-  .from('announcements')
+  .from('events')
   .delete()
   .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
 

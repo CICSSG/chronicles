@@ -13,17 +13,11 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
+import { EventsData, EventsSearch } from "@/components/admin/documents-data";
 import {
-  AnnouncementData,
-  AnnouncementSearch,
-  EventsData,
-  EventsSearch,
-} from "@/components/admin/documents-data";
-import {
-  createAnnouncementPOST,
   createEventPOST,
-  deleteAnnouncementPOST,
-  editAnnouncementPOST,
+  deleteEventPOST,
+  editEventPOST,
 } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -66,10 +60,11 @@ export default function Events() {
     if (base64Image) {
       imgurUpload(base64Image)
         .then((result) => {
+          console.log(result)
           setImage(`${result.data.link}`);
         })
         .catch((err) => {
-          // handle error if needed
+          console.log(err)
         });
     }
   }, [base64Image]);
@@ -88,7 +83,7 @@ export default function Events() {
       .channel("public:data")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "announcements" },
+        { event: "*", schema: "public", table: "events" },
         (payload) => {
           EventsData().then(({ documents, pagination }) => {
             setDocuments(documents ?? null);
@@ -384,8 +379,7 @@ export default function Events() {
                         New Event
                       </DialogTitle>
                       <div className="mt-4 flex w-full flex-row gap-6">
-                        <div className="flex flex-col gap-4 grow basis-0">
-
+                        <div className="flex grow basis-0 flex-col gap-4">
                           <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
@@ -533,7 +527,7 @@ export default function Events() {
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-4 grow basis-0">
+                        <div className="flex grow basis-0 flex-col gap-4">
                           <div className="w-full max-w-md">
                             <Field className="flex flex-col items-center gap-4">
                               <Label className="text-sm/6 font-medium text-nowrap text-black">
@@ -552,7 +546,6 @@ export default function Events() {
                             </Field>
                           </div>
                         </div>
-
                       </div>
                     </div>
                   </div>
@@ -589,7 +582,7 @@ export default function Events() {
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <DialogPanel
               transition
-              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-3xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
               <form
                 onSubmit={(e) => {
@@ -599,7 +592,7 @@ export default function Events() {
                   } else {
                     const formData = new FormData(e.currentTarget);
                     formData.set("image", image ?? "");
-                    editAnnouncementPOST(formData);
+                    editEventPOST(formData);
                     setEditForm(false);
                     setBase64Image("");
                     setImage("");
@@ -609,13 +602,13 @@ export default function Events() {
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-amber-100 sm:mx-0 sm:size-10">
+                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
                       <DocumentIcon
                         aria-hidden="true"
-                        className="size-6 text-amber-600"
+                        className="size-6 text-green-600"
                       />
                     </div>
-                    <div className="mt-3 w-full text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <div className="mt-3 w-full overflow-y-scroll text-center sm:mt-0 sm:ml-4 sm:text-left">
                       <DialogTitle
                         as="h3"
                         className="text-base font-semibold text-gray-900"
@@ -623,24 +616,26 @@ export default function Events() {
                         Edit Event
                       </DialogTitle>
 
-                      <div className="flex w-full flex-col gap-4">
-                        <div className="hidden w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Input
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              defaultValue={editDocument && editDocument[0].id}
-                              name="id"
-                            ></Input>
-                          </Field>
+                      <div className="mt-4 flex w-full flex-row gap-6">
+                        <div className="flex flex-col gap-4">
+                          <div className="hidden w-full max-w-md">
+                            <Field className="flex flex-row items-center gap-4">
+                              <Input
+                                className={clsx(
+                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                )}
+                                defaultValue={
+                                  editDocument && editDocument[0].id
+                                }
+                                name="id"
+                              ></Input>
+                            </Field>
+                          </div>
                         </div>
-                      </div>
 
-                      <div className="mt-4 flex w-full flex-col gap-4">
-
-                        <div className="w-full max-w-md">
+                        <div className="grow basis-0 mt-4 flex w-full flex-col gap-4">
+                          <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
                                 Title
@@ -651,7 +646,9 @@ export default function Events() {
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
-                                defaultValue={editDocument && editDocument[0].title}
+                                defaultValue={
+                                  editDocument && editDocument[0].title
+                                }
                                 required
                               />
                             </Field>
@@ -670,7 +667,9 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                   "scheme-light",
                                 )}
-                                defaultValue={editDocument && editDocument[0].date}
+                                defaultValue={
+                                  editDocument && editDocument[0].date
+                                }
                               />
                             </Field>
                           </div>
@@ -688,7 +687,9 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                   "scheme-light",
                                 )}
-                                defaultValue={editDocument && editDocument[0].academic_year}
+                                defaultValue={
+                                  editDocument && editDocument[0].academic_year
+                                }
                               />
                             </Field>
                           </div>
@@ -706,6 +707,9 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                   "scheme-light",
                                 )}
+                                defaultValue={
+                                  editDocument && editDocument[0].location
+                                }
                               />
                             </Field>
                           </div>
@@ -722,6 +726,9 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
                                 rows={8}
+                                defaultValue={
+                                  editDocument && editDocument[0].description
+                                }
                               />
                             </Field>
                           </div>
@@ -739,6 +746,9 @@ export default function Events() {
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
+                                defaultValue={
+                                  editDocument && editDocument[0].expenses
+                                }
                               />
                             </Field>
                           </div>
@@ -755,6 +765,9 @@ export default function Events() {
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
+                                defaultValue={
+                                  editDocument && editDocument[0].link
+                                }
                               />
                             </Field>
                           </div>
@@ -776,7 +789,9 @@ export default function Events() {
                             </Field>
                             <div className="text-xs font-bold">
                               {!image && !base64Image ? (
-                                <div className="text-red-400">No image</div>
+                                <div className="text-red-400">
+                                  Upload to update image
+                                </div>
                               ) : !image && base64Image ? (
                                 <div className="text-amber-300">
                                   Image uploading
@@ -790,13 +805,17 @@ export default function Events() {
                           </div>
                         </div>
 
-                        <div className="flex flex-col gap-4 grow basis-0">
+                        <div className="flex grow basis-0 flex-col gap-4">
                           <div className="w-full max-w-md">
                             <Field className="flex flex-col items-center gap-4">
                               <Label className="text-sm/6 font-medium text-nowrap text-black">
                                 Project Head/s
                               </Label>
-                              <DynamicInputFieldsProjectHead />
+                              <DynamicInputFieldsProjectHead
+                                data={
+                                  editDocument && editDocument[0].project_heads
+                                }
+                              />
                             </Field>
                           </div>
 
@@ -805,13 +824,18 @@ export default function Events() {
                               <Label className="text-sm/6 font-medium text-nowrap text-black">
                                 Highlight Information
                               </Label>
-                              <DynamicInputFieldsHighlights />
+                              <DynamicInputFieldsHighlights
+                                data={
+                                  editDocument && editDocument[0].highlights
+                                }
+                              />
                             </Field>
                           </div>
                         </div>
                       </div>
                     </div>
                   </div>
+                </div>
                 <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
                   <button
                     type="submit"
@@ -851,7 +875,7 @@ export default function Events() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={deleteAnnouncementPOST}>
+              <form action={deleteEventPOST}>
                 <input
                   type="text"
                   name="id"
@@ -871,7 +895,7 @@ export default function Events() {
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        Delete announcement
+                        Delete event
                       </DialogTitle>
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">

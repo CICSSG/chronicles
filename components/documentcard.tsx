@@ -27,7 +27,7 @@ export function DocumentCard({
         <img
           src={Image}
           alt=""
-          className="aspect-square rounded-lg object-cover"
+          className="aspect-square rounded-lg border-4 border-black object-cover"
         />
       )}
       <h1 className="text-2xl font-bold">{Title}</h1>
@@ -36,7 +36,7 @@ export function DocumentCard({
         <p className="grow basis-0 font-medium">{Date}</p>
         <Link
           href={URL}
-          className="flex flex-row items-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70"
+          className="flex flex-row items-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white"
           target="_blank"
         >
           Read More <IoIosArrowForward />{" "}
@@ -59,7 +59,7 @@ export default function EventCard({
   Date,
   AcademicYear,
   URL,
-  Location
+  Location,
 }: DocumentCardData) {
   return (
     <div className="flex flex-col gap-4">
@@ -67,19 +67,19 @@ export default function EventCard({
         <img
           src={Image}
           alt=""
-          className="aspect-square rounded-lg object-cover"
+          className="aspect-square rounded-lg border-4 border-black object-cover"
         />
       )}
       <h1 className="text-2xl font-bold">{Title}</h1>
       <hr className="rounded-2xl border-2 font-bold text-blue-300" />
       <div className="flex min-h-12 flex-col">
-        <p className="grow basis-0 font-medium">{Date}</p>
-        <p className="grow basis-0 font-medium">{AcademicYear}</p>
-        <p className="grow basis-0 font-medium">{Location}</p>
+        <p className="font-bolder grow basis-0 text-lg">{Location}</p>
+        <p className="grow basis-0 text-md font-medium">{Date}</p>
+        <p className="grow basis-0 text-sm font-thin">{AcademicYear}</p>
       </div>
       <Link
         href={URL}
-        className="flex flex-row items-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 justify-center hover:bg-black/80 hover:text-white"
+        className="flex flex-row items-center justify-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white"
       >
         Read More <IoIosArrowForward />{" "}
       </Link>
