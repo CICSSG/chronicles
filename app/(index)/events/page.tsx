@@ -58,7 +58,7 @@ const Events = () => {
       </div>
       <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80">
         <Suspense>
-          <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-4">
+          <div className="grid grid-rows-1 grid-flow-col gap-4 *:rounded-xl *:bg-white/80 *:p-4 overflow-x-auto no-scrollbar">
             {/* Card */}
             {documents?.map((data) => (
               <EventCard

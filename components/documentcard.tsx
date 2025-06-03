@@ -62,7 +62,7 @@ export default function EventCard({
   Location,
 }: DocumentCardData) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 min-w-sm">
       {Image && (
         <img
           src={Image}
@@ -79,7 +79,7 @@ export default function EventCard({
       </div>
       <Link
         href={URL}
-        className="flex flex-row items-center justify-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white"
+        className="flex flex-row items-center justify-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white mt-auto"
       >
         Read More <IoIosArrowForward />{" "}
       </Link>
