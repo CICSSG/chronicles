@@ -5,7 +5,7 @@ import Link from "next/link";
 export default async function Home() {
   return (
     <>
-      <div className="flex grow flex-col gap-5 text-2xl lg:flex-row max-w-full xl:max-w-10/12 2xl:max-w-full m-auto">
+      <div className="flex grow flex-col gap-5 text-2xl lg:flex-row max-w-full xl:max-w-10/12 m-auto">
         {/* Left 2 Columns */}
         <div className="flex grow-6 basis-0 flex-col gap-5">
           <div className="flex grow flex-col justify-between overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 transition-all md:flex-row md:items-center md:p-1">

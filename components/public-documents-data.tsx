@@ -7,6 +7,7 @@ const supabase = createClient(
 );
 
 const ITEMS_PER_PAGE = 8;
+const ANNOUNCEMENT_ITEMS_PER_PAGE = 7;
 
 export async function PublicDocumentData(document_type: string, page?: number | null) {
   page == null && (page = 1);
@@ -27,7 +28,7 @@ export async function PublicDocumentData(document_type: string, page?: number | 
 
 export async function PublicAnnouncementData(page?: number | null) {
   page == null && (page = 1);
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+  const { from, to } = getPagination(page - 1, ANNOUNCEMENT_ITEMS_PER_PAGE);
 
   let { data: documents, count } = await supabase
     .from("announcements")
@@ -35,7 +36,7 @@ export async function PublicAnnouncementData(page?: number | null) {
     .range(from, to)
     .order("id", { ascending: false });
 
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  let pagination = count != null ? Math.ceil(count / (ANNOUNCEMENT_ITEMS_PER_PAGE + 1)) : 1;
 
   return { documents, pagination };
 }

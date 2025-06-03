@@ -81,3 +81,7 @@
 @utility no-scrollbar {
   @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }
+
+@utility min-scrollbar {
+  @apply [scrollbar-width:1px] [&::-webkit-scrollbar]:hidden;
+}

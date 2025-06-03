@@ -231,11 +231,13 @@ export async function createEventPOST(formData: FormData) {
   const date = formData.get("date")
   const academicYear = formData.get("academic_year")
   const location = formData.get("location")
-  const projectHeads = formData.get("project_heads")
   const expenses = formData.get("expenses")
-  const highlights = formData.get("highlights")
   const description = formData.get("description")
   const documentationLink = formData.get("documentation_link")
+  const highlightsRaw = formData.get("highlights");
+  const highlights = typeof highlightsRaw === "string" ? JSON.parse(highlightsRaw) : highlightsRaw;
+  const projectHeadsRaw = formData.get("project_heads");
+  const projectHeads = typeof projectHeadsRaw === "string" ? JSON.parse(projectHeadsRaw) : projectHeadsRaw;
   
   
   const { error } = await supabase
@@ -272,10 +274,17 @@ export async function editEventPOST(formData: FormData) {
 
   const id = formData.get("id")
   const title = formData.get("title")
-  const date = formData.get("date")
-  const description = formData.get("description")
-  const postLink = formData.get("post_link")
   const image = formData.get("image")
+  const date = formData.get("date")
+  const academicYear = formData.get("academic_year")
+  const location = formData.get("location")
+  const expenses = formData.get("expenses")
+  const description = formData.get("description")
+  const documentationLink = formData.get("documentation_link")
+  const highlightsRaw = formData.get("highlights");
+  const highlights = typeof highlightsRaw === "string" ? JSON.parse(highlightsRaw) : highlightsRaw;
+  const projectHeadsRaw = formData.get("project_heads");
+  const projectHeads = typeof projectHeadsRaw === "string" ? JSON.parse(projectHeadsRaw) : projectHeadsRaw;
   // const externalLinksRaw = formData.get("external_links");
   // const externalLinks = externalLinksRaw ? JSON.parse(externalLinksRaw as string) : [];
 
@@ -288,9 +297,13 @@ const { data, error } = await supabase
   .update({ 
         title: title,
         date: date,
+        academic_year: academicYear,
+        location: location,
+        project_heads: projectHeads,
+        expenses: expenses,
+        highlights: highlights,
         description: description,
-        link: postLink,
-        // external_links: externalLinks
+        link: documentationLink,
       })
   .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
   .select()
@@ -302,11 +315,15 @@ const { data, error } = await supabase
   .from('events')
   .update({ 
         title: title,
-        date: date,
-        description: description,
-        link: postLink,
         image: image,
-        // external_links: externalLinks
+        date: date,
+        academic_year: academicYear,
+        location: location,
+        project_heads: projectHeads,
+        expenses: expenses,
+        highlights: highlights,
+        description: description,
+        link: documentationLink,
       })
   .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
   .select()
