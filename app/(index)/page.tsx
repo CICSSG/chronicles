@@ -84,6 +84,7 @@ export default async function Home() {
         {/* Right Column 3 Rows */}
         <div className="flex grow-3 basis-0 flex-col gap-5">
           {/* Announcements */}
+          {/* TODO FIX LAYOUT ON SCREEN SIZES */}
           <Link
             href={"/announcements"}
             className="flex min-h-fit grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 pb-12 transition-all hover:scale-102"

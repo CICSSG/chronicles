@@ -43,10 +43,16 @@ export default async function RootLayout({
         <SignedIn>
           <Link href={"/admin"} className="fixed bottom-4 right-4 bg-neutral-100 p-4 rounded-full hover:bg-neutral-200 hover:cursor-pointer z-20"><Edit/></Link>
         </SignedIn>
+        {/* TODO ANNOUNCEMENTS */}
+        {/* <div className="flex flex-row justify-center gap-2 w-full px-3 py-3 text-xl font-bold">
+          <h1>ANNOUCNEMTN</h1>
+          <div>asd</div>
+        </div> */}
+        
         <div className="flex w-full flex-col items-center gap-5">
           <div className="font-space flex min-h-dvh min-w-dvw flex-col items-center bg-neutral-800 font-semibold">
-            <div className="my-10 flex max-w-11/12 flex-col gap-5 xl:max-w-[1920px] lg:px-10 w-full h-full">
-              <div className="flex w-full flex-row justify-between lg:px-8 py-2 text-xl text-white">
+            <div className="my-10 flex max-w-11/12 flex-col gap-5 xl:max-w-10/12 3xl:max-w-[1920px] lg:px-10 w-full h-full">
+              <div className="flex w-full flex-row justify-between 2xl:px-8 py-2 text-xl text-white">
                 <NavLinks />
               </div>
 

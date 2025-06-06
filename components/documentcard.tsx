@@ -62,7 +62,7 @@ export default function EventCard({
   Location,
 }: DocumentCardData) {
   return (
-    <div className="flex flex-col gap-4 min-w-sm">
+    <div className="flex flex-col gap-4">
       {Image && (
         <img
           src={Image}
