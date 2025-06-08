@@ -40,16 +40,16 @@ const documents = [
 
 const cics = [
   { name: 'About', description: 'More information about CICS', href: '/cics', icon: InformationCircleIcon },
-  { name: 'Programs', description: 'View available programs', href: '/cics/programs', icon: ComputerDesktopIcon },
+  { name: 'Programs', description: 'View available programs in CICS', href: '/cics/programs', icon: ComputerDesktopIcon },
   { name: 'Departments', description: 'Current departments of CICS', href: '/cics/departments', icon: AcademicCapIcon },
-  { name: 'Student Organization', description: 'idk', href: '/cics/student-organization', icon: BriefcaseIcon },
-  { name: 'Admin & Staff', description: 'ewan na din', href: '/cics/admin-staff', icon: BuildingOfficeIcon },
-  { name: 'Faculty', description: 'Current faculty members', href: '/cics/faculty', icon: PresentationChartLineIcon },
+  { name: 'Student Organization', description: 'About the Student Organization', href: '/cics/student-organization', icon: BriefcaseIcon },
+  { name: 'Admin & Staff', description: 'Current admin and staff of CICS', href: '/cics/admin-staff', icon: BuildingOfficeIcon },
+  { name: 'Faculty', description: 'Current faculty members of CICS', href: '/cics/faculty', icon: PresentationChartLineIcon },
 ]
 
 const cicssg = [
   { name: 'About', description: 'More information about CICSSG', href: '/cicssg', icon: InformationCircleIcon },
-  { name: 'Slate', description: 'Current officers of CICSSG', href: '/cics/slate', icon: ListBulletIcon },
+  { name: 'Slate', description: 'Current officers of CICSSG', href: '/cicssg/slate', icon: ListBulletIcon },
 ]
 
 export default function NavLinks() {

@@ -16,7 +16,7 @@ export default function NavCICS() {
     <>
       <Link
         href={"/cics"}
-        className={pathname.endsWith("/cics") ? "text-black underline" : ""}
+        className={pathname.endsWith("/cics") ? "text-black underline" : "hover:text-black/75"}
       >
         About
       </Link>
@@ -28,7 +28,7 @@ export default function NavCICS() {
           className={
             pathname.match(item.href)
               ? "text-black underline"
-              : ""
+              : "hover:text-black/75"
           }
         >
           {item.text}

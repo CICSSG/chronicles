@@ -64,3 +64,27 @@ export async function PublicEventDataByID(id?: string) {
 
   return { documents };
 }
+
+export async function PublicSlateData(page?: number | null) {
+  page == null && (page = 1);
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  let { data: documents, count } = await supabase
+    .from("slate")
+    .select("*", { count: "exact", head: false })
+    .range(from, to)
+    .order("id", { ascending: false });
+
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+
+  return { documents, pagination };
+}
+
+export async function PublicSlateDataByID(id?: string) {
+  let { data: documents } = await supabase
+    .from("slate")
+    .select("*")
+    .eq('id', id)
+
+  return { documents };
+}

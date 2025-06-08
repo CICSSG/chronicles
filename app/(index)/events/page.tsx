@@ -1,6 +1,6 @@
 'use client'
 import EventCard from '@/components/documentcard';
-import { PublicAnnouncementData, PublicEventsData } from '@/components/public-documents-data';
+import { PublicEventsData } from '@/components/public-documents-data';
 import Link from 'next/link';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import React, { Suspense, useEffect, useState } from 'react'
