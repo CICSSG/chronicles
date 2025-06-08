@@ -13,6 +13,12 @@ export interface DocumentCardData {
   Location?: string;
 }
 
+export interface SlateCardData {
+  Image?: string;
+  URL: string;
+  AcademicYear: string;
+}
+
 export function DocumentCard({
   Image,
   Title,
@@ -62,7 +68,7 @@ export default function EventCard({
   Location,
 }: DocumentCardData) {
   return (
-    <div className="flex flex-col gap-4 min-w-sm">
+    <div className="flex flex-col gap-4">
       {Image && (
         <img
           src={Image}
@@ -70,7 +76,7 @@ export default function EventCard({
           className="aspect-square rounded-lg border-4 border-black object-cover"
         />
       )}
-      <h1 className="text-2xl font-bold">{Title}</h1>
+      <h1 className="text-2xl font-bold md:min-h-[3.9725rem] ">{Title}</h1>
       <hr className="rounded-2xl border-2 font-bold text-blue-300" />
       <div className="flex min-h-12 flex-col">
         <p className="font-bolder grow basis-0 text-lg">{Location}</p>
@@ -82,6 +88,35 @@ export default function EventCard({
         className="flex flex-row items-center justify-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white mt-auto"
       >
         Read More <IoIosArrowForward />{" "}
+      </Link>
+    </div>
+  );
+}
+
+export function SlateCard({
+  Image,
+  AcademicYear,
+  URL,
+}: SlateCardData) {
+  return (
+    <div className="flex flex-col gap-4">
+      {Image && (
+        <img
+          src={Image? Image : "https://placehold.co/400"}
+          alt=""
+          className="rounded-lg border-4 border-black object-cover"
+        />
+      )}
+      <h1 className="text-2xl font-bold md:min-h-[3.9725rem]">Academic Year <br />{AcademicYear}</h1>
+      <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+      {/* <div className="flex min-h-12 flex-col">
+        <p className="grow basis-0 text-sm font-thin"></p>
+      </div> */}
+      <Link
+        href={URL}
+        className="flex flex-row items-center justify-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white mt-auto"
+      >
+        View Slate <IoIosArrowForward />{" "}
       </Link>
     </div>
   );

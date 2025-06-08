@@ -352,3 +352,179 @@ export async function deleteEventPOST(formData: FormData) {
 
   console.log(error?.message)
 }
+
+export async function editImagePOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+  );
+
+  const id = formData.get("id")
+  const image = formData.get("image")
+  
+  const { error } = await supabase
+    .from('slate')
+    .update([
+      { 
+        image: image
+      },
+    ])
+    .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
+    .select()
+
+  console.log(error?.message)
+  // console.log(data)      
+}
+
+export async function editAdviserPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+  );
+
+  const id = formData.get("id")
+  const name = formData.get("name")
+  const image = formData.get("image")
+  
+  const { error } = await supabase
+    .from('slate')
+    .update([
+      { 
+        adviser: {
+          name: name,
+          image: image,
+        }
+      },
+    ])
+    .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
+    .select()
+
+  console.log(error?.message)
+  // console.log(data)      
+}
+
+export async function editGovernorPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+  );
+
+  const id = formData.get("id")
+  const name = formData.get("name")
+  const image = formData.get("image")
+  
+  const { error } = await supabase
+    .from('slate')
+    .update([
+      { 
+        governor: {
+          name: name,
+          image: image,
+        }
+      },
+    ])
+    .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
+    .select()
+
+  console.log(error?.message)
+  // console.log(data)      
+}
+
+export async function editViceGovernorPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+  );
+
+  const id = formData.get("id")
+  const name = formData.get("name")
+  const image = formData.get("image")
+  
+  const { error } = await supabase
+    .from('slate')
+    .update([
+      { 
+        vice_governor: {
+          name: name,
+          image: image,
+        }
+      },
+    ])
+    .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
+    .select()
+
+  console.log(error?.message)
+  // console.log(data)      
+}
+
+export async function deleteSlatePOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+  );
+  
+  const id = formData.get("id")
+  
+  const { error } = await supabase
+  .from('slate')
+  .delete()
+  .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
+
+  console.log(error?.message)
+}
+
+export async function createSlatePOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } }
+  );
+  
+  const academic_year = formData.get("academic_year")
+  
+  const { error } = await supabase
+  .from('slate')
+  .insert([
+      { 
+        academic_year: academic_year,
+        adviser: {
+          name: "",
+          image: "",
+        },
+        governor: {
+          name: "",
+          image: "",
+        },
+        vice_governor: {
+          name: "",
+          image: "",
+        },
+      },
+    ])
+    .select()
+
+  console.log(error?.message)
+}

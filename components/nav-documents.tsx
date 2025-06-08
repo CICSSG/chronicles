@@ -22,7 +22,7 @@ export default function NavDocuments() {
           className={
             pathname.match(item.href)
               ? "text-black underline"
-              : ""
+              : "hover:text-black/75"
           }
         >
           {item.text}

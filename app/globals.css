@@ -5,6 +5,10 @@
 @tailwind utilities;
 
 @theme {
+  --breakpoint-3xl: 120rem;
+}
+
+@theme {
   --font-secondary: 'Geist', 'sans-serif';
 }
 

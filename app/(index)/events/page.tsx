@@ -1,6 +1,6 @@
 'use client'
 import EventCard from '@/components/documentcard';
-import { PublicAnnouncementData, PublicEventsData } from '@/components/public-documents-data';
+import { PublicEventsData } from '@/components/public-documents-data';
 import Link from 'next/link';
 import { parseAsInteger, useQueryState } from 'nuqs';
 import React, { Suspense, useEffect, useState } from 'react'
@@ -48,8 +48,8 @@ const Events = () => {
   }, [page]);
 
   return (
-    <div className="flex w-full flex-col gap-4 *:rounded-2xl">
-      <div className="sticky flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-neutral-300 *:px-8 *:py-8 *:shadow-xl">
+    <div className="flex flex-col gap-4 *:rounded-2xl">
+      <div className="flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-neutral-300 *:px-8 *:py-8 *:shadow-xl">
         <div className="bg-[url(/images/noise.png)]">
           <h2 className="text-3xl font-bold">
             Event Archive
@@ -58,7 +58,8 @@ const Events = () => {
       </div>
       <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80">
         <Suspense>
-          <div className="grid grid-rows-1 grid-flow-col gap-4 *:rounded-xl *:bg-white/80 *:p-4 overflow-x-auto no-scrollbar">
+          <div className="grid grid-cols-1 sm:grid-cols-2
+          xl:grid-cols-3 2xl:grid-cols-4 gap-4 *:rounded-xl *:bg-white/80 *:p-4 overflow-x-auto no-scrollbar">
             {/* Card */}
             {documents?.map((data) => (
               <EventCard

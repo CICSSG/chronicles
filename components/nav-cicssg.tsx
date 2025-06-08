@@ -12,7 +12,7 @@ export default function NavCICSSG() {
     <>
       <Link
         href={"/cicssg"}
-        className={pathname.endsWith("/cicssg") ? "text-black underline" : ""}
+        className={pathname.endsWith("/cicssg") ? "text-black underline" : "hover:text-black/75"}
       >
         About
       </Link>
@@ -24,7 +24,7 @@ export default function NavCICSSG() {
           className={
             pathname.match(item.href)
               ? "text-black underline"
-              : ""
+              : "hover:text-black/75"
           }
         >
           {item.text}
