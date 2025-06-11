@@ -9,63 +9,35 @@ import {
   Input,
   Label,
 } from "@headlessui/react";
-import React, { useEffect, useState } from "react";
-import { createClient } from "@supabase/supabase-js";
+import React, { useState } from "react";
 import { ArrowLeftCircleIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { imgurUpload } from "@/utils/imgur-upload";
 import clsx from "clsx";
-import { createOfficerPOST, deleteOfficerPOST, editOfficerPOST } from "@/app/actions";
+import {
+  createCommitteePOST,
+  deleteCommitteePOST,
+  editCommitteePOST,
+} from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/20/solid";
+import DynamicInputFieldsCommitteeHead from "./dynamic-input-field-committee-head";
+import DynamicInputFieldsCommittee from "./dynamic-input-field-committee";
 
-export default function ExecutiveOverview({ document }: { document: any }) {
+export default function CommitteesOverview({ document }: { document: any }) {
   const [createOfficerForm, setCreateOfficerForm] = useState(false);
   const [editOfficerForm, setEditOfficerForm] = useState(false);
-  const [editOfficerName, setEditOfficerName] = useState("");
-  const [editOfficerPosition, setEditOfficerPosition] = useState("");
+  const [editCommitteeName, setEditCommitteeName] = useState("");
   const [deleteForm, setDeleteForm] = useState(false);
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
-  const [deleteDocumentName, setDeleteDocumentName] = useState("");
-
-  const [base64Image, setBase64Image] = useState<string>("");
-  const [image, setImage] = useState<string>("");
-
-  useEffect(() => {
-    if (base64Image) {
-      imgurUpload(base64Image)
-        .then((result) => {
-          setImage(`${result.data.link}`);
-        })
-        .catch((err) => {
-          // handle error if needed
-        });
-    }
-  }, [base64Image]);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    setImage("");
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setBase64Image(reader.result as string);
-    reader.readAsDataURL(file);
-  };
+  const [deleteCommitteeName, setDeleteCommitteeName] = useState("");
 
   function handleEditDocument(name: string) {
-    const directorate = document?.directorate || [];
-    
-    const filtered = directorate.filter((officer: { name: string }) => officer.name == name);
-
     setEditOfficerForm(true);
-    setBase64Image("");
-    setEditOfficerName(filtered[0]?.name || "");
-    setEditOfficerPosition(filtered[0]?.position || "");
-    setImage(filtered[0]?.image || "");
+    setEditCommitteeName(name);
   }
 
   const handleDeleteDocument = (id: string, name: string, open: boolean) => {
     setDeleteDocumentId(id);
-    setDeleteDocumentName(name);
+    setDeleteCommitteeName(name);
     setDeleteForm(open);
   };
 
@@ -79,7 +51,7 @@ export default function ExecutiveOverview({ document }: { document: any }) {
       </Link>
       <div className="flex grow-0 basis-0 flex-row items-center justify-between">
         <div className="">
-          <h1 className="text-4xl font-bold">Executive Board</h1>
+          <h1 className="text-4xl font-bold">Committees</h1>
           <p className="text-lg font-semibold">
             Currently editing academic year {document && document.academic_year}
           </p>
@@ -89,13 +61,11 @@ export default function ExecutiveOverview({ document }: { document: any }) {
       <div className="flex flex-row justify-between align-bottom">
         <Button
           onClick={() => {
-            setImage("");
-            setBase64Image("");
             setCreateOfficerForm(true);
           }}
           className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-green-600 px-3 py-1.5 font-semibold text-white hover:bg-green-500"
         >
-          New Officer
+          New Committee
         </Button>
       </div>
 
@@ -103,53 +73,54 @@ export default function ExecutiveOverview({ document }: { document: any }) {
         <table className="table">
           <thead className="text-white">
             <tr className="border-b border-b-black">
-              <th></th>
-              <th>Name</th>
-              <th>Position</th>
+              <th>Committee</th>
+              <th>Head/s</th>
+              <th>Members</th>
               <th>Actions</th>
             </tr>
           </thead>
           <tbody className="*:border-b *:border-b-black/30 *:hover:bg-white/10">
             {document &&
-              document.directorate &&
-              document.directorate.map((officer: any, index: number) => (
-                <tr key={index} className="w-full">
-                  <td>
-                    <img
-                      src={
-                        officer.image != ""
-                          ? officer.image
-                          : "https://placehold.co/400/black/FFF?text=No+image."
-                      }
-                      alt=""
-                      className="size-16"
-                    />
-                  </td>
-                  <td className="text-nowrap">{officer.name}</td>
-                  <td className="text-nowrap">{officer.position}</td>
-                  <td className="grid grid-flow-row grid-cols-2 gap-2 text-center font-semibold *:my-auto *:rounded-xl *:px-4 *:py-2">
-                    <Button
-                      onClick={() => handleEditDocument(officer.name)}
-                      className="basis-0 bg-amber-200 text-nowrap text-black hover:cursor-pointer hover:bg-amber-100"
-                    >
-                      Edit
-                    </Button>
-                    <Button
-                      onClick={() =>
-                        handleDeleteDocument(document.id, officer.name, true)
-                      }
-                      className="basis-0 bg-red-400 text-nowrap text-black hover:cursor-pointer hover:bg-red-300"
-                    >
-                      Delete
-                    </Button>
-                  </td>
-                </tr>
-              ))}
+              document.committees &&
+              Object.entries(document.committees).map(
+                ([committeeName, committeeData]: [string, any], i: number) => (
+                  <tr key={i} className="w-full">
+                    <td className="text-nowrap">{committeeName}</td>
+                    <td className="text-nowrap">
+                      {committeeData.head.map((data: string, i: number) => (
+                        <span key={i} className="font-medium">
+                          {data}
+                          {i < committeeData.head.length - 1 ? ", " : ""}
+                        </span>
+                      ))}
+                    </td>
+                    <td className="text-nowrap">
+                      {committeeData.committees.length}
+                    </td>
+                    <td className="grid grid-flow-row grid-cols-2 gap-2 text-center font-semibold *:my-auto *:rounded-xl *:px-4 *:py-2">
+                      <Button
+                        onClick={() => handleEditDocument(committeeName)}
+                        className="basis-0 bg-amber-200 text-nowrap text-black hover:cursor-pointer hover:bg-amber-100"
+                      >
+                        Edit
+                      </Button>
+                      <Button
+                        onClick={() =>
+                          handleDeleteDocument(document.id, committeeName, true)
+                        }
+                        className="basis-0 bg-red-400 text-nowrap text-black hover:cursor-pointer hover:bg-red-300"
+                      >
+                        Delete
+                      </Button>
+                    </td>
+                  </tr>
+                ),
+              )}
           </tbody>
         </table>
       </div>
 
-      {/* New Officer */}
+      {/* New Committee */}
       <Dialog
         open={createOfficerForm}
         onClose={() => setCreateOfficerForm(false)}
@@ -162,21 +133,14 @@ export default function ExecutiveOverview({ document }: { document: any }) {
           <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
             <DialogPanel
               transition
-              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-fit data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "" && base64Image != "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? null);
-                    createOfficerPOST(formData);
-                    setBase64Image("");
-                    setImage("");
-                    setCreateOfficerForm(false);
-                  }
+                  const formData = new FormData(e.currentTarget);
+                  createCommitteePOST(formData);
+                  setCreateOfficerForm(false);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -192,7 +156,7 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        Create New Officer
+                        Create new committee
                       </DialogTitle>
 
                       <div className="flex w-full flex-col gap-4">
@@ -213,11 +177,11 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                       <div className="mt-4 flex w-full flex-col gap-4">
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Name
+                            <Label className="text-sm/6 font-medium text-nowrap text-black">
+                              Committee Name
                             </Label>
                             <Input
-                              name="name"
+                              name="committee_name"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -226,55 +190,24 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                             />
                           </Field>
                         </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Position
+                      </div>
+                      <div className="mt-4 flex w-full flex-row gap-4">
+                        <div className="w-full max-w-md grow basis-0">
+                          <Field className="flex flex-col items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-nowrap text-black">
+                              Committee Head/s
                             </Label>
-                            <Input
-                              name="position"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              required
-                            />
+                            <DynamicInputFieldsCommitteeHead />
                           </Field>
                         </div>
 
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
+                        <div className="w-full max-w-md grow basis-0">
+                          <Field className="flex flex-col items-center gap-4">
                             <Label className="text-sm/6 font-medium text-black">
-                              Image
+                              Committees
                             </Label>
-                            <Input
-                              type="file"
-                              onChange={handleImageChange}
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              accept=".png,.jpg,.jpeg"
-                            />
+                            <DynamicInputFieldsCommittee />
                           </Field>
-                          <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
-                              <div className="text-red-400">No image</div>
-                            ) : !image && base64Image ? (
-                              <div className="text-amber-300">
-                                Image uploading
-                              </div>
-                            ) : image && !base64Image ? (
-                              <div className="text-amber-300">
-                                Upload to update image
-                              </div>
-                            ) : (
-                              <div className="text-green-300">
-                                Image uploaded
-                              </div>
-                            )}
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -302,11 +235,8 @@ export default function ExecutiveOverview({ document }: { document: any }) {
         </div>
       </Dialog>
 
-      {/* Edit Officer */}
-      <Dialog
-        open={editOfficerForm}
-        onClose={() => setEditOfficerForm(false)}
-      >
+      {/* Edit Committee */}
+      <Dialog open={editOfficerForm} onClose={() => setEditOfficerForm(false)}>
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
@@ -320,25 +250,18 @@ export default function ExecutiveOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "" && base64Image != "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("id_name", editOfficerName ?? null);
-                    formData.set("image", image ?? null);
-                    editOfficerPOST(formData);
-                    setBase64Image("");
-                    setImage("");
-                    setEditOfficerForm(false);
-                  }
+                  const formData = new FormData(e.currentTarget);
+                  formData.set("id_committee_name", editCommitteeName ?? null);
+                  editCommitteePOST(formData);
+                  setEditOfficerForm(false);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
+                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-amber-100 sm:mx-0 sm:size-10">
                       <DocumentIcon
                         aria-hidden="true"
-                        className="size-6 text-green-600"
+                        className="size-6 text-amber-600"
                       />
                     </div>
                     <div className="mt-3 w-full overflow-y-scroll text-center sm:mt-0 sm:ml-4 sm:text-left">
@@ -346,7 +269,7 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        Edit officer
+                        Edit Committee
                       </DialogTitle>
 
                       <div className="flex w-full flex-col gap-4">
@@ -367,70 +290,49 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                       <div className="mt-4 flex w-full flex-col gap-4">
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Name
+                            <Label className="text-sm/6 font-medium text-nowrap text-black">
+                              Committee Name
                             </Label>
                             <Input
-                              name="name"
+                              name="committee_name"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
                               required
-                              defaultValue={editOfficerName}
+                              defaultValue={editCommitteeName}
+                            />
+                          </Field>
+                        </div>
+                      </div>
+                      <div className="mt-4 flex w-full flex-row gap-4">
+                        <div className="w-full max-w-md grow basis-0">
+                          <Field className="flex flex-col items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-nowrap text-black">
+                              Committee Head/s
+                            </Label>
+                            <DynamicInputFieldsCommitteeHead
+                              data={
+                                document &&
+                                document.committees[editCommitteeName]?.head
+                              }
                             />
                           </Field>
                         </div>
 
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
+                        <div className="w-full max-w-md grow basis-0">
+                          <Field className="flex flex-col items-center gap-4">
                             <Label className="text-sm/6 font-medium text-black">
-                              Position
+                              Committees
                             </Label>
-                            <Input
-                              name="position"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              required
-                              defaultValue={editOfficerPosition}
+                            <DynamicInputFieldsCommittee
+                              data={
+                                document &&
+                                document.committees[editCommitteeName]
+                                  ?.committees
+                              }
                             />
                           </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Image
-                            </Label>
-                            <Input
-                              type="file"
-                              onChange={handleImageChange}
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              accept=".png,.jpg,.jpeg"
-                            />
-                          </Field>
-                          <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
-                              <div className="text-red-400">No image</div>
-                            ) : !image && base64Image ? (
-                              <div className="text-amber-300">
-                                Image uploading
-                              </div>
-                            ) : image && !base64Image ? (
-                              <div className="text-amber-300">
-                                Upload to update image
-                              </div>
-                            ) : (
-                              <div className="text-green-300">
-                                Image uploaded
-                              </div>
-                            )}
-                          </div>
                         </div>
                       </div>
                     </div>
@@ -475,7 +377,7 @@ export default function ExecutiveOverview({ document }: { document: any }) {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={deleteOfficerPOST}>
+              <form action={deleteCommitteePOST}>
                 <input
                   type="text"
                   name="id"
@@ -484,9 +386,9 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                 />
                 <input
                   type="text"
-                  name="name"
+                  name="committee_name"
                   className="hidden"
-                  defaultValue={deleteDocumentName}
+                  defaultValue={deleteCommitteeName}
                 />
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
@@ -501,13 +403,13 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        Delete officer
+                        Delete committee
                       </DialogTitle>
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">
                           Are you sure you want to delete{" "}
                           <span className="font-bold">
-                            {deleteDocumentName}
+                            {deleteCommitteeName} Committee
                           </span>
                           ?
                         </p>

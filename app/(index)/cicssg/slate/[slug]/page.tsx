@@ -7,6 +7,7 @@ import { useParams } from "next/navigation";
 import NavCICSSG from "@/components/nav-cicssg";
 
 export default function Page() {
+  const NO_DATA_MESSAGE = "No data available";
   const params = useParams();
   const slug =
     typeof params.slug === "string"
@@ -52,7 +53,7 @@ export default function Page() {
       </div>
       <div className="flex grow-3 basis-0 flex-col gap-20 bg-neutral-100 bg-[url(/images/noise.png)] px-6 py-16 text-black/80">
         {/* Adviser */}
-        {document && document.adviser && (
+        {document && document.adviser.name && (
           <div className="flex flex-col items-center gap-8">
             <h1 className="text-4xl">Adviser</h1>
             <div className="mx-auto flex flex-col items-center gap-2">
@@ -60,7 +61,7 @@ export default function Page() {
                 src={
                   document.adviser.image != ""
                     ? document.adviser.image
-                    : "https://placehold.co/400/black/FFF"
+                    : "https://placehold.co/400/black/FFF?text=No+image."
                 }
                 alt=""
                 className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
@@ -83,7 +84,7 @@ export default function Page() {
                   src={
                     document.governor.image != ""
                       ? document.governor.image
-                      : "https://placehold.co/400/black/FFF"
+                      : "https://placehold.co/400/black/FFF?text=No+image."
                   }
                   alt=""
                   className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
@@ -100,7 +101,7 @@ export default function Page() {
                   src={
                     document.vice_governor.image != ""
                       ? document.vice_governor.image
-                      : "https://placehold.co/400/black/FFF"
+                      : "https://placehold.co/400/black/FFF?text=No+image."
                   }
                   alt=""
                   className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
@@ -115,73 +116,90 @@ export default function Page() {
         </div>
 
         {/* Executive Board */}
-        <div className="flex flex-col items-center gap-8">
-          <h1 className="text-4xl">Executive Board</h1>
-
-          <div className="flex flex-row flex-wrap justify-evenly gap-10 *:basis-[20%]">
-            {document &&
-              document.directorate.map(
-                (
-                  data: { image: string; position: string; name: string },
-                  i: number,
-                ) => (
-                  <div key={i} className="flex flex-col items-center gap-2">
-                    <img
-                      src={
-                        data.image != ""
-                          ? data.image
-                          : "https://placehold.co/400/black/FFF"
-                      }
-                      alt=""
-                      className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
-                    />
-                    <h1 className="text-center text-xl font-bold">
-                      {data.position}
-                    </h1>
-                    <h2 className="mt-auto text-center text-xl font-medium">
-                      {data.name}
-                    </h2>
-                  </div>
-                ),
-              )}
+        {document && document.directorate && (
+          <div className="flex flex-col items-center gap-8">
+            <h1 className="text-4xl">Executive Board</h1>
+            {document.directorate.length == 0 && (
+              <span className="text-center text-xl font-normal">
+                {NO_DATA_MESSAGE}
+              </span>
+            )}
+            <div className="flex flex-row flex-wrap justify-evenly gap-10 *:basis-[20%]">
+              {document &&
+                document.directorate.map(
+                  (
+                    data: { image: string; position: string; name: string },
+                    i: number,
+                  ) => (
+                    <div key={i} className="flex flex-col items-center gap-2">
+                      <img
+                        src={
+                          data.image != ""
+                            ? data.image
+                            : "https://placehold.co/400/black/FFF?text=No+image."
+                        }
+                        alt=""
+                        className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
+                      />
+                      <h1 className="text-center text-xl font-bold">
+                        {data.position}
+                      </h1>
+                      <h2 className="mt-auto text-center text-xl font-medium">
+                        {data.name}
+                      </h2>
+                    </div>
+                  ),
+                )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Legislative Council */}
-        <div className="flex flex-col items-center gap-8">
-          <h1 className="text-4xl">Legislative Council</h1>
-
-          <div className="flex flex-row flex-wrap justify-evenly gap-10 *:basis-[20%]">
-            {document &&
-              document.legislative.map(
-                (data: { image: string; name: string }, i: number) => (
-                  <div key={i} className="flex flex-col items-center gap-2">
-                    <img
-                      src={
-                        data.image != ""
-                          ? data.image
-                          : "https://placehold.co/400/black/FFF"
-                      }
-                      alt=""
-                      className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
-                    />
-                    <h1 className="text-center text-xl font-bold">
-                      Legislative Councilor
-                    </h1>
-                    <h2 className="mt-auto text-center text-xl font-medium">
-                      {data.name}
-                    </h2>
-                  </div>
-                ),
-              )}
+        {document && document.legislative && (
+          <div className="flex flex-col items-center gap-8">
+            <h1 className="text-4xl">Legislative Council</h1>
+            {document.legislative.length == 0 && (
+              <span className="text-center text-xl font-normal">
+                {NO_DATA_MESSAGE}
+              </span>
+            )}
+            <div className="flex flex-row flex-wrap justify-evenly gap-10 *:basis-[20%]">
+              {document &&
+                document.legislative &&
+                document.legislative.map(
+                  (data: { image: string; name: string }, i: number) => (
+                    <div key={i} className="flex flex-col items-center gap-2">
+                      <img
+                        src={
+                          data.image != ""
+                            ? data.image
+                            : "https://placehold.co/400/black/FFF?text=No+image."
+                        }
+                        alt=""
+                        className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
+                      />
+                      <h1 className="text-center text-xl font-bold">
+                        Legislative Councilor
+                      </h1>
+                      <h2 className="mt-auto text-center text-xl font-medium">
+                        {data.name}
+                      </h2>
+                    </div>
+                  ),
+                )}
+            </div>
           </div>
-        </div>
+        )}
 
         {/* Junior Officers */}
         {document && document.junior_officers && (
           <div className="flex flex-col items-center gap-8">
             <h1 className="text-4xl">Junior Officers</h1>
-
+            {document.junior_officers.length == 0 && (
+              <span className="text-center text-xl font-normal">
+                {NO_DATA_MESSAGE}
+              </span>
+            )}
             <div className="flex flex-row flex-wrap justify-evenly gap-10 *:basis-[20%]">
               {document &&
                 document.junior_officers.map(
@@ -194,7 +212,7 @@ export default function Page() {
                         src={
                           data.image != ""
                             ? data.image
-                            : "https://placehold.co/400/black/FFF"
+                            : "https://placehold.co/400/black/FFF?text=No+image."
                         }
                         alt=""
                         className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
@@ -214,9 +232,13 @@ export default function Page() {
 
         {/* Committees */}
         {document && document.committees && (
-          <div className="flex flex-col gap-8 w-11/12 mx-auto">
-            <h1 className="text-4xl text-center">Committees</h1>
-
+          <div className="mx-auto flex w-11/12 flex-col gap-8">
+            <h1 className="text-center text-4xl">Committees</h1>
+            {document.committees.length == 0 && (
+              <span className="text-center text-xl font-normal">
+                {NO_DATA_MESSAGE}
+              </span>
+            )}
             <div className="grid grid-cols-1 gap-4">
               {document &&
                 document.committees &&
@@ -227,7 +249,7 @@ export default function Page() {
                   ) => (
                     <div
                       key={i}
-                      className="collapse-arrow bg-base-100 border-base-300 collapse border"
+                      className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-neutral-100 from-60% to-blue-50 transition duration-300 hover:scale-101 hover:from-blue-50"
                     >
                       <input type="checkbox" name="my-accordion-2" />
                       <div className="collapse-title font-semibold">

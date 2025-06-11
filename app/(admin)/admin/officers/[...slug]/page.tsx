@@ -7,6 +7,7 @@ import ExecutiveOverview from "@/components/admin/officers/executive";
 import LegislativeOverview from "@/components/admin/officers/legislative";
 import JuniorOfficerOverview from "@/components/admin/officers/junior-officer";
 import { createClient } from "@supabase/supabase-js";
+import CommitteesOverview from "@/components/admin/officers/committees";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -63,5 +64,9 @@ export default function Page() {
 
   if(slug[1] === "junior-officers") {
     return <JuniorOfficerOverview document={document} />;
+  }
+
+  if(slug[1] === "committees") {
+    return <CommitteesOverview document={document} />;
   }
 }
