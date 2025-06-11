@@ -659,7 +659,6 @@ export async function createLegislativePOST(formData: FormData) {
 
   const id = formData.get("id");
   const name = formData.get("name");
-  const position = formData.get("position");
   const image = formData.get("image");
 
   const { data } = await supabase
@@ -668,7 +667,7 @@ export async function createLegislativePOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
   const legislative = data?.[0]?.legislative || [];
-  legislative.push({ name, position, image });
+  legislative.push({ name, image });
 
   const { error } = await supabase
     .from("slate")
@@ -698,7 +697,6 @@ export async function editLegislativePOST(formData: FormData) {
   const id = formData.get("id");
   const id_name = formData.get("id_name");
   const name = formData.get("name");
-  const position = formData.get("position");
   const image = formData.get("image");
 
   const { data } = await supabase
@@ -709,7 +707,7 @@ export async function editLegislativePOST(formData: FormData) {
   const legislative = data?.[0]?.legislative || [];
 
   filtered = legislative.map((item: any) =>
-    item.name === id_name ? { name, position, image } : item,
+    item.name === id_name ? { name, image } : item,
   );
 
   const { error } = await supabase
