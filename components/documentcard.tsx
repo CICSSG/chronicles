@@ -1,5 +1,6 @@
 import Link from "next/link";
 import React from "react";
+import Image from 'next/image'
 import { IoIosArrowForward } from "react-icons/io";
 
 export interface DocumentCardData {
@@ -14,7 +15,7 @@ export interface DocumentCardData {
 }
 
 export interface SlateCardData {
-  Image?: string;
+  ImageLink?: string;
   URL: string;
   AcademicYear: string;
 }
@@ -94,17 +95,17 @@ export default function EventCard({
 }
 
 export function SlateCard({
-  Image,
+  ImageLink,
   AcademicYear,
   URL,
 }: SlateCardData) {
   return (
     <div className="flex flex-col gap-4">
-      {Image && (
+      {ImageLink && (
         <img
-          src={Image? Image : "https://placehold.co/400"}
+          src={ImageLink? ImageLink : "https://placehold.co/400"}
           alt=""
-          className="rounded-lg border-4 border-black object-cover"
+          className="rounded-lg border-4 border-black object-cover grow-1 basis-0 aspect-square md:aspect-auto"
         />
       )}
       <h1 className="text-2xl font-bold md:min-h-[3.9725rem]">Academic Year <br />{AcademicYear}</h1>

@@ -8,17 +8,13 @@ import {
   Field,
   Input,
   Label,
-  Textarea,
 } from "@headlessui/react";
-import { redirect, useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { SlatesData } from "@/components/admin/documents-data";
 import { createClient } from "@supabase/supabase-js";
 import { ArrowLeftCircleIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
-import { set } from "react-hook-form";
 import clsx from "clsx";
-import { createAnnouncementPOST, editAdviserPOST, editGovernorPOST, editImagePOST, editViceGovernorPOST } from "@/app/actions";
+import { editAdviserPOST, editGovernorPOST, editImagePOST, editViceGovernorPOST } from "@/app/actions";
 import { imgurUpload } from "@/utils/imgur-upload";
 
 const supabase = createClient(
@@ -97,7 +93,7 @@ export default function OfficersOverview({ document }: { document: any }) {
       </Link>
       <div className="flex grow-0 basis-0 flex-row items-center justify-between">
         <div className="">
-          <h1 className="text-4xl font-bold">Slate</h1>
+          <h1 className="text-4xl font-bold">Slate Overview</h1>
           <p className="text-lg font-semibold">
             Currently editing academic year {document && document.academic_year}
           </p>
@@ -118,7 +114,7 @@ export default function OfficersOverview({ document }: { document: any }) {
               <th className="text-nowrap">Image</th>
               <td className="text-nowrap">
                 <img
-                  src={document && document.image ? document.image : "https://placehold.co/400"}
+                  src={document && document.image ? document.image : "https://placehold.co/400/black/FFF?text=No+image."}
                   alt="Slate Image"
                   className="h-16"
                 />
@@ -375,11 +371,11 @@ export default function OfficersOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "") {
+                  if (image == "" && base64Image != "") {
                     alert("Image was not uploaded yet, try again");
                   } else {
                     const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? "");
+                    formData.set("image", image ?? null);
                     editAdviserPOST(formData);
                     setBase64Image("");
                     setImage("");
@@ -510,11 +506,11 @@ export default function OfficersOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "") {
+                  if (image == "" && base64Image != "") {
                     alert("Image was not uploaded yet, try again");
                   } else {
                     const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? "");
+                    formData.set("image", image ?? null);
                     editGovernorPOST(formData);
                     setBase64Image("");
                     setImage("");
@@ -645,11 +641,11 @@ export default function OfficersOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "") {
+                  if (image == "" && base64Image != "") {
                     alert("Image was not uploaded yet, try again");
                   } else {
                     const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? "");
+                    formData.set("image", image ?? null);
                     editViceGovernorPOST(formData);
                     setBase64Image("");
                     setImage("");
