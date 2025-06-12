@@ -28,7 +28,7 @@ const ContactUs = () => {
   }
   return (
     <div className="*w-full flex flex-col gap-4 text-black/80 *:rounded-2xl *:bg-neutral-100">
-      <div className="px-10 py-10 text-4xl">Contact Us</div>
+      <p className="px-10 py-10 text-4xl">Contact Us</p>
 
       <div className="flex flex-col xl:flex-row gap-30 px-8 xl:px-12 2xl:px-24 py-30">
         {/* Lets Connect */}
@@ -61,9 +61,9 @@ const ContactUs = () => {
 
         {/* Form */}
         <div className="flex grow basis-0 flex-col gap-4">
-          <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">
+          <p className="text-3xl md:text-4xl lg:text-5xl font-bold">
             Complete the form below to take the first step!
-          </h1>
+          </p>
           <p className="text-xl font-medium">
             Tell us about yourself and your concern, and we will get back to you
             with an answer or solution.

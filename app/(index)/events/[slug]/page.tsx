@@ -42,8 +42,8 @@ export default function Page() {
               </h1>
                     <hr className="rounded-2xl border-2 font-bold text-blue-300" />
 
-              <h2>{document.date}</h2>
-              <h2>{document.academic_year}</h2>
+              <p>{document.date}</p>
+              <p>{document.academic_year}</p>
             </>
           )}
         </div>
@@ -56,18 +56,18 @@ export default function Page() {
               {document.expenses && (
                 <h2>
                   Expenses:{" "}
-                  <span className="font-bold text-black/80">
+                  <p className="font-bold text-black/80">
                     ₱{document.expenses}
-                  </span>
+                  </p>
                 </h2>
               )}
               {document.highlights.map((data: { highlight: string; description: string }) => (
-                <h2>
+                <p>
                   <span className="font-bold text-black/80">
                     {data.highlight}
                   </span>{" "}
                   - {data.description}
-                </h2>
+                </p>
               ))}
             </>
           )}
@@ -81,7 +81,7 @@ export default function Page() {
           {document && (
             <>
               {document.project_heads.map((data: { name: string }) => (
-                <h2>{data.name}</h2>
+                <p>{data.name}</p>
               ))}
             </>
           )}

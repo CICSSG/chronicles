@@ -43,7 +43,7 @@ export default function Page() {
           <hr className="rounded-2xl border-2 font-bold text-blue-300" />
           {document && (
             <>
-              <h2>Academic Year {document.academic_year}</h2>
+              <p>Academic Year {document.academic_year}</p>
             </>
           )}
         </div>
@@ -67,7 +67,7 @@ export default function Page() {
                 className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
               />
               <h1 className="text-xl font-bold">{document.adviser.position}</h1>
-              <h2 className="text-xl font-medium">{document.adviser.name}</h2>
+              <p className="text-xl font-medium">{document.adviser.name}</p>
             </div>
           </div>
         )}
@@ -90,9 +90,9 @@ export default function Page() {
                   className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
                 />
                 <h1 className="text-xl font-bold">Governor</h1>
-                <h2 className="text-xl font-medium">
+                <p className="text-xl font-medium">
                   {document.governor.name}
-                </h2>
+                </p>
               </div>
             )}
             {document && document.vice_governor && (
@@ -107,9 +107,9 @@ export default function Page() {
                   className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
                 />
                 <h1 className="text-xl font-bold">Vice Governor</h1>
-                <h2 className="text-xl font-medium">
+                <p className="text-xl font-medium">
                   {document.vice_governor.name}
-                </h2>
+                </p>
               </div>
             )}
           </div>
@@ -144,9 +144,9 @@ export default function Page() {
                       <h1 className="text-center text-xl font-bold">
                         {data.position}
                       </h1>
-                      <h2 className="mt-auto text-center text-xl font-medium">
+                      <p className="mt-auto text-center text-xl font-medium">
                         {data.name}
-                      </h2>
+                      </p>
                     </div>
                   ),
                 )}
@@ -181,9 +181,9 @@ export default function Page() {
                       <h1 className="text-center text-xl font-bold">
                         Legislative Councilor
                       </h1>
-                      <h2 className="mt-auto text-center text-xl font-medium">
+                      <p className="mt-auto text-center text-xl font-medium">
                         {data.name}
-                      </h2>
+                      </p>
                     </div>
                   ),
                 )}
@@ -220,9 +220,9 @@ export default function Page() {
                       <h1 className="text-center text-xl font-bold">
                         {data.position}
                       </h1>
-                      <h2 className="mt-auto text-center text-xl font-medium">
+                      <p className="mt-auto text-center text-xl font-medium">
                         {data.name}
-                      </h2>
+                      </p>
                     </div>
                   ),
                 )}
@@ -234,15 +234,13 @@ export default function Page() {
         {document && document.committees && (
           <div className="mx-auto flex w-11/12 flex-col gap-8">
             <h1 className="text-center text-4xl">Committees</h1>
-            {document.committees.length == 0 && (
+            {Object.keys(document.committees).length == 0 && (
               <span className="text-center text-xl font-normal">
                 {NO_DATA_MESSAGE}
               </span>
             )}
             <div className="grid grid-cols-1 gap-4">
-              {document &&
-                document.committees &&
-                Object.entries(document.committees).map(
+              {Object.entries(document.committees).map(
                   (
                     [committeeName, committeeData]: [string, any],
                     i: number,
@@ -256,7 +254,8 @@ export default function Page() {
                         <h1 className="text-2xl font-bold">
                           {committeeName} Committee
                         </h1>
-                        <h2 className="text-lg font-bold">
+                        
+                        <p className="text-lg font-bold">
                           Head/s:{" "}
                           {committeeData.head.map((data: string, i: number) => (
                             <span key={i} className="font-medium">
@@ -264,7 +263,7 @@ export default function Page() {
                               {i < committeeData.head.length - 1 ? ", " : ""}
                             </span>
                           ))}
-                        </h2>
+                        </p>
                       </div>
                       <div className="collapse-content text-sm">
                         <ul className="list *:text-lg">
