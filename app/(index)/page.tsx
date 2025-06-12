@@ -66,16 +66,16 @@ export default async function Home() {
           >
             <h2 className="pt-5 pl-5">Documents</h2>
             <div className="*md:text-2xl relative left-0 mx-auto max-w-4xl text-white *:absolute *:aspect-[9/16] *:w-3xs *:rounded-2xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:p-4 *:transition-all *:hover:scale-102 *:md:w-xs">
-              <Link href={"/resolutions"} className="top-20 -left-4 z-4 scale-70 -rotate-18 text-center sm:scale-80 md:top-24 md:left-12 md:scale-90 md:-rotate-12 md:text-left xl:top-26 xl:scale-100">
+              <Link href={"/resolutions"} className="z-4 left-2/12 top-25 scale-90 sm:top-20 sm:-left-4 sm:z-4 sm:text-center sm:scale-80 md:top-24 md:left-8 md:scale-90 sm:-rotate-12 md:text-left lg:left-5 xl: xl:top-26 xl:scale-95 3xl:-left-6">
                 Resolutions
               </Link>
-              <Link href={"/executive-orders"} className="top-4 left-4 z-2 scale-70 -rotate-8 sm:left-1/12 sm:scale-80 md:top-8 md:left-2/12 md:scale-90 xl:top-6 xl:left-1/5 xl:scale-100">
+              <Link href={"/executive-orders"} className="z-3 left-2/12 top-5 scale-80 sm:top-4 sm:z-2 sm:-rotate-8 sm:left-1/12 sm:scale-80 md:top-8 md:left-2/12 md:scale-90 xl:top-6 xl:left-1/5 xl:scale-95">
                 Executive Orders
               </Link>
-              <Link href={"/ordinances"} className="-top-8 -right-2 z-1 scale-70 rotate-3 sm:right-2/12 sm:scale-80 md:right-1/6 md:scale-90 lg:-top-7 lg:right-1/12 xl:right-2/12 xl:scale-100">
+              <Link href={"/ordinances"} className="z-2 right-1/6 -top-10 sm:-top-8 sm:z-1 scale-70 sm:rotate-3 sm:right-2/12 sm:scale-80 md:right-1/6 md:scale-90 lg:-top-7 lg:right-1/12 xl:right-2/12 xl:scale-95 3xl:right-40">
                 Ordinances
               </Link>
-              <Link href={"/formal-documents"} className="top-16 -right-10 z-3 scale-70 rotate-12 sm:-right-2 sm:scale-80 md:-right-12 md:scale-90 xl:-right-8 xl:scale-100">
+              <Link href={"/formal-documents"} className="z-1 right-1/6 -top-24 sm:top-16 sm:z-3 scale-60 sm:rotate-12 sm:-right-2 sm:scale-80 md:-right-8 md:scale-90 lg:-right-7 xl:-right-8 xl:scale-95 3xl:-right-10">
                 Formal Documents
               </Link>
             </div>
@@ -171,10 +171,10 @@ export default async function Home() {
               @
             </span>
             <h2 className="z-1 text-end font-bold">Contact Us</h2>
-            <h3 className="z-1 text-end text-base font-normal">
-              Got concerns or suggestions? <br /> Tell us --we're listening.
-            </h3>
-            <div className="font-secondary z-1 w-full rounded-xl border-1 border-white bg-neutral-800 py-1 text-center font-normal">
+            <p className="z-1 text-end text-base font-normal">
+              Got concerns or suggestions? <br /> Tell us—we're listening.
+            </p>
+            <div className="z-1 w-full rounded-xl border-1 border-white bg-neutral-800 py-1 text-center font-normal">
               cicssg@dlsud.edu.ph
             </div>
           </Link>

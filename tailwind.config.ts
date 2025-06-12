@@ -1,6 +1,6 @@
 import type { Config } from "tailwindcss";
 
-const config = {
+export default {
   darkMode: ["class", ""],
   content: [
     "./pages/**/*.{ts,tsx}",
@@ -18,6 +18,10 @@ const config = {
       },
     },
     extend: {
+      fontFamily: {
+        sans: ["'Comic Sans MS'", "cursive"], // obvious test
+        inter: ["var(--font-inter)"],
+      },
       transitionProperty: {
         'width': 'width'
       },
@@ -79,5 +83,3 @@ const config = {
   },
   plugins: [require("tailwindcss-animate"), require("daisyui")],
 } satisfies Config;
-
-export default config;

@@ -37,7 +37,7 @@ export function DocumentCard({
           className="aspect-square rounded-lg border-4 border-black object-cover"
         />
       )}
-      <h1 className="text-2xl font-bold">{Title}</h1>
+      <h1 className="text-2xl font-bold lg:min-h-[3.9725rem]">{Title}</h1>
       <hr className="rounded-2xl border-2 font-bold text-blue-300" />
       <div className="flex min-h-12 flex-row items-center">
         <p className="grow basis-0 font-medium">{Date}</p>
@@ -79,10 +79,10 @@ export default function EventCard({
       )}
       <h1 className="text-2xl font-bold md:min-h-[3.9725rem] ">{Title}</h1>
       <hr className="rounded-2xl border-2 font-bold text-blue-300" />
-      <div className="flex min-h-12 flex-col">
+      <div className="h-full flex min-h-12 flex-col">
         <p className="font-bolder grow basis-0 text-lg">{Location}</p>
         <p className="grow basis-0 text-md font-medium">{Date}</p>
-        <p className="grow basis-0 text-sm font-thin">{AcademicYear}</p>
+        <p className="grow basis-0 text-sm font-medium">{AcademicYear}</p>
       </div>
       <Link
         href={URL}

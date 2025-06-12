@@ -1,7 +1,7 @@
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Analytics } from '@vercel/analytics/next';
 
-import { Space_Grotesk } from "next/font/google";
+import { Space_Grotesk, Inter } from "next/font/google";
 import Link from "next/link";
 import "/app/globals.css";
 import Footer from "@/components/footer";
@@ -22,9 +22,16 @@ export const metadata = {
     "The archival website for the College of Information and Computer Studies Student Government (CICSSG)",
 };
 
-const geistSans = Space_Grotesk({
+const spaceGrotesk = Space_Grotesk({
   display: "swap",
   subsets: ["latin"],
+  variable: "--font-space-grotesk",
+});
+
+const inter = Inter({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export default async function RootLayout({
@@ -36,7 +43,7 @@ export default async function RootLayout({
     <html
       lang="en"
       data-theme="cicssg"
-      className={geistSans.className}
+      className={`${spaceGrotesk.className} ${inter.className}`}
       suppressHydrationWarning
     >
       <body className="bg-background text-foreground flex min-h-screen flex-col justify-between overflow-x-hidden">

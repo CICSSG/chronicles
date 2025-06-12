@@ -1,8 +1,12 @@
-@import url('https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap');
 @import "tailwindcss";
 @import "tailwindcss-animated";
 @plugin "daisyui";
-@tailwind utilities;
+@import "tailwindcss/utilities";
+
+/* Your custom styles below */
+h1, h2, h3 {
+  font-family: 'Space Grotesk', cursive;
+}
 
 @theme {
   --breakpoint-3xl: 120rem;
@@ -89,3 +93,4 @@
 @utility min-scrollbar {
   @apply [scrollbar-width:1px] [&::-webkit-scrollbar]:hidden;
 }
+

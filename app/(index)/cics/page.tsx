@@ -1,4 +1,3 @@
-import NavCICS from "@/components/nav-cics";
 import React from "react";
 
 const Faculty = () => {
@@ -19,7 +18,7 @@ const Faculty = () => {
         future leaders who excel in their professions and make meaningful
         contributions to the global digital landscape.
       </p>
-<hr />
+      <hr />
       <div className="flex flex-row justify-around gap-16">
         <div className="flex flex-col gap-2">
           <h1 className="text-center text-3xl">Mission</h1>
@@ -43,7 +42,7 @@ const Faculty = () => {
         </div>
       </div>
 
-<hr />
+      <hr />
       <div className="flex flex-col gap-2">
         <h1 className="text-3xl">Research Focus</h1>
         <p className="text-xl font-normal">

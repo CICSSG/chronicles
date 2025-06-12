@@ -105,7 +105,6 @@ export default function LegislativeOverview({ document }: { document: any }) {
             <tr className="border-b border-b-black">
               <th></th>
               <th>Name</th>
-              <th>Position</th>
               <th>Actions</th>
             </tr>
           </thead>
@@ -126,7 +125,6 @@ export default function LegislativeOverview({ document }: { document: any }) {
                     />
                   </td>
                   <td className="text-nowrap">{officer.name}</td>
-                  <td className="text-nowrap">{officer.position}</td>
                   <td className="grid grid-flow-row grid-cols-2 gap-2 text-center font-semibold *:my-auto *:rounded-xl *:px-4 *:py-2">
                     <Button
                       onClick={() => handleEditDocument(officer.name)}
@@ -218,22 +216,6 @@ export default function LegislativeOverview({ document }: { document: any }) {
                             </Label>
                             <Input
                               name="name"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              required
-                            />
-                          </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Position
-                            </Label>
-                            <Input
-                              name="position"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -378,23 +360,6 @@ export default function LegislativeOverview({ document }: { document: any }) {
                               )}
                               required
                               defaultValue={editOfficerName}
-                            />
-                          </Field>
-                        </div>
-
-                        <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black">
-                              Position
-                            </Label>
-                            <Input
-                              name="position"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              required
-                              defaultValue={editOfficerPosition}
                             />
                           </Field>
                         </div>
