@@ -8,7 +8,7 @@ import {
 } from "react-icons/ri";
 import { FiLogOut, FiUser } from "react-icons/fi";
 import { IoDocuments } from "react-icons/io5";
-import { GiPoliceOfficerHead } from "react-icons/gi";
+import { GiPoliceOfficerHead, GiTeacher } from "react-icons/gi";
 import { PiUsersFill } from "react-icons/pi";
 import { CalendarDaysIcon, MegaphoneIcon } from '@heroicons/react/20/solid';
 
@@ -56,6 +56,13 @@ async function NavLinksAdmin() {
             </Link>
           </li>
           
+          <li>
+            <Link href="/admin/faculty" className='flex items-center flex-nowrap gap-2 w-fit'>
+              <GiTeacher className='text-3xl' />
+              <span className='hidden group-hover:block'>Faculty</span>
+            </Link>
+          </li>
+
           <li>
             <Link href="/admin/users" className='flex items-center flex-nowrap gap-2 w-fit'>
               <PiUsersFill className='text-3xl' />

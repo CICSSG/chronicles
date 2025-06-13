@@ -66,7 +66,7 @@ const Slate = () => {
                   key={data.id}
                   AcademicYear={data.academic_year}
                   URL={"/cicssg/slate/" + data.id}
-                  ImageLink={data.image}
+                  ImageLink={data.image ? data.image : "https://i.imgur.com/6pP0o7C.png"}
                 />
               ))}
             </div>

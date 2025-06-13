@@ -114,7 +114,7 @@ export default function OfficersOverview({ document }: { document: any }) {
               <th className="text-nowrap">Image</th>
               <td className="text-nowrap">
                 <img
-                  src={document && document.image ? document.image : "https://placehold.co/400/black/FFF?text=No+image."}
+                  src={document && document.image ? document.image : "https://i.imgur.com/6pP0o7C.png"}
                   alt="Slate Image"
                   className="h-16"
                 />

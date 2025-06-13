@@ -1,10 +1,10 @@
+import Image from "next/image";
 import Link from "next/link";
 import React from "react";
-import Image from 'next/image'
 import { IoIosArrowForward } from "react-icons/io";
 
 export interface DocumentCardData {
-  Image?: string;
+  ImageLink?: string;
   Title: string;
   Date: string;
   URL: string;
@@ -21,7 +21,7 @@ export interface SlateCardData {
 }
 
 export function DocumentCard({
-  Image,
+  ImageLink,
   Title,
   Date,
   URL,
@@ -31,10 +31,12 @@ export function DocumentCard({
   return (
     <div className="flex flex-col gap-4">
       {Image && (
-        <img
-          src={Image}
+        <Image
+          src={ImageLink? ImageLink : "https://i.imgur.com/6pP0o7C.png"}
+          width={400}
+          height={400}
           alt=""
-          className="aspect-square rounded-lg border-4 border-black object-cover"
+          className="aspect-square rounded-lg border-4 border-black object-cover mx-auto"
         />
       )}
       <h1 className="text-2xl font-bold lg:min-h-[3.9725rem]">{Title}</h1>
@@ -61,7 +63,7 @@ export function DocumentCard({
 }
 
 export default function EventCard({
-  Image,
+  ImageLink,
   Title,
   Date,
   AcademicYear,
@@ -70,11 +72,13 @@ export default function EventCard({
 }: DocumentCardData) {
   return (
     <div className="flex flex-col gap-4">
-      {Image && (
-        <img
-          src={Image}
+      {ImageLink && (
+        <Image
+          src={ImageLink? ImageLink : "https://i.imgur.com/6pP0o7C.png"}
+          width={400}
+          height={400}
           alt=""
-          className="aspect-square rounded-lg border-4 border-black object-cover"
+          className="aspect-square rounded-lg border-4 border-black object-cover mx-auto"
         />
       )}
       <h1 className="text-2xl font-bold md:min-h-[3.9725rem] ">{Title}</h1>
@@ -102,10 +106,12 @@ export function SlateCard({
   return (
     <div className="flex flex-col gap-4">
       {ImageLink && (
-        <img
-          src={ImageLink? ImageLink : "https://placehold.co/400"}
+        <Image
+          src={ImageLink? ImageLink : "https://i.imgur.com/6pP0o7C.png"}
           alt=""
-          className="rounded-lg border-4 border-black object-cover grow-1 basis-0 aspect-square md:aspect-auto"
+          width={250}
+          height={250}
+          className="rounded-lg border-4 border-black object-cover grow-1 basis-0 aspect-square md:aspect-auto mx-auto"
         />
       )}
       <h1 className="text-2xl font-bold md:min-h-[3.9725rem]">Academic Year <br />{AcademicYear}</h1>
