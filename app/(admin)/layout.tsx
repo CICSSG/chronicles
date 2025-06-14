@@ -1,7 +1,7 @@
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import type { Metadata } from "next";
 import { ClerkProvider, SignedIn } from "@clerk/nextjs";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Space_Grotesk, Inter } from "next/font/google";
 import "/app/globals.css";
 import { currentUser } from "@clerk/nextjs/server";
 import { permanentRedirect } from "next/navigation";
@@ -11,14 +11,16 @@ import { User } from "lucide-react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Analytics } from "@vercel/analytics/next";
 
-const geistSans = Geist({
-  variable: "--font-geist-sans",
+const spaceGrotesk = Space_Grotesk({
+  display: "swap",
   subsets: ["latin"],
+  variable: "--font-space-grotesk",
 });
 
-const geistMono = Geist_Mono({
-  variable: "--font-geist-mono",
+const inter = Inter({
+  display: "swap",
   subsets: ["latin"],
+  variable: "--font-inter",
 });
 
 export const metadata: Metadata = {
@@ -42,7 +44,7 @@ export default async function RootLayout({
     <ClerkProvider>
       <html lang="en">
         <body
-          className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+          className={`${spaceGrotesk.className} ${inter.className}`}
         >
           <Link
             href={"/"}

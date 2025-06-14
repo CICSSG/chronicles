@@ -170,7 +170,7 @@ export default function Programs() {
                 <div className="grid grid-cols-2 gap-6">
                   {Object.entries(data.coreSubjects).map(
                     ([name, data]: [string, any], i: number) => (
-                      <div>
+                      <div key={i}>
                         <h2 className="mb-2 text-lg font-bold">{name}</h2>
                         <ul className="list gap-2 *:text-lg *:font-normal">
                           {data.map((subjectData: string, i: number) => (
@@ -198,7 +198,7 @@ export default function Programs() {
                 <div className="grid grid-cols-1 gap-6">
                   {Object.entries(data.eligibility).map(
                     ([name, data]: [string, any], i: number) => (
-                      <div>
+                      <div key={i}>
                         <h2 className="mb-2 text-lg font-bold">{name}</h2>
                         <ul className="list gap-2 *:text-lg *:font-normal">
                           {data.map((subjectData: string, i: number) => (
