@@ -119,7 +119,7 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                       src={
                         officer.image != ""
                           ? officer.image
-                          : "https://placehold.co/400/black/FFF?text=No+image."
+                          : "https://i.imgur.com/6pP0o7C.png"
                       }
                       alt=""
                       className="size-16"

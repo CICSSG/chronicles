@@ -68,7 +68,7 @@ export default function Announcements() {
                 Date={data.date}
                 URL={data.link}
                 Description={data.description}
-                Image={data.image}
+                ImageLink={data.image}
               />
             ))}
           </div>

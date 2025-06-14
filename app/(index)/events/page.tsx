@@ -68,7 +68,7 @@ const Events = () => {
                 Date={data.date}
                 AcademicYear={data.academic_year}
                 URL={"/events/" + data.id}
-                Image={data.image}
+                ImageLink={data.image}
                 Location={data.location}
               />
             ))}

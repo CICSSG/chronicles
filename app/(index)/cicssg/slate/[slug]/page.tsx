@@ -5,6 +5,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import NavCICSSG from "@/components/nav-cicssg";
+import Image from "next/image";
 
 export default function Page() {
   const NO_DATA_MESSAGE = "No data available";
@@ -57,11 +58,13 @@ export default function Page() {
           <div className="flex flex-col items-center gap-8">
             <h1 className="text-4xl">Adviser</h1>
             <div className="mx-auto flex flex-col items-center gap-2">
-              <img
+              <Image
+                height={250}
+                width={250}
                 src={
                   document.adviser.image != ""
                     ? document.adviser.image
-                    : "https://placehold.co/400/black/FFF?text=No+image."
+                    : "https://i.imgur.com/6pP0o7C.png"
                 }
                 alt=""
                 className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
@@ -80,28 +83,30 @@ export default function Page() {
           <div className="flex flex-row justify-evenly">
             {document && document.governor && (
               <div className="flex flex-col items-center gap-2">
-                <img
+                <Image
+                  height={250}
+                  width={250}
                   src={
                     document.governor.image != ""
                       ? document.governor.image
-                      : "https://placehold.co/400/black/FFF?text=No+image."
+                      : "https://i.imgur.com/6pP0o7C.png"
                   }
                   alt=""
                   className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
                 />
                 <h1 className="text-xl font-bold">Governor</h1>
-                <p className="text-xl font-medium">
-                  {document.governor.name}
-                </p>
+                <p className="text-xl font-medium">{document.governor.name}</p>
               </div>
             )}
             {document && document.vice_governor && (
               <div className="flex flex-col items-center gap-2">
-                <img
+                <Image
+                  height={250}
+                  width={250}
                   src={
                     document.vice_governor.image != ""
                       ? document.vice_governor.image
-                      : "https://placehold.co/400/black/FFF?text=No+image."
+                      : "https://i.imgur.com/6pP0o7C.png"
                   }
                   alt=""
                   className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
@@ -132,11 +137,13 @@ export default function Page() {
                     i: number,
                   ) => (
                     <div key={i} className="flex flex-col items-center gap-2">
-                      <img
+                      <Image
+                        height={250}
+                        width={250}
                         src={
                           data.image != ""
                             ? data.image
-                            : "https://placehold.co/400/black/FFF?text=No+image."
+                            : "https://i.imgur.com/6pP0o7C.png"
                         }
                         alt=""
                         className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
@@ -169,11 +176,13 @@ export default function Page() {
                 document.legislative.map(
                   (data: { image: string; name: string }, i: number) => (
                     <div key={i} className="flex flex-col items-center gap-2">
-                      <img
+                      <Image
+                        height={250}
+                        width={250}
                         src={
                           data.image != ""
                             ? data.image
-                            : "https://placehold.co/400/black/FFF?text=No+image."
+                            : "https://i.imgur.com/6pP0o7C.png"
                         }
                         alt=""
                         className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
@@ -208,13 +217,15 @@ export default function Page() {
                     i: number,
                   ) => (
                     <div key={i} className="flex flex-col items-center gap-2">
-                      <img
+                      <Image
                         src={
                           data.image != ""
                             ? data.image
-                            : "https://placehold.co/400/black/FFF?text=No+image."
+                            : "https://i.imgur.com/6pP0o7C.png"
                         }
                         alt=""
+                        height={250}
+                        width={250}
                         className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
                       />
                       <h1 className="text-center text-xl font-bold">
@@ -241,44 +252,41 @@ export default function Page() {
             )}
             <div className="grid grid-cols-1 gap-4">
               {Object.entries(document.committees).map(
-                  (
-                    [committeeName, committeeData]: [string, any],
-                    i: number,
-                  ) => (
-                    <div
-                      key={i}
-                      className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-neutral-100 from-60% to-blue-50 transition duration-300 hover:scale-101 hover:from-blue-50"
-                    >
-                      <input type="checkbox" name="my-accordion-2" />
-                      <div className="collapse-title font-semibold">
-                        <h1 className="text-2xl font-bold">
-                          {committeeName} Committee
-                        </h1>
-                        
-                        <p className="text-lg font-bold">
-                          Head/s:{" "}
-                          {committeeData.head.map((data: string, i: number) => (
-                            <span key={i} className="font-medium">
-                              {data}
-                              {i < committeeData.head.length - 1 ? ", " : ""}
-                            </span>
-                          ))}
-                        </p>
-                      </div>
-                      <div className="collapse-content text-sm">
-                        <ul className="list *:text-lg">
-                          {committeeData.committees.map(
-                            (data: string, i: number) => (
-                              <li className="list-row py-1.5 font-medium">
-                                {i + 1}. {data}
-                              </li>
-                            ),
-                          )}
-                        </ul>
-                      </div>
+                ([committeeName, committeeData]: [string, any], i: number) => (
+                  <div
+                    key={i}
+                    className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-neutral-100 from-60% to-blue-50 transition duration-300 hover:scale-101 hover:from-blue-50"
+                  >
+                    <input type="checkbox" name="my-accordion-2" />
+                    <div className="collapse-title font-semibold">
+                      <h1 className="text-2xl font-bold">
+                        {committeeName} Committee
+                      </h1>
+
+                      <p className="text-lg font-bold">
+                        Head/s:{" "}
+                        {committeeData.head.map((data: string, i: number) => (
+                          <span key={i} className="font-medium">
+                            {data}
+                            {i < committeeData.head.length - 1 ? ", " : ""}
+                          </span>
+                        ))}
+                      </p>
                     </div>
-                  ),
-                )}
+                    <div className="collapse-content text-sm">
+                      <ul className="list *:text-lg">
+                        {committeeData.committees.map(
+                          (data: string, i: number) => (
+                            <li className="list-row py-1.5 font-medium">
+                              {i + 1}. {data}
+                            </li>
+                          ),
+                        )}
+                      </ul>
+                    </div>
+                  </div>
+                ),
+              )}
             </div>
           </div>
         )}
