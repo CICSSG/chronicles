@@ -39,7 +39,49 @@ export function DocumentCard({
           className="aspect-square rounded-lg border-4 border-black object-cover mx-auto"
         />
       )}
-      <h1 className="text-2xl font-bold lg:min-h-[3.9725rem]">{Title}</h1>
+      <h1 className="text-2xl font-bold">{Title}</h1>
+      <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+      <div className="flex min-h-12 flex-row items-center">
+        <p className="grow basis-0 font-medium">{Date}</p>
+        <Link
+          href={URL}
+          className="flex flex-row items-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white"
+          target="_blank"
+        >
+          Read More <IoIosArrowForward />{" "}
+        </Link>
+      </div>
+      <p className="font-medium">{Description}</p>
+      {Author && (
+        <div className="mt-auto text-sm">
+          <span className="font-bold">Author/s:</span>{" "}
+          <span className="font-medium">{Author}</span>
+        </div>
+      )}
+    </div>
+  );
+}
+
+export function AnnouncementCard({
+  ImageLink,
+  Title,
+  Date,
+  URL,
+  Description,
+  Author,
+}: DocumentCardData) {
+  return (
+    <div className="flex flex-col gap-4">
+      {Image && (
+        <Image
+          src={ImageLink? ImageLink : "https://i.imgur.com/6pP0o7C.png"}
+          width={400}
+          height={400}
+          alt=""
+          className="aspect-square rounded-lg border-4 border-black object-cover mx-auto"
+        />
+      )}
+      <h1 className="text-2xl font-bold min-h-[3.975rem]">{Title}</h1>
       <hr className="rounded-2xl border-2 font-bold text-blue-300" />
       <div className="flex min-h-12 flex-row items-center">
         <p className="grow basis-0 font-medium">{Date}</p>

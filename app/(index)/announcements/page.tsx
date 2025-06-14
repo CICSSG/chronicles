@@ -1,7 +1,7 @@
 "use client";
 import NavDocuments from "@/components/nav-documents";
 import React, { Suspense, useEffect, useState } from "react";
-import {DocumentCard} from "@/components/documentcard";
+import {AnnouncementCard, DocumentCard} from "@/components/documentcard";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { PublicAnnouncementData, PublicDocumentData } from "@/components/public-documents-data";
 import Link from "next/link";
@@ -62,7 +62,7 @@ export default function Announcements() {
           <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
             {/* Card */}
             {documents?.map((data) => (
-              <DocumentCard
+              <AnnouncementCard
                 key={data.id}
                 Title={data.title}
                 Date={data.date}
