@@ -88,3 +88,12 @@ export async function PublicSlateDataByID(id?: string) {
 
   return { documents };
 }
+
+export async function PublicAdminStaffData() {
+  let { data: documents } = await supabase
+    .from("adminstaff")
+    .select("*", { count: "exact", head: false })
+    .order("id", { ascending: false });
+
+  return { documents };
+}
