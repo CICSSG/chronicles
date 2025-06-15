@@ -11,7 +11,9 @@ export async function GetTableRows(){
     'documents',
     'events',
     'slate',
-    'profiles'
+    'profiles',
+    'adminstaff',
+    'faculty'
   ];
   const rowCounts: { [key: string]: number | null } = {};
   for (const table of tables){
