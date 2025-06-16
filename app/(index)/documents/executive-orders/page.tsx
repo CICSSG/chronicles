@@ -1,7 +1,7 @@
 "use client";
 import NavDocuments from "@/components/nav-documents";
 import React, { Suspense, useEffect, useState } from "react";
-import {DocumentCard} from "@/components/documentcard";
+import {DocumentCard, ExecutiveCard} from "@/components/documentcard";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { PublicDocumentData } from "@/components/public-documents-data";
 import Link from "next/link";
@@ -65,7 +65,7 @@ export default function ExecutiveOrders() {
           <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3 w-full">
             {/* Card */}
             {documents?.map((data) => (
-              <DocumentCard
+              <ExecutiveCard
                 key={data.id}
                 Title={data.title}
                 Date={data.date}

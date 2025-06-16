@@ -1,7 +1,7 @@
 "use client";
 import NavDocuments from "@/components/nav-documents";
 import React, { Suspense, useEffect, useState } from "react";
-import DocumentCard from "@/components/documentcard";
+import DocumentCard, { TransparencyCard } from "@/components/documentcard";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { PublicDocumentData } from "@/components/public-documents-data";
 import Link from "next/link";
@@ -48,6 +48,7 @@ function TransparencyReports() {
     );
   }, [page]);
 
+  console.log(documents)
   return (
     <div className="flex w-full flex-col gap-4 *:rounded-2xl md:flex-row">
       <div className="sticky flex grow-1 basis-0 flex-col gap-4 text-black/60 *:rounded-2xl *:bg-neutral-300 *:px-6 *:py-8 *:shadow-xl">
@@ -65,7 +66,7 @@ function TransparencyReports() {
           <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3">
             {/* Card */}
             {documents?.map((data) => (
-              <DocumentCard
+              <TransparencyCard
                 key={data.id}
                 Title={data.title}
                 Date={data.date}

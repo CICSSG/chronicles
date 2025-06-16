@@ -1,5 +1,5 @@
 "use client";
-import {DocumentCard} from "@/components/documentcard";
+import {DocumentCard, ExecutiveCard} from "@/components/documentcard";
 import NavDocuments from "@/components/nav-documents";
 import React, { Suspense, useEffect, useState } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -65,7 +65,7 @@ function FormalDocuments() {
           <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3">
             {/* Card */}
             {documents?.map((data) => (
-              <DocumentCard
+              <ExecutiveCard
                 key={data.id}
                 Title={data.title}
                 Date={data.date}

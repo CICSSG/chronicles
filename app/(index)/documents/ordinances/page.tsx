@@ -1,5 +1,5 @@
 "use client";
-import {DocumentCard} from "@/components/documentcard";
+import {DocumentCard, ExecutiveCard} from "@/components/documentcard";
 import NavDocuments from "@/components/nav-documents";
 import { PublicDocumentData } from "@/components/public-documents-data";
 import Link from "next/link";
@@ -63,7 +63,7 @@ export default function Ordinances() {
           <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3">
             {/* Card */}
             {documents?.map((data) => (
-              <DocumentCard
+              <ExecutiveCard
                 key={data.id}
                 Title={data.title}
                 Date={data.date}

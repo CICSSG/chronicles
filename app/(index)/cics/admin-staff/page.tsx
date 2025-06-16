@@ -1,24 +1,10 @@
 "use client";
+import { AdminStaffDocumentData } from "@/app/(admin)/admin/admin-staff/page";
 import { PublicAdminStaffData } from "@/components/public-documents-data";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
-interface AdminStaffDocumentData {
-  id: number;
-  dean: {
-    name: string;
-    image: string;
-  };
-  associate_dean: {
-    name: string;
-    image: string;
-  };
-  staff: {
-    name: string;
-    image: string;
-    position: string;
-  }[];
-}
+
 export default function AdminStaff() {
   const [documents, setDocuments] = useState<AdminStaffDocumentData | null>(
     null,

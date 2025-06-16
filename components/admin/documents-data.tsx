@@ -290,3 +290,65 @@ export async function SlatesSearch(
     count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
+
+export async function AdminStaffData(id?: string, page?: number) {
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  if (id == null) {
+    let { data: documents, count } = await supabase
+      .from("adminstaff")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .order("id", { ascending: false });
+
+    let pagination =
+      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+
+    return { documents, pagination };
+  } else {
+    let { data: documents, count } = await supabase
+      .from("adminstaff")
+      .select("*")
+      .eq("id", parseInt(id));
+
+    let pagination =
+      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+    return { documents, pagination };
+  }
+}
+
+export async function AdminStaffSearch(
+  title?: string,
+  page?: number,
+) {
+  title == "" || title == null
+    ? (title = undefined)
+    : (title = "%" + title + "%");
+
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  if (title != undefined) {
+    let { data: documents, count } = await supabase
+      .from("adminstaff")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .ilike("title", title)
+      .order("id", { ascending: false });
+
+    let pagination =
+      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+    return { documents, pagination };
+  }
+
+  let { data: documents, count } = await supabase
+    .from("adminstaff")
+    .select("*", { count: "exact", head: false })
+    .range(from, to)
+    .order("id", { ascending: false });
+
+  let pagination =
+    count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+  return { documents, pagination };
+}
