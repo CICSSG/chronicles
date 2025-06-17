@@ -51,13 +51,13 @@ export default function Announcements() {
   return (
     <div className="flex w-full flex-col gap-4 *:rounded-2xl">
       <div className="sticky flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:px-8 *:py-8 *:shadow-xl">
-        <div className="bg-linear-to-r from-neutral-100 via-neutral-100 via-70% to-blue-200">
+        <div className="bg-linear-to-r from-neutral-100 via-neutral-100 via-70% to-blue-200 bg-neutral-300 px-6 py-8 rounded-2xl">
           <h2 className="text-3xl font-bold">
             Announcements
           </h2>
         </div>
       </div>
-      <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80">
+      <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80 rounded-2xl">
         <Suspense>
           <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4">
             {/* Card */}

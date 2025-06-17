@@ -29,7 +29,7 @@ export function DocumentCard({
   Author,
 }: DocumentCardData) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 bg-white p-8 rounded-2xl">
       {Image && (
         <Image
           src={ImageLink? ImageLink : "https://i.imgur.com/6pP0o7C.png"}
@@ -71,7 +71,7 @@ export function ExecutiveCard({
   Author,
 }: DocumentCardData) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 bg-white p-8 rounded-2xl">
       <h1 className="text-2xl font-bold">{Title}</h1>
       <hr className="rounded-2xl border-2 font-bold text-blue-300" />
       <div className="flex min-h-12 flex-row items-center">
@@ -104,7 +104,7 @@ export function TransparencyCard({
   Author,
 }: DocumentCardData) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 bg-white p-8 rounded-2xl">
       <h1 className="text-2xl font-bold">{Title}</h1>
       <hr className="rounded-2xl border-2 font-bold text-blue-300" />
       <div className="flex min-h-12 flex-row items-center">
@@ -137,7 +137,7 @@ export function AnnouncementCard({
   Author,
 }: DocumentCardData) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 bg-white p-8 rounded-2xl">
       {Image && (
         <Image
           src={ImageLink? ImageLink : "https://i.imgur.com/6pP0o7C.png"}
@@ -179,7 +179,7 @@ export default function EventCard({
   Location,
 }: DocumentCardData) {
   return (
-    <div className="flex flex-col gap-4">
+    <div className="flex flex-col gap-4 bg-white p-8 rounded-2xl">
       {ImageLink && (
         <Image
           src={ImageLink? ImageLink : "https://i.imgur.com/6pP0o7C.png"}

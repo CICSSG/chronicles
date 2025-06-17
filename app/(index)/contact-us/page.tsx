@@ -28,9 +28,9 @@ const ContactUs = () => {
   }
   return (
     <div className="*w-full flex flex-col gap-4 text-black/80 *:rounded-2xl *:bg-neutral-100">
-      <p className="px-10 py-10 text-4xl">Contact Us</p>
+      <p className="px-10 py-10 text-4xl bg-neutral-100 rounded-2xl">Contact Us</p>
 
-      <div className="flex flex-col xl:flex-row gap-30 px-8 xl:px-12 2xl:px-24 py-30">
+      <div className="flex flex-col xl:flex-row gap-30 px-8 xl:px-12 2xl:px-24 py-8 2xl:py-30 bg-neutral-100 rounded-2xl">
         {/* Lets Connect */}
         <div className="flex grow basis-0 flex-col gap-6">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">Let's connect!</h1>
@@ -52,10 +52,10 @@ const ContactUs = () => {
           </div>
 
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 text-neutral-500 text-lg font-light *:bg-white *:border-2 *:border-neutral-300 *:rounded-lg *:px-4 *:py-20 *:shadow-lg *:flex *:flex-col *:lg:flex-row *:xl:flex-col *:2xl:flex-row *:items-center *:gap-1 *:justify-center *:text-md *:sm:text-lg">
-            <div><EnvelopeIcon className="size-6"/> cicssg@dlsud.edu.ph</div>
-            <div><FaFacebook className="size-6"/>@DLSUD.CICSSG</div>
-            <div><FaInstagram className="size-6"/>@dlsud.cicssg</div>
-            <div><MapPinIcon className="size-6"/>PCH 102, DLSU-D</div>
+            <div className="flex flex-col bg-white px-4 py-20 items-center justify-center rounded-lg"><EnvelopeIcon className="size-6"/> cicssg@dlsud.edu.ph</div>
+            <div className="flex flex-col bg-white px-4 py-20 items-center justify-center rounded-lg"><FaFacebook className="size-6"/>@DLSUD.CICSSG</div>
+            <div className="flex flex-col bg-white px-4 py-20 items-center justify-center rounded-lg"><FaInstagram className="size-6"/>@dlsud.cicssg</div>
+            <div className="flex flex-col bg-white px-4 py-20 items-center justify-center rounded-lg"><MapPinIcon className="size-6"/>PCH 102, DLSU-D</div>
           </div>
         </div>
 
@@ -234,16 +234,19 @@ const ContactUs = () => {
                     id="message"
                     maxLength={CONCERN_CHARACTERS_MAX}
                     rows={15}
+                    onKeyUp={e => setCharacter((e.target as HTMLTextAreaElement).value.length)}
                     placeholder="Tell us about your concern..."
                     className="block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none text-md/4 sm:text-lg/5 lg:text-xl/6"
                     required
-                    {...register('message', { 
+                    {
+                      ...register('message', { 
                       required: true,
                     })}
+                    
                   />
                 </div>
               </div>
-              <span className={`text-black/40 ${character == 0 ? 'hidden': null}`}>{character}/{CONCERN_CHARACTERS_MAX}</span>
+              <span className={`text-black/40 text-sm ${character == 0 ? 'hidden': null}`}>{CONCERN_CHARACTERS_MAX - character} characters left</span>
             </div>
 
             <button type="submit" className="py-3 rounded-full bg-neutral-900 text-xl text-white font-semibold bg-[url(/images/noise.png)] hover:cursor-pointer hover:bg-neutral-950 hover:scale-105">
