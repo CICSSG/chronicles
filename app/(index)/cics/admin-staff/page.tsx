@@ -29,7 +29,7 @@ export default function AdminStaff() {
         </div>
         <hr />
 
-        <div className="flex flex-row justify-around">
+        <div className="flex flex-col mx-auto lg:mx-0 lg:flex-row justify-around gap-8">
           {/* Dean */}
           <div className="flex flex-row items-center gap-4">
             <Image

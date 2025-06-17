@@ -47,7 +47,7 @@ export default function Faculty() {
         <h1 className="text-center text-3xl font-bold">
           Computer Science Department
         </h1>
-        <div className="grid grid-cols-4 gap-x-4 gap-y-16">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 3xl:grid-cols-4 gap-x-4 gap-y-16">
           {documentsCS?.map((data, i) => (
             <div key={i} className="flex flex-col items-center gap-1.5 text-center">
               <Image
@@ -81,7 +81,7 @@ export default function Faculty() {
         </h1>
       </div>
 
-      <div className="grid grid-cols-4 gap-x-4 gap-y-16">
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 3xl:grid-cols-4 gap-x-4 gap-y-16">
           {documentsIT?.map((data, i) => (
             <div key={i} className="flex flex-col items-center gap-1.5 text-center">
               <Image
