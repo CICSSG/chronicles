@@ -217,14 +217,6 @@ export default function Faculty() {
         >
           Create Faculty Member
         </Button>
-        <Button
-          onClick={() => {
-            CreatePopup("Testtt");
-          }}
-          className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-green-600 px-3 py-1.5 font-semibold text-white hover:bg-green-500"
-        >
-          Create Faculty Member
-        </Button>
 
         <div className="flex flex-row">
           <div className="w-full max-w-2xs px-4">
@@ -772,7 +764,10 @@ export default function Faculty() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form onSubmit={(e) => handleDeleteSubmit(e)}>
+              <form onSubmit={(e) => {
+                e.preventDefault()
+                handleDeleteSubmit(e)
+              }}>
                 <input
                   type="text"
                   name="id"

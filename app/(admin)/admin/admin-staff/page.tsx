@@ -5,7 +5,6 @@ import {
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
-  Textarea,
 } from "@headlessui/react";
 import { DocumentIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
@@ -16,19 +15,16 @@ import clsx from "clsx";
 import {
   AdminStaffData,
   AdminStaffSearch,
-  EventsData,
-  EventsSearch,
 } from "@/components/admin/documents-data";
-import { createEventPOST, deleteEventPOST, editEventPOST } from "@/app/actions";
+import { editEventPOST } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
-import DynamicInputFieldsProjectHead from "@/components/admin/dynamic-input-field-project-head";
-import DynamicInputFieldsHighlights from "@/components/admin/dynamic-input-field-highlights";
 import Image from "next/image";
 import DynamicInputFieldsStaff from "@/components/admin/dynamic-input-field-staff";
+import { CreatePopup } from "@/components/admin/alert-fragment";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -56,8 +52,8 @@ export default function AdminStaff() {
   const pathname = usePathname();
   const [page, setPage] = useQueryState("page", parseAsInteger);
   const [title, setTitle] = useQueryState("title");
-  const [createForm, setCreateForm] = useState(false);
-  const [deleteForm, setDeleteForm] = useState(false);
+  // const [createForm, setCreateForm] = useState(false);
+  // const [deleteForm, setDeleteForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
   const [documents, setDocuments] = useState<AdminStaffDocumentData | null>(
     null,
@@ -111,6 +107,17 @@ export default function AdminStaff() {
       },
     );
   }, [page, title]);
+
+  const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const result = await editEventPOST(formData);
+    setEditForm(false);
+    if (result.success) {
+      CreatePopup("Successfully deleted faculty member");
+    } else {
+      CreatePopup(result.message || "Failed to create faculty");
+    }
+  };
 
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
@@ -579,7 +586,12 @@ export default function AdminStaff() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-3xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={editEventPOST}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleEditSubmit(e)
+                }}
+              >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">

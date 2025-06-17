@@ -52,8 +52,6 @@ export default function OfficersOverview({ document }: { document: any }) {
     reader.readAsDataURL(file);
   };
 
-  function handleViewDocument(number: string) {}
-
   const handleEditImage = () => {
     setImageForm(true);
     setImage(document?.image || "");

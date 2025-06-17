@@ -29,9 +29,9 @@ export default function AdminStaff() {
         </div>
         <hr />
 
-        <div className="flex flex-col mx-auto lg:mx-0 lg:flex-row justify-around gap-8">
+        <div className="flex flex-col *:basis-[40%] lg:mx-0 lg:flex-row justify-around gap-8">
           {/* Dean */}
-          <div className="flex flex-row items-center gap-4">
+          <div className="flex items-center gap-4">
             <Image
               src={
                 documents && documents.dean.image !== ""
@@ -72,11 +72,11 @@ export default function AdminStaff() {
         </div>
 
         {/* Staff */}
-        <div className="m-auto my-16 flex w-fit flex-col items-stretch gap-4">
+        <div className="m-auto my-16 flex flex-row flex-wrap *:basis-[40%] justify-around items-center gap-x-4 gap-y-10 w-full">
           {documents?.staff.map((data, i) => (
             <div
               key={i}
-              className={`flex grow ${i % 2 == 0 ? "flex-row" : "flex-row-reverse"} items-center gap-4`}
+              className={`flex items-center gap-4 w-full`}
             >
               <Image
                 src={data.image !== "" ? data.image : "/images/NoImage.png"}
@@ -85,9 +85,9 @@ export default function AdminStaff() {
                 height={150}
                 className="grow-0 basis-0 rounded-xl border-2 border-black/60 shadow-lg shadow-blue-300"
               />
-              <div className="grow basis-0 text-center">
-                <p className="text-xl font-normal">{data.name}</p>
-                <p className="text-lg font-semibold">{data.position}</p>
+              <div className="grow basis-0">
+                <p className={`text-xl font-normal`}>{data.name}</p>
+                <p className={`text-lg font-semibold`}>{data.position}</p>
               </div>
             </div>
           ))}
