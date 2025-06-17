@@ -222,7 +222,7 @@ export function SlateCard({
           className="rounded-lg border-4 border-black object-cover grow-1 basis-0 aspect-square md:aspect-auto mx-auto"
         />
       )}
-      <h1 className="text-2xl font-bold md:min-h-[3.9725rem]">Academic Year <br />{AcademicYear}</h1>
+      <h1 className="text-2xl font-bold md:min-h-[3.9725rem] text-center">Academic Year <br /><p className="font-normal">{AcademicYear}</p></h1>
       <hr className="rounded-2xl border-2 font-bold text-blue-300" />
       {/* <div className="flex min-h-12 flex-col">
         <p className="grow basis-0 text-sm font-thin"></p>
