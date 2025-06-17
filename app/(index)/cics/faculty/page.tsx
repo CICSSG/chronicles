@@ -51,7 +51,7 @@ export default function Faculty() {
           {documentsCS?.map((data, i) => (
             <div key={i} className="flex flex-col items-center gap-1.5 text-center">
               <Image
-                src={"/images/NoImage.png"}
+                src={data.image.length > 2 ? data.image : "/images/NoImage.png"}
                 alt=""
                 width={200}
                 height={200}
@@ -85,7 +85,7 @@ export default function Faculty() {
           {documentsIT?.map((data, i) => (
             <div key={i} className="flex flex-col items-center gap-1.5 text-center">
               <Image
-                src={"/images/NoImage.png"}
+                src={data.image.length > 2 ? data.image : "/images/NoImage.png"}
                 alt=""
                 width={200}
                 height={200}
