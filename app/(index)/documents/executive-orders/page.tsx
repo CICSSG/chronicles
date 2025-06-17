@@ -62,7 +62,7 @@ export default function ExecutiveOrders() {
       </div>
       <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80 w-full">
         <Suspense>
-          <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 xl:grid-cols-3 w-full">
+          <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 xl:grid-cols-2 3xl:grid-cols-3 w-full">
             {/* Card */}
             {documents?.map((data) => (
               <ExecutiveCard
