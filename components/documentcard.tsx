@@ -147,7 +147,7 @@ export function AnnouncementCard({
           className="aspect-square rounded-lg border-4 border-black object-cover mx-auto"
         />
       )}
-      <h1 className="text-2xl font-bold min-h-[3.975rem]">{Title}</h1>
+      <h1 className="text-2xl font-bold lg:min-h-[3.975rem]">{Title}</h1>
       <hr className="rounded-2xl border-2 font-bold text-blue-300" />
       <div className="flex min-h-12 flex-row items-center">
         <p className="grow basis-0 font-medium">{Date}</p>
