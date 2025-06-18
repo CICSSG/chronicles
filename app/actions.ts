@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
 import { imgurUpload } from "@/utils/imgur-upload";
 import { useState } from "react";
+import { CreatePopup } from "@/components/admin/alert-fragment";
 
 export async function createNewDocument(formData: FormData) {
   const { getToken } = await auth();
@@ -40,7 +41,9 @@ export async function createNewDocument(formData: FormData) {
     ])
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -81,7 +84,9 @@ export async function editDocumentPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -102,8 +107,12 @@ export async function deleteDocumentPOST(formData: FormData) {
     .delete()
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
+
+// ANNOUNCEMENTS //
 
 export async function createAnnouncementPOST(formData: FormData) {
   const { getToken } = await auth();
@@ -134,7 +143,9 @@ export async function createAnnouncementPOST(formData: FormData) {
     ])
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -172,7 +183,9 @@ export async function editAnnouncementPOST(formData: FormData) {
       .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
       .select();
 
-    console.log(error?.message);
+    return error
+      ? { success: false, message: error?.message }
+      : { success: true };
   } else {
     const { data, error } = await supabase
       .from("announcements")
@@ -187,7 +200,9 @@ export async function editAnnouncementPOST(formData: FormData) {
       .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
       .select();
 
-    console.log(error?.message);
+    return error
+      ? { success: false, message: error?.message }
+      : { success: true };
   }
 }
 
@@ -208,7 +223,9 @@ export async function deleteAnnouncementPOST(formData: FormData) {
     .delete()
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 // EVENTS //
@@ -259,7 +276,9 @@ export async function createEventPOST(formData: FormData) {
     ])
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -314,7 +333,9 @@ export async function editEventPOST(formData: FormData) {
       .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
       .select();
 
-    console.log(error?.message);
+    return error
+      ? { success: false, message: error?.message }
+      : { success: true };
   } else {
     const { data, error } = await supabase
       .from("events")
@@ -333,7 +354,9 @@ export async function editEventPOST(formData: FormData) {
       .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
       .select();
 
-    console.log(error?.message);
+    return error
+      ? { success: false, message: error?.message }
+      : { success: true };
   }
 }
 
@@ -354,9 +377,12 @@ export async function deleteEventPOST(formData: FormData) {
     .delete()
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
+// IMAGES //
 export async function editImagePOST(formData: FormData) {
   const { getToken } = await auth();
   const accessToken = await getToken({ template: "supabase" });
@@ -380,10 +406,13 @@ export async function editImagePOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
+// SLATE //
 export async function editAdviserPOST(formData: FormData) {
   const { getToken } = await auth();
   const accessToken = await getToken({ template: "supabase" });
@@ -411,7 +440,9 @@ export async function editAdviserPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -442,7 +473,9 @@ export async function editGovernorPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -473,7 +506,9 @@ export async function editViceGovernorPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -494,7 +529,9 @@ export async function deleteSlatePOST(formData: FormData) {
     .delete()
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 export async function createSlatePOST(formData: FormData) {
@@ -530,7 +567,9 @@ export async function createSlatePOST(formData: FormData) {
     ])
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 export async function createOfficerPOST(formData: FormData) {
@@ -566,7 +605,9 @@ export async function createOfficerPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -608,7 +649,9 @@ export async function editOfficerPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 export async function deleteOfficerPOST(formData: FormData) {
@@ -644,7 +687,9 @@ export async function deleteOfficerPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 export async function createLegislativePOST(formData: FormData) {
@@ -679,7 +724,9 @@ export async function createLegislativePOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -720,7 +767,9 @@ export async function editLegislativePOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 export async function deleteLegislativePOST(formData: FormData) {
@@ -756,7 +805,9 @@ export async function deleteLegislativePOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 export async function createJuniorOfficerPOST(formData: FormData) {
@@ -792,7 +843,9 @@ export async function createJuniorOfficerPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -834,7 +887,9 @@ export async function editJuniorOfficerPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 export async function deleteJuniorOfficerPOST(formData: FormData) {
@@ -870,7 +925,9 @@ export async function deleteJuniorOfficerPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 export async function createCommitteePOST(formData: FormData) {
@@ -917,7 +974,9 @@ export async function createCommitteePOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error?.message);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
   // console.log(data)
 }
 
@@ -943,7 +1002,10 @@ export async function editCommitteePOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
   const committee: { [key: string]: any } = data?.[0]?.committees || {};
-  if (typeof id_committee_name === "string" && typeof committee_name === "string") {
+  if (
+    typeof id_committee_name === "string" &&
+    typeof committee_name === "string"
+  ) {
     if (committee_name === id_committee_name) {
       committee[id_committee_name] = {
         head: JSON.parse(head as string) || [],
@@ -965,20 +1027,22 @@ export async function editCommitteePOST(formData: FormData) {
   });
 
   const { error } = await supabase
-    .from('slate')
+    .from("slate")
     .update([
       {
-        committees: sortedCommittee
+        committees: sortedCommittee,
       },
     ])
-    .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
-    .select()
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
+    .select();
 
-  console.log(error?.message)
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 export async function deleteCommitteePOST(formData: FormData) {
-  console.log("delete committee post")
+  console.log("delete committee post");
   const { getToken } = await auth();
   const accessToken = await getToken({ template: "supabase" });
 
@@ -1008,14 +1072,152 @@ export async function deleteCommitteePOST(formData: FormData) {
   });
 
   const { error } = await supabase
-    .from('slate')
+    .from("slate")
     .update([
       {
-        committees: sortedCommittee
+        committees: sortedCommittee,
       },
     ])
-    .eq('id', id !== null ? parseInt(id as string, 10) : undefined)
-    .select()
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
+    .select();
 
-  console.log(error?.message)
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}
+
+// FACULTY //
+export async function createFacultyPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const name = formData.get("name");
+  const department = formData.get("department");
+  const work_type = formData.get("work_type");
+  const image = formData.get("image");
+  const specializationRaw = formData.get("specialization_data");
+  const specializations =
+    typeof specializationRaw === "string"
+      ? JSON.parse(specializationRaw)
+      : specializationRaw;
+
+  if (image != "") {
+    const { error } = await supabase
+      .from("faculty")
+      .insert([
+        {
+          name: name,
+          department: department,
+          work_type: work_type,
+          specialization: specializations,
+          image: image,
+        },
+      ])
+      .select();
+    return error
+      ? { success: false, message: error?.message }
+      : { success: true };
+  } else {
+    const { error } = await supabase
+      .from("faculty")
+      .insert([
+        {
+          name: name,
+          department: department,
+          work_type: work_type,
+          specialization: specializations,
+        },
+      ])
+      .select();
+    return error
+      ? { success: false, message: error?.message }
+      : { success: true };
+  }
+}
+
+export async function editFacultyPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+  const name = formData.get("name");
+  const department = formData.get("department");
+  const work_type = formData.get("work_type");
+  const image = formData.get("image");
+  const specializationRaw = formData.get("specialization_data");
+  const specializations =
+    typeof specializationRaw === "string"
+      ? JSON.parse(specializationRaw)
+      : specializationRaw;
+  // const externalLinksRaw = formData.get("external_links");
+  // const externalLinks = externalLinksRaw ? JSON.parse(externalLinksRaw as string) : [];
+
+  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
+
+  if (!image) {
+    const { data, error } = await supabase
+      .from("faculty")
+      .update({
+        name: name,
+        department: department,
+        work_type: work_type,
+        specialization: specializations,
+      })
+      .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
+      .select();
+
+    return error
+      ? { success: false, message: error?.message }
+      : { success: true };
+  } else {
+    const { data, error } = await supabase
+      .from("faculty")
+      .update({
+        name: name,
+        department: department,
+        work_type: work_type,
+        specialization: specializations,
+        image: image,
+      })
+      .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
+      .select();
+
+    return error
+      ? { success: false, message: error?.message }
+      : { success: true };
+  }
+}
+
+export async function deleteFacultyPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+
+  const { error } = await supabase
+    .from("faculty")
+    .delete()
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }

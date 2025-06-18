@@ -22,28 +22,31 @@ export default function ProtectedPage() {
 
   return (
     <>
-      <div className="flex flex-col gap-4 w-1/2 p-6 rounded-2xl h-fit bg-white/80">
-      <div className="text-black font-semibold text-2xl">
-        Data Count
-      </div>
-        <div className="flex flex-row gap-3 justify-around">
+      <div className="flex h-fit w-1/2 flex-col gap-4 rounded-2xl bg-white/80 p-6">
+        <div className="text-2xl font-semibold text-black">Data Count</div>
+        <div className="grid grid-cols-4 justify-around gap-x-3 gap-y-8">
           {tables &&
-        typeof tables === "object" &&
-        Object.entries(tables).map(
-          ([tableName, tableRows]: [string, any], idx: number) => (
-            <div key={tableName} className="grow shrink-0 basis-0 h-fit flex flex-col-reverse gap-3 justify-center items-center">
-              <h2 className="capitalize font-bold text-lg text-black">{tableName}</h2>
-              <div
-                className="radial-progress text-blue-400 font-bold"
-                style={{ "--value": 100 } as React.CSSProperties}
-                aria-valuenow={70}
-                role="progressbar"
-              >
-                {tableRows}
-              </div>
-            </div>
-          ),
-        )}
+            typeof tables === "object" &&
+            Object.entries(tables).map(
+              ([tableName, tableRows]: [string, any], idx: number) => (
+                <div
+                  key={tableName}
+                  className="flex h-fit shrink-0 grow basis-0 flex-col-reverse items-center justify-center gap-3"
+                >
+                  <h2 className="text-lg font-bold text-black capitalize">
+                    {tableName}
+                  </h2>
+                  <div
+                    className="radial-progress font-bold text-blue-400"
+                    style={{ "--value": 100 } as React.CSSProperties}
+                    aria-valuenow={70}
+                    role="progressbar"
+                  >
+                    {tableRows}
+                  </div>
+                </div>
+              ),
+            )}
         </div>
       </div>
     </>

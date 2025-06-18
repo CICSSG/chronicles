@@ -75,7 +75,7 @@ export default function NavLinks() {
         </div>
         <PopoverGroup className="hidden lg:flex lg:gap-x-6 ">
           <Popover className="relative">
-            <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
+            <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6 hover:cursor-pointer">
               The CICS
               <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
             </PopoverButton>
@@ -105,7 +105,7 @@ export default function NavLinks() {
             </PopoverPanel>
           </Popover>
           <Popover className="relative">
-            <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
+            <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6 hover:cursor-pointer">
               The CICSSG
               <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
             </PopoverButton>
@@ -139,7 +139,7 @@ export default function NavLinks() {
           </Link>
 
           <Popover className="relative">
-            <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
+            <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6 hover:cursor-pointer">
               Documents
               <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
             </PopoverButton>

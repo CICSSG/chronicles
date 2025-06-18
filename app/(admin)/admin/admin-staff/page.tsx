@@ -5,7 +5,6 @@ import {
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
-  Textarea,
 } from "@headlessui/react";
 import { DocumentIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
@@ -13,15 +12,18 @@ import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
-import { EventsData, EventsSearch } from "@/components/admin/documents-data";
-import { createEventPOST, deleteEventPOST, editEventPOST } from "@/app/actions";
+import {
+  AdminStaffData,
+  AdminStaffSearch,
+} from "@/components/admin/documents-data";
+import { editEventPOST } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
-import DynamicInputFieldsProjectHead from "@/components/admin/dynamic-input-field-project-head";
-import DynamicInputFieldsHighlights from "@/components/admin/dynamic-input-field-highlights";
+import Image from "next/image";
+import DynamicInputFieldsStaff from "@/components/admin/dynamic-input-field-staff";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 
 const supabase = createClient(
@@ -29,52 +31,42 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 );
 
-export default function Events() {
+export interface AdminStaffDocumentData {
+  id: number;
+  dean: {
+    name: string;
+    image: string;
+  };
+  associate_dean: {
+    name: string;
+    image: string;
+  };
+  staff: {
+    name: string;
+    image: string;
+    position: string;
+  }[];
+}
+
+export default function AdminStaff() {
   const pathname = usePathname();
   const [page, setPage] = useQueryState("page", parseAsInteger);
   const [title, setTitle] = useQueryState("title");
-  const [createForm, setCreateForm] = useState(false);
-  const [deleteForm, setDeleteForm] = useState(false);
+  // const [createForm, setCreateForm] = useState(false);
+  // const [deleteForm, setDeleteForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
-  const [documents, setDocuments] = useState<any[] | null>(null);
-  const [editFormId, setEditFormId] = useState("");
-  const [editDocument, setEditDocument] = useState<any | null>(null);
-  const [deleteDocumentId, setDeleteDocumentId] = useState("");
-  const [deleteDocumentName, setDeleteDocumentName] = useState("");
+  const [documents, setDocuments] = useState<AdminStaffDocumentData | null>(
+    null,
+  );
   const [pagination, setPagination] = useState(1);
-  const [base64Image, setBase64Image] = useState<string>("");
-  const [image, setImage] = useState<string>("");
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setBase64Image(reader.result as string);
-    reader.readAsDataURL(file);
-  };
-
-  useEffect(() => {
-    if (base64Image) {
-      CreatePopup("Image uploading");
-      imgurUpload(base64Image)
-        .then((result) => {
-          setImage(`${result.data.link}`);
-          CreatePopup("Image upload successful!", "success");
-        })
-        .catch((err) => {
-          CreatePopup("Image failed to upload. Try Again", "error");
-          // handle error if needed
-        });
-    }
-  }, [base64Image]);
 
   const setCurrentPageHandler = (value: number) => {
     setPage(value);
   };
 
   useEffect(() => {
-    EventsData().then(({ documents, pagination }) => {
-      setDocuments(documents ?? null);
+    AdminStaffData().then(({ documents, pagination }) => {
+      setDocuments(documents && documents[0] ? documents[0] : null);
       setPagination(pagination);
     });
 
@@ -82,12 +74,11 @@ export default function Events() {
       .channel("public:data")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "events" },
+        { event: "*", schema: "public", table: "adminstaff" },
         (payload) => {
-          EventsData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
+          AdminStaffData().then(({ documents, pagination }) => {
+            setDocuments(documents && documents[0] ? documents[0] : null);
             setPagination(pagination);
-            CreatePopup("Data updated");
           });
           // console.log("Change received!", payload);
         },
@@ -99,120 +90,51 @@ export default function Events() {
     };
   }, []);
 
-  useEffect(() => {
-    editFormId != "" ? setEditForm(true) : setEditForm(false);
-  }, [editDocument]);
-
-  const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
-      CreatePopup("Image was not uploaded yet. Please wait", "error");
-    } else {
-      const formData = new FormData(e.currentTarget);
-      formData.set("image", image ?? "");
-      const result = await createEventPOST(formData);
-      setBase64Image("");
-      setImage("");
-      setCreateForm(false);
-      if (result.success) {
-        CreatePopup("Successfully created event", "success");
-      } else {
-        CreatePopup("Failed to create event", "error");
-      }
-    }
-  };
-
-  const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
-      CreatePopup("Image was not uploaded yet. Please wait", "error");
-    } else {
-      const formData = new FormData(e.currentTarget);
-      formData.set("image", image ?? "");
-      const result = await editEventPOST(formData);
-      setEditForm(false);
-      setBase64Image("");
-      setImage("");
-      handleEditDocument("");
-      if (result.success) {
-        CreatePopup("Successfully edited event", "success");
-      } else {
-        CreatePopup("Failed to edit event. Try again", "error");
-      }
-    }
-  };
-  const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
-      CreatePopup("Image was not uploaded yet. Please wait", "error");
-    } else {
-      const formData = new FormData(e.currentTarget);
-      formData.set("image", image ?? "");
-      const result = await deleteEventPOST(formData);
-      setBase64Image("");
-      setImage("");
-      setDeleteForm(false);
-      if (result.success) {
-        CreatePopup("Successfully deleted event", "success");
-      } else {
-        CreatePopup("Failed to delete event", "error");
-      }
-    }
-  };
-
-  const handleEditDocument = (id: string) => {
-    if (id == "") {
-      setImage("");
-      setEditFormId(id);
-      setEditForm(false);
-    } else {
-      EventsData(id).then(({ documents, pagination }) => {
-        setEditDocument(documents);
-        setEditFormId(id);
-      });
-    }
-  };
-
-  const handleDeleteDocument = (id: string, name: string, open: boolean) => {
-    setDeleteDocumentId(id);
-    setDeleteDocumentName(name);
-    setDeleteForm(open);
-  };
-
   const clearFilters = () => {
     setPage(1);
     setTitle(null);
 
-    EventsData().then(({ documents, pagination }) => {
-      setDocuments(documents ?? null);
+    AdminStaffData().then(({ documents, pagination }) => {
+      setDocuments(documents && documents[0] ? documents[0] : null);
       setPagination(pagination);
     });
   };
 
   useEffect(() => {
-    EventsSearch(title ?? undefined, page ?? undefined).then(
+    AdminStaffSearch(title ?? undefined, page ?? undefined).then(
       ({ documents }) => {
-        setDocuments(documents ?? null);
+        setDocuments(documents && documents[0] ? documents[0] : null);
       },
     );
   }, [page, title]);
+
+  const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const result = await editEventPOST(formData);
+    setEditForm(false);
+    if (result.success) {
+      CreatePopup("Successfully deleted faculty member");
+    } else {
+      CreatePopup(result.message || "Failed to create faculty");
+    }
+  };
 
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
       <div className="flex grow-0 basis-0 flex-row items-center justify-between">
         <div className="">
-          <h1 className="text-4xl font-bold">Events</h1>
-          <p className="text-lg font-semibold">Edit Events</p>
+          <h1 className="text-4xl font-bold">Admin & Staff</h1>
         </div>
       </div>
 
       <div className="flex flex-row justify-between align-bottom">
         <Button
           onClick={() => {
-            setImage("");
-            setBase64Image("");
-            setCreateForm(true);
+            setEditForm(true);
           }}
-          className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-green-600 px-3 py-1.5 font-semibold text-white hover:bg-green-500"
+          className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-amber-600 px-3 py-1.5 font-semibold text-white hover:cursor-pointer hover:bg-amber-500"
         >
-          Create Event
+          Edit Admin & Staff
         </Button>
 
         <div className="flex flex-row">
@@ -249,43 +171,69 @@ export default function Events() {
       </div>
 
       <div className="relative flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-x-auto overflow-y-auto rounded-2xl border bg-white/10 p-4 shadow-xl">
-        {!documents && (
-          <div className="absolute top-0 left-0 z-20 flex h-full w-full items-center justify-center bg-black/30">
-            No Data Found.
-          </div>
-        )}
         <table className="table">
           {/* head */}
           <thead className="text-white">
             <tr className="border-b border-b-black">
-              <th>Title</th>
-              <th>Date</th>
-              <th>Description</th>
-              <th>Actions</th>
+              <th></th>
+              <th>Name</th>
+              <th>Position</th>
             </tr>
           </thead>
           <tbody className="*:border-b *:border-b-black/30 *:hover:bg-white/10">
-            {documents?.map((data, i) => (
-              <tr className="w-full" key={i}>
-                <th className="text-nowrap">{data.title}</th>
-                <td className="text-nowrap">{data.date}</td>
-                <td className="max-w-2xl truncate">{data.description}</td>
-                <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
-                  <Button
-                    onClick={() => handleEditDocument(data.id)}
-                    className="grow-1 basis-0 bg-amber-200 text-black hover:cursor-pointer hover:bg-amber-100"
-                  >
-                    Edit
-                  </Button>
-                  <Button
-                    onClick={() =>
-                      handleDeleteDocument(data.id, data.title, true)
-                    }
-                    className="grow-1 basis-0 bg-red-400 text-black"
-                  >
-                    Delete
-                  </Button>
+            <tr className="w-full">
+              <td>
+                <Image
+                  src={
+                    documents && documents.dean.image !== ""
+                      ? documents.dean.image
+                      : "/images/NoImage.png"
+                  }
+                  alt=""
+                  width={50}
+                  height={50}
+                  className="rounded-xl border-2 border-black/60"
+                />
+              </td>
+              <td className="text-nowrap">
+                {documents && documents.dean.name}
+              </td>
+              <td className="text-nowrap">Dean</td>
+            </tr>
+
+            <tr className="w-full">
+              <td>
+                <Image
+                  src={
+                    documents && documents.dean.image !== ""
+                      ? documents.dean.image
+                      : "/images/NoImage.png"
+                  }
+                  alt=""
+                  width={50}
+                  height={50}
+                  className="rounded-xl border-2 border-black/60"
+                />
+              </td>
+              <td className="text-nowrap">
+                {documents && documents.associate_dean.name}
+              </td>
+              <td className="text-nowrap">Associate Dean</td>
+            </tr>
+
+            {documents?.staff.map((data, i) => (
+              <tr className="w-full">
+                <td>
+                  <Image
+                    src={data.image !== "" ? data.image : "/images/NoImage.png"}
+                    alt=""
+                    width={50}
+                    height={50}
+                    className="rounded-xl border-2 border-black/60"
+                  />
                 </td>
+                <td className="text-nowrap">{data.name}</td>
+                <td className="text-nowrap">{data.position}</td>
               </tr>
             ))}
           </tbody>
@@ -391,7 +339,7 @@ export default function Events() {
       </div>
 
       {/* Create Form */}
-      <Dialog open={createForm} onClose={() => setCreateForm(false)}>
+      {/* <Dialog open={createForm} onClose={() => setCreateForm(false)}>
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
@@ -405,7 +353,16 @@ export default function Events() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleCreateSubmit(e);
+                  if (image == "") {
+                    alert("Image was not uploaded yet, try again");
+                  } else {
+                    const formData = new FormData(e.currentTarget);
+                    formData.set("image", image ?? "");
+                    createEventPOST(formData);
+                    setBase64Image("");
+                    setImage("");
+                    setCreateForm(false);
+                  }
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -615,7 +572,7 @@ export default function Events() {
             </DialogPanel>
           </div>
         </div>
-      </Dialog>
+      </Dialog> */}
 
       {/* Edit Form */}
       <Dialog open={editForm} onClose={() => setEditForm(false)}>
@@ -632,7 +589,7 @@ export default function Events() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleEditSubmit(e);
+                  handleEditSubmit(e)
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -660,9 +617,7 @@ export default function Events() {
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].id
-                                }
+                                defaultValue={documents?.id}
                                 name="id"
                               ></Input>
                             </Field>
@@ -673,7 +628,7 @@ export default function Events() {
                           <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
-                                Title
+                                Dean
                               </Label>
                               <Input
                                 name="title"
@@ -681,9 +636,7 @@ export default function Events() {
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].title
-                                }
+                                defaultValue={documents?.dean.name}
                                 required
                               />
                             </Field>
@@ -692,7 +645,7 @@ export default function Events() {
                           <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
-                                Date
+                                Dean Image
                               </Label>
                               <Input
                                 name="date"
@@ -702,9 +655,9 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                   "scheme-light",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].date
-                                }
+                                // defaultValue={
+                                //   editDocument && editDocument[0].date
+                                // }
                               />
                             </Field>
                           </div>
@@ -712,7 +665,7 @@ export default function Events() {
                           <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Academic Year
+                                Associate Dean
                               </Label>
                               <Input
                                 name="academic_year"
@@ -722,18 +675,16 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                   "scheme-light",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].academic_year
-                                }
+                                // defaultValue={
+                                //   editDocument && editDocument[0].academic_year
+                                // }
                               />
                             </Field>
                           </div>
 
                           <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-black">
-                                Location
-                              </Label>
+                              <Label className="text-sm/6 font-medium text-black"></Label>
                               <Input
                                 name="location"
                                 type="text"
@@ -742,129 +693,24 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                   "scheme-light",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].location
-                                }
+                                // defaultValue={
+                                //   editDocument && editDocument[0].location
+                                // }
                               />
                             </Field>
                           </div>
 
-                          <div className="w-full max-w-md">
-                            <Field>
-                              <Label className="text-sm/6 font-medium text-black">
-                                Description
-                              </Label>
-                              <Textarea
-                                name="description"
-                                className={clsx(
-                                  "mt-3 block w-full resize-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                                rows={8}
-                                defaultValue={
-                                  editDocument && editDocument[0].description
-                                }
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Expenses
-                              </Label>
-                              <Input
-                                name="expenses"
-                                placeholder="Optional"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                                defaultValue={
-                                  editDocument && editDocument[0].expenses
-                                }
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Documentation Link
-                              </Label>
-                              <Input
-                                name="documentation_link"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                                defaultValue={
-                                  editDocument && editDocument[0].link
-                                }
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-black">
-                                Image
-                              </Label>
-                              <Input
-                                type="file"
-                                onChange={handleImageChange}
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                                accept=".png,.jpg,.jpeg"
-                              />
-                            </Field>
-                            <div className="text-xs font-bold">
-                              {!image && !base64Image ? (
-                                <div className="text-red-400">
-                                  Upload to update image
-                                </div>
-                              ) : !image && base64Image ? (
-                                <div className="text-amber-300">
-                                  Image uploading
-                                </div>
-                              ) : (
-                                <div className="text-green-300">
-                                  Image uploaded
-                                </div>
-                              )}
+                          <div className="flex grow basis-0 flex-col gap-4">
+                            <div className="w-full">
+                              <Field className="flex flex-col items-center gap-4">
+                                <Label className="text-sm/6 font-medium text-nowrap text-black">
+                                  Staff
+                                </Label>
+                                <DynamicInputFieldsStaff
+                                  data={documents?.staff}
+                                />
+                              </Field>
                             </div>
-                          </div>
-                        </div>
-
-                        <div className="flex grow basis-0 flex-col gap-4">
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-col items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Project Head/s
-                              </Label>
-                              <DynamicInputFieldsProjectHead
-                                data={
-                                  editDocument && editDocument[0].project_heads
-                                }
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-col items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Highlight Information
-                              </Label>
-                              <DynamicInputFieldsHighlights
-                                data={
-                                  editDocument && editDocument[0].highlights
-                                }
-                              />
-                            </Field>
                           </div>
                         </div>
                       </div>
@@ -881,7 +727,7 @@ export default function Events() {
                   <button
                     type="button"
                     data-autofocus
-                    onClick={() => handleEditDocument("")}
+                    // onClick={() => handleEditDocument("")}
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
                   >
                     Cancel
@@ -894,7 +740,7 @@ export default function Events() {
       </Dialog>
 
       {/* Delete Form */}
-      <Dialog
+      {/* <Dialog
         open={deleteForm}
         onClose={setDeleteForm}
         className="relative z-10"
@@ -910,12 +756,7 @@ export default function Events() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  handleDeleteSubmit(e);
-                }}
-              >
+              <form action={deleteEventPOST}>
                 <input
                   type="text"
                   name="id"
@@ -970,7 +811,7 @@ export default function Events() {
             </DialogPanel>
           </div>
         </div>
-      </Dialog>
+      </Dialog> */}
     </div>
   );
 }

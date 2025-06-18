@@ -8,7 +8,7 @@ export default async function Home() {
       <div className="flex grow flex-col gap-5 text-2xl lg:flex-row max-w-full xl:max-w-10/12 m-auto">
         {/* Left 2 Columns */}
         <div className="flex grow-6 basis-0 flex-col gap-5">
-          <div className="flex grow flex-col justify-between overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 transition-all md:flex-row md:items-center md:p-1">
+          <div className="flex grow flex-col justify-between overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-blue-100 p-5 transition-all md:flex-row md:items-center md:p-1">
             <div className="bgImage hidden overflow-hidden rounded-2xl md:block">
               <Image
                 src={"/images/HeroPanther.png"}
@@ -32,7 +32,7 @@ export default async function Home() {
             {/* The CICS */}
             <Link
               href={"/cics"}
-              className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 transition-all hover:scale-102"
+              className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-blue-100 transition-all hover:scale-102"
             >
               <h2 className="absolute top-6 left-6 z-2">The CICS</h2>
               <Image
@@ -46,7 +46,7 @@ export default async function Home() {
             {/* The CICSSG */}
             <Link
               href={"/cicssg"}
-              className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 transition-all hover:scale-102"
+              className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-blue-100 transition-all hover:scale-102"
             >
               <h2 className="absolute top-6 left-6 z-2 md:right-6 md:left-auto">
                 The CICS&#123;SG&#125;
@@ -62,10 +62,10 @@ export default async function Home() {
           </div>
           {/* Documents */}
           <div
-            className="h-64 overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 transition-all"
+            className="h-64 overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-blue-100 transition-all"
           >
             <h2 className="pt-5 pl-5">Documents</h2>
-            <div className="*md:text-2xl relative left-0 mx-auto max-w-4xl text-white *:absolute *:aspect-[9/16] *:w-3xs *:rounded-2xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:p-4 *:transition-all *:hover:scale-102 *:md:w-xs">
+            <div className="*md:text-2xl relative left-0 mx-auto max-w-4xl text-white *:absolute *:aspect-[9/16] *:w-3xs *:rounded-2xl *:border-2 *:border-white *:bg-neutral-800 *: *:bg-[url(/images/noise.png)] *:p-4 *:transition-all *:hover:scale-102 *:md:w-xs">
               <Link href={"/resolutions"} className="z-4 left-2/12 top-25 scale-90 sm:top-20 sm:-left-4 sm:z-4 sm:text-center sm:scale-80 md:top-24 md:left-8 md:scale-90 sm:-rotate-12 md:text-left lg:left-5 xl: xl:top-26 xl:scale-95 3xl:-left-6">
                 Resolutions
               </Link>
@@ -87,7 +87,7 @@ export default async function Home() {
           {/* TODO FIX LAYOUT ON SCREEN SIZES */}
           <Link
             href={"/announcements"}
-            className="flex min-h-fit grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 pb-12 transition-all hover:scale-102"
+            className="flex min-h-96 md:min-h-fit grow-[2.5] basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-blue-100 p-5 pb-12 transition-all hover:scale-102"
           >
             <h2 className="lg:text-right">Announcements</h2>
             <div className="relative m-auto flex h-fit w-11/12 flex-col overflow-hidden rounded-2xl shadow-2xl">
@@ -129,7 +129,7 @@ export default async function Home() {
           {/* Events */}
           <Link
             href={"/events"}
-            className="flex min-h-fit grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-linear-to-br from-white via-white to-blue-100 p-5 transition-all hover:scale-102"
+            className="flex min-h-96 md:min-h-fit grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-blue-100 p-5 transition-all hover:scale-102"
           >
             <h2 className="lg:text-right">Events</h2>
             <div className="carousel carousel-center rounded-box m-auto min-h-fit gap-4">
@@ -165,7 +165,7 @@ export default async function Home() {
           {/* Contact Us */}
           <Link
             href={"/contact-us"}
-            className="relative flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-hidden rounded-2xl bg-neutral-500 p-5 text-white transition-all hover:scale-102"
+            className="relative flex min-h-48 md:min-h-fit grow-1 basis-0 flex-col justify-between overflow-hidden rounded-2xl bg-neutral-500 p-5 text-white transition-all hover:scale-102"
           >
             <span className="absolute -top-5 -left-5 z-0 -rotate-12 text-9xl">
               @

@@ -14,13 +14,14 @@ import { createClient } from "@supabase/supabase-js";
 import { ArrowLeftCircleIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import clsx from "clsx";
-import { editAdviserPOST, editGovernorPOST, editImagePOST, editViceGovernorPOST } from "@/app/actions";
+import {
+  editAdviserPOST,
+  editGovernorPOST,
+  editImagePOST,
+  editViceGovernorPOST,
+} from "@/app/actions";
 import { imgurUpload } from "@/utils/imgur-upload";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+import { CreatePopup } from "../alert-fragment";
 
 export default function OfficersOverview({ document }: { document: any }) {
   const [editImageForm, setImageForm] = useState(false);
@@ -33,11 +34,14 @@ export default function OfficersOverview({ document }: { document: any }) {
 
   useEffect(() => {
     if (base64Image) {
+      CreatePopup("Image uploading");
       imgurUpload(base64Image)
         .then((result) => {
           setImage(`${result.data.link}`);
+          CreatePopup("Image upload successful!", "success");
         })
         .catch((err) => {
+          CreatePopup("Image failed to upload. Try Again", "error");
           // handle error if needed
         });
     }
@@ -52,11 +56,27 @@ export default function OfficersOverview({ document }: { document: any }) {
     reader.readAsDataURL(file);
   };
 
-  function handleViewDocument(number: string) {}
-
   const handleEditImage = () => {
     setImageForm(true);
     setImage(document?.image || "");
+  };
+
+  const handleEditImageSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await editImagePOST(formData);
+      setImageForm(false);
+      setBase64Image("");
+      setImage("");
+      if (result.success) {
+        CreatePopup("Successfully edited slate image", "success");
+      } else {
+        CreatePopup("Failed to edit slate image. Try again", "error");
+      }
+    }
   };
 
   const handleEditAdviser = () => {
@@ -64,14 +84,68 @@ export default function OfficersOverview({ document }: { document: any }) {
     setImage(document?.adviser?.image || "");
   };
 
+  const handleEditAdviserSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await editAdviserPOST(formData);
+      setAdviserForm(false);
+      setBase64Image("");
+      setImage("");
+      if (result.success) {
+        CreatePopup("Successfully edited adviser", "success");
+      } else {
+        CreatePopup("Failed to edit adviser. Try again", "error");
+      }
+    }
+  };
+
   const handleEditGovernor = () => {
     setGovernorForm(true);
     setImage(document?.governor?.image || "");
   };
 
+  const handleEditGovernorSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await editGovernorPOST(formData);
+      setGovernorForm(false);
+      setBase64Image("");
+      setImage("");
+      if (result.success) {
+        CreatePopup("Successfully edited governor", "success");
+      } else {
+        CreatePopup("Failed to edit governor. Try again", "error");
+      }
+    }
+  };
+
   const handleEditViceGovernor = () => {
     setViceGovernorForm(true);
     setImage(document?.vice_governor?.image || "");
+  };
+
+  const handleEditViceGovernorSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await editViceGovernorPOST(formData);
+      setViceGovernorForm(false);
+      setBase64Image("");
+      setImage("");
+      if (result.success) {
+        CreatePopup("Successfully edited vice governor", "success");
+      } else {
+        CreatePopup("Failed to edit vice governor. Try again", "error");
+      }
+    }
   };
 
   const executiveRedirectString =
@@ -114,7 +188,11 @@ export default function OfficersOverview({ document }: { document: any }) {
               <th className="text-nowrap">Image</th>
               <td className="text-nowrap">
                 <img
-                  src={document && document.image ? document.image : "https://i.imgur.com/6pP0o7C.png"}
+                  src={
+                    document && document.image
+                      ? document.image
+                      : "https://i.imgur.com/6pP0o7C.png"
+                  }
                   alt="Slate Image"
                   className="h-16"
                 />
@@ -177,7 +255,7 @@ export default function OfficersOverview({ document }: { document: any }) {
             <tr className="w-full">
               <th className="text-nowrap">Executive Board</th>
               <td className="text-nowrap">
-                {document && document.directorate?.length || "0"} items
+                {(document && document.directorate?.length) || "0"} items
               </td>
               <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                 <Link
@@ -192,7 +270,7 @@ export default function OfficersOverview({ document }: { document: any }) {
             <tr className="w-full">
               <th className="text-nowrap">Legislative Council</th>
               <td className="text-nowrap">
-                {document && document.legislative?.length || "0"} items
+                {(document && document.legislative?.length) || "0"} items
               </td>
               <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                 <Link
@@ -207,7 +285,7 @@ export default function OfficersOverview({ document }: { document: any }) {
             <tr className="w-full">
               <th className="text-nowrap">Junior Officers</th>
               <td className="text-nowrap">
-                {document && document.junior_officers?.length || "0"} items
+                {(document && document.junior_officers?.length) || "0"} items
               </td>
               <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                 <Link
@@ -222,7 +300,8 @@ export default function OfficersOverview({ document }: { document: any }) {
             <tr className="w-full">
               <th className="text-nowrap">Committees</th>
               <td className="text-nowrap">
-                {document && Object.keys(document.committees || {}).length || "0"}{" "}
+                {(document && Object.keys(document.committees || {}).length) ||
+                  "0"}{" "}
                 items
               </td>
               <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
@@ -253,16 +332,7 @@ export default function OfficersOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? "");
-                    editImagePOST(formData);
-                    setBase64Image("");
-                    setImage("");
-                    setImageForm(false);
-                  }
+                  handleEditImageSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -371,16 +441,7 @@ export default function OfficersOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "" && base64Image != "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? null);
-                    editAdviserPOST(formData);
-                    setBase64Image("");
-                    setImage("");
-                    setAdviserForm(false);
-                  }
+                  handleEditAdviserSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -506,16 +567,7 @@ export default function OfficersOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "" && base64Image != "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? null);
-                    editGovernorPOST(formData);
-                    setBase64Image("");
-                    setImage("");
-                    setGovernorForm(false);
-                  }
+                  handleEditGovernorSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -627,7 +679,10 @@ export default function OfficersOverview({ document }: { document: any }) {
       </Dialog>
 
       {/* Edit Vice Governor */}
-      <Dialog open={editViceGovernorForm} onClose={() => setViceGovernorForm(false)}>
+      <Dialog
+        open={editViceGovernorForm}
+        onClose={() => setViceGovernorForm(false)}
+      >
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
@@ -641,16 +696,7 @@ export default function OfficersOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "" && base64Image != "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? null);
-                    editViceGovernorPOST(formData);
-                    setBase64Image("");
-                    setImage("");
-                    setViceGovernorForm(false);
-                  }
+                  handleEditViceGovernorSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -697,7 +743,9 @@ export default function OfficersOverview({ document }: { document: any }) {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
                               required
-                              defaultValue={document && document.vice_governor.name}
+                              defaultValue={
+                                document && document.vice_governor.name
+                              }
                             />
                           </Field>
                         </div>
@@ -760,7 +808,6 @@ export default function OfficersOverview({ document }: { document: any }) {
           </div>
         </div>
       </Dialog>
-
     </div>
   );
 }

@@ -88,3 +88,23 @@ export async function PublicSlateDataByID(id?: string) {
 
   return { documents };
 }
+
+export async function PublicAdminStaffData() {
+  let { data: documents } = await supabase
+    .from("adminstaff")
+    .select("*", { count: "exact", head: false })
+    .order("id", { ascending: false });
+
+  return { documents };
+}
+
+export async function PublicFacultyData(department: string) {
+  let { data: documents } = await supabase
+    .from("faculty")
+    .select("*", { count: "exact", head: false })
+    .eq("department", department)
+    .order("work_type", {ascending: true})
+    .order("name", { ascending: true })
+    
+  return { documents };
+}

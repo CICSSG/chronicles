@@ -28,6 +28,7 @@ import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
 import DynamicInputFieldsProjectHead from "@/components/admin/dynamic-input-field-project-head";
 import DynamicInputFieldsHighlights from "@/components/admin/dynamic-input-field-highlights";
+import { CreatePopup } from "@/components/admin/alert-fragment";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -46,14 +47,6 @@ export default function Slate() {
   const [pagination, setPagination] = useState(1);
   const [base64Image, setBase64Image] = useState<string>("");
   const [image, setImage] = useState<string>("");
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setBase64Image(reader.result as string);
-    reader.readAsDataURL(file);
-  };
 
   useEffect(() => {
     if (base64Image) {
@@ -87,6 +80,7 @@ export default function Slate() {
           SlatesData().then(({ documents, pagination }) => {
             setDocuments(documents ?? null);
             setPagination(pagination);
+            CreatePopup("Data updated");
           });
           // console.log("Change received!", payload);
         },
@@ -126,6 +120,36 @@ export default function Slate() {
     );
   }, [page, title]);
 
+  const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await createSlatePOST(formData);
+      setBase64Image("");
+      setImage("");
+      setCreateForm(false);
+      if (result.success) {
+        CreatePopup("Successfully created slate", "success");
+      } else {
+        CreatePopup("Failed to create slate", "error");
+      }
+    }
+  };
+
+  const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const result = await deleteSlatePOST(formData);
+    setBase64Image("");
+    setImage("");
+    setDeleteForm(false);
+    if (result.success) {
+      CreatePopup("Successfully deleted slate", "success");
+    } else {
+      CreatePopup("Failed to delete slate", "error");
+    }
+  };
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
       <div className="flex grow-0 basis-0 flex-row items-center justify-between">
@@ -345,7 +369,12 @@ export default function Slate() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={createSlatePOST}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleCreateSubmit(e);
+                }}
+              >
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
@@ -365,7 +394,7 @@ export default function Slate() {
                       <div className="mt-4 flex w-full flex-col gap-4">
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-black text-nowrap">
+                            <Label className="text-sm/6 font-medium text-nowrap text-black">
                               Academic Year
                             </Label>
                             <Input
@@ -422,7 +451,12 @@ export default function Slate() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={deleteSlatePOST}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleDeleteSubmit(e);
+                }}
+              >
                 <input
                   type="text"
                   name="id"

@@ -27,6 +27,7 @@ import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
+import { CreatePopup } from "@/components/admin/alert-fragment";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -59,17 +60,19 @@ export default function Documents() {
 
   useEffect(() => {
     if (base64Image) {
+      CreatePopup("Image uploading");
       imgurUpload(base64Image)
         .then((result) => {
           setImage(`${result.data.link}`);
+          CreatePopup("Image upload successful!", "success");
         })
         .catch((err) => {
+          CreatePopup("Image failed to upload. Try Again", "error");
           // handle error if needed
         });
     }
   }, [base64Image]);
 
-  
   const setCurrentPageHandler = (value: number) => {
     setPage(value);
   };
@@ -89,6 +92,7 @@ export default function Documents() {
           AnnouncementData().then(({ documents, pagination }) => {
             setDocuments(documents ?? null);
             setPagination(pagination);
+            CreatePopup("Data updated");
           });
           // console.log("Change received!", payload);
         },
@@ -104,9 +108,64 @@ export default function Documents() {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
   }, [editDocument]);
 
+  const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await createAnnouncementPOST(formData);
+      setBase64Image("");
+      setImage("");
+      setCreateForm(false);
+      if (result.success) {
+        CreatePopup("Successfully created announcement", "success");
+      } else {
+        CreatePopup("Failed to create announcement", "error");
+      }
+    }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await editAnnouncementPOST(formData);
+      setEditForm(false);
+      setBase64Image("");
+      setImage("");
+      handleEditDocument("");
+      if (result.success) {
+        CreatePopup("Successfully edited announcement", "success");
+      } else {
+        CreatePopup("Failed to edit announcement. Try again", "error");
+      }
+    }
+  };
+  
+  const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await deleteAnnouncementPOST(formData);
+      setBase64Image("");
+      setImage("");
+      setDeleteForm(false);
+      if (result.success) {
+        CreatePopup("Successfully deleted annoucement", "success");
+      } else {
+        CreatePopup("Failed to delete announcement", "error");
+      }
+    }
+  };
+
   const handleEditDocument = (id: string) => {
     if (id == "") {
-      setImage("")
+      setImage("");
       setEditFormId(id);
       setEditForm(false);
     } else {
@@ -153,9 +212,9 @@ export default function Documents() {
       <div className="flex flex-row justify-between align-bottom">
         <Button
           onClick={() => {
-            setImage("")
-            setBase64Image("")
-            setCreateForm(true)
+            setImage("");
+            setBase64Image("");
+            setCreateForm(true);
           }}
           className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-green-600 px-3 py-1.5 font-semibold text-white hover:bg-green-500"
         >
@@ -215,9 +274,7 @@ export default function Documents() {
             {documents?.map((data, i) => (
               <tr className="w-full" key={i}>
                 <th className="text-nowrap">{data.title}</th>
-                <td className="text-nowrap">
-                  {data.date}
-                </td>
+                <td className="text-nowrap">{data.date}</td>
                 <td className="max-w-2xl truncate">{data.description}</td>
                 <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                   <Button
@@ -351,20 +408,12 @@ export default function Documents() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form 
-              onSubmit={(e) => {
+              <form
+                onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? "");
-                    createAnnouncementPOST(formData);
-                    setBase64Image("")
-                    setImage("")
-                    setCreateForm(false);
-                  }
-                }}>
+                  handleCreateSubmit(e);
+                }}
+              >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
@@ -464,8 +513,14 @@ export default function Documents() {
                           <div className="text-xs font-bold">
                             {!image && !base64Image ? (
                               <div className="text-red-400">No image</div>
-                            ) : !image && base64Image ? (<div className="text-amber-300">Image uploading</div>) : (
-                              <div className="text-green-300">Image uploaded</div>
+                            ) : !image && base64Image ? (
+                              <div className="text-amber-300">
+                                Image uploading
+                              </div>
+                            ) : (
+                              <div className="text-green-300">
+                                Image uploaded
+                              </div>
                             )}
                           </div>
                         </div>
@@ -510,17 +565,7 @@ export default function Documents() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "" && base64Image != "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? "");
-                    editAnnouncementPOST(formData);
-                    setEditForm(false);
-                    setBase64Image("")
-                    setImage("")
-                    handleEditDocument("")
-                  }
+                  handleEditSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -651,9 +696,17 @@ export default function Documents() {
                           </Field>
                           <div className="text-xs font-bold">
                             {!image && !base64Image ? (
-                              <div className="text-red-400">Upload to change image</div>
-                            ) : !image && base64Image ? (<div className="text-amber-300">Image uploading</div>) : (
-                              <div className="text-green-300">Image uploaded</div>
+                              <div className="text-red-400">
+                                Upload to change image
+                              </div>
+                            ) : !image && base64Image ? (
+                              <div className="text-amber-300">
+                                Image uploading
+                              </div>
+                            ) : (
+                              <div className="text-green-300">
+                                Image uploaded
+                              </div>
                             )}
                           </div>
                         </div>
@@ -700,7 +753,12 @@ export default function Documents() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={deleteAnnouncementPOST}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleDeleteSubmit(e);
+                }}
+              >
                 <input
                   type="text"
                   name="id"

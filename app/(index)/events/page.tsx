@@ -49,17 +49,17 @@ const Events = () => {
 
   return (
     <div className="flex flex-col gap-4 *:rounded-2xl">
-      <div className="flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-neutral-300 *:px-8 *:py-8 *:shadow-xl">
-        <div className="bg-[url(/images/noise.png)]">
+      <div className="flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-neutral-300 *:px-8 *:py-8 *:shadow-xl ">
+        <div className="bg-neutral-300 px-6 py-8 rounded-2xl bg-[url(/images/noise.png)]">
           <h2 className="text-3xl font-bold">
             Event Archive
           </h2>
         </div>
       </div>
-      <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80">
+      <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80 rounded-2xl">
         <Suspense>
-          <div className="grid grid-cols-1 sm:grid-cols-2
-          xl:grid-cols-3 2xl:grid-cols-4 gap-4 *:rounded-xl *:bg-white/80 *:p-4 overflow-x-auto no-scrollbar">
+          <div className="grid grid-cols-1 lg:grid-cols-2
+          2xl:grid-cols-3 3xl:grid-cols-4 gap-4 *:rounded-xl *:bg-white/80 *:p-4 overflow-x-auto no-scrollbar">
             {/* Card */}
             {documents?.map((data) => (
               <EventCard

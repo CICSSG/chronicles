@@ -78,9 +78,9 @@ export default function Page() {
         {/* Gov & VGov */}
         <div className="flex w-full flex-col gap-8">
           <h1 className="w-full text-center text-4xl">
-            Governor & Vice Governor
+            Governor & <br className="xl:hidden"/> Vice Governor
           </h1>
-          <div className="flex flex-row justify-evenly">
+          <div className="flex flex-col xl:flex-row justify-evenly gap-8">
             {document && document.governor && (
               <div className="flex flex-col items-center gap-2">
                 <Image
@@ -129,7 +129,7 @@ export default function Page() {
                 {NO_DATA_MESSAGE}
               </span>
             )}
-            <div className="flex flex-row flex-wrap justify-evenly gap-10 *:basis-[20%]">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 justify-evenly gap-10">
               {document &&
                 document.directorate.map(
                   (
@@ -170,7 +170,7 @@ export default function Page() {
                 {NO_DATA_MESSAGE}
               </span>
             )}
-            <div className="flex flex-row flex-wrap justify-evenly gap-10 *:basis-[20%]">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 justify-evenly gap-10">
               {document &&
                 document.legislative &&
                 document.legislative.map(
@@ -209,7 +209,7 @@ export default function Page() {
                 {NO_DATA_MESSAGE}
               </span>
             )}
-            <div className="flex flex-row flex-wrap justify-evenly gap-10 *:basis-[20%]">
+            <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 3xl:grid-cols-4 justify-evenly gap-10 *:basis-[20%]">
               {document &&
                 document.junior_officers.map(
                   (

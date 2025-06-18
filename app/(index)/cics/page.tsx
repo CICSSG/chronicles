@@ -23,7 +23,7 @@ const About = () => {
           meaningful contributions to the global digital landscape.
         </p>
         <hr />
-        <div className="flex flex-row justify-around gap-16">
+        <div className="flex flex-col lg:flex-row justify-around gap-16">
           <div className="flex flex-col gap-2">
             <h1 className="text-center text-3xl">Mission</h1>
             <p className="text-xl font-normal">

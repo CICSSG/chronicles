@@ -19,8 +19,55 @@ const programs: ProgramData[] = [
       "The Bachelor of Science in Computer Science program prepares students to be highly competent and certified in the areas of computing theory and applications; trains them in the areas of abstract reasoning, analytical thinking and research; with track in: Robotics or Mobile and Game Development. Graduates of this program may pursue a meaningful career as an applications developer, CS instructor, researcher, trainer, database programmer/design, mobile applications, games developer or system analyst. ",
     accreditation: "Accredited by PAASCU - Level 1",
     imageUrl: "/images/ProgramsPlaceholder.png",
-    courseOverview: [],
-    coreSubjects: {},
+    courseOverview: [
+      "The Bachelor of Science in Computer Science program prepares students to be highly competent and certified in the areas of computing theory and applications; trains them in the areas of abstract reasoning, analytical thinking and research; with track in: Robotics or Mobile and Game Development. Graduates of this program may pursue a meaningful career as an applications developer, CS instructor, researcher, trainer, database programmer/design, mobile applications, games developer or system analyst.",
+    ],
+    coreSubjects: {
+      "Major Subjects": [
+        "Introduction to Computing",
+        "Fundamentals of Programming",
+        "Intermediate Programming",
+        "Data Structures and Algorithms",
+        "Information Management",
+        "Applications Development and Emerging Technologies",
+        "Object-oriented Programming",
+        "Human Computer Interaction",
+        "Information Assurance and Security",
+        "Social Issues and Professional Practice",
+        "Discrete Structures",
+        "Programming Languages",
+        "Algorithms and Complexity",
+        "Architecture and Organization",
+        "Automata Theory and Formal Languages",
+        "Networks and Communications",
+        "Operating Systems",
+        "Practicum",
+        "Software Engineering",
+        "Thesis",
+        "Computational Science",
+        "Graphics and Visual Computing",
+        "Parallel and Distributed Computing",
+        "Intelligent Systems",
+        "System Fundamentals",
+      ],
+      "Additional Domains for Intelligent Systems Track": [
+        "Introduction to Computing",
+        "Introduction to Statistical Machine Learning",
+        "Introduction to Parallel Computing",
+        "Advanced Topics in Artificial Intelligence",
+        "Computer Vision/Image Processing",
+        "Advanced Topics In Algorithms",
+        "Special Topics in Artificial Intelligence",
+      ],
+      "Additional Domains for Game Development Track": [
+        "Introduction to Game Programming",
+        "Game Design Principles and Practice",
+        "Computer Animation and Simulation",
+        "Advanced Game Programming",
+        "Immersive Game Development",
+        "3D Graphics and Animation",
+      ],
+    },
     eligibility: {
       "College Freshmen": [
         "An applicant who has completed Senior High School and has not taken any college course, or",
@@ -170,7 +217,7 @@ export default function Programs() {
                 <div className="grid grid-cols-2 gap-6">
                   {Object.entries(data.coreSubjects).map(
                     ([name, data]: [string, any], i: number) => (
-                      <div>
+                      <div key={i}>
                         <h2 className="mb-2 text-lg font-bold">{name}</h2>
                         <ul className="list gap-2 *:text-lg *:font-normal">
                           {data.map((subjectData: string, i: number) => (
@@ -198,7 +245,7 @@ export default function Programs() {
                 <div className="grid grid-cols-1 gap-6">
                   {Object.entries(data.eligibility).map(
                     ([name, data]: [string, any], i: number) => (
-                      <div>
+                      <div key={i}>
                         <h2 className="mb-2 text-lg font-bold">{name}</h2>
                         <ul className="list gap-2 *:text-lg *:font-normal">
                           {data.map((subjectData: string, i: number) => (

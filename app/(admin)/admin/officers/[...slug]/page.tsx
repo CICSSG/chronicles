@@ -8,6 +8,7 @@ import LegislativeOverview from "@/components/admin/officers/legislative";
 import JuniorOfficerOverview from "@/components/admin/officers/junior-officer";
 import { createClient } from "@supabase/supabase-js";
 import CommitteesOverview from "@/components/admin/officers/committees";
+import { CreatePopup } from "@/components/admin/alert-fragment";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -39,6 +40,7 @@ export default function Page() {
             (payload) => {
               SlatesData(slug[0]).then(({ documents }) => {
                 setDocument(documents && documents[0] ? documents[0] : null);
+                CreatePopup("Data updated");
               });
               // console.log("Change received!", payload);
             },

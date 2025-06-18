@@ -11,13 +11,14 @@ import { IoDocuments } from "react-icons/io5";
 import { GiPoliceOfficerHead, GiTeacher } from "react-icons/gi";
 import { PiUsersFill } from "react-icons/pi";
 import { CalendarDaysIcon, MegaphoneIcon } from '@heroicons/react/20/solid';
+import { BuildingIcon } from 'lucide-react';
 
 async function NavLinksAdmin() {
   const user = await currentUser()
   return (
     <div className='flex flex-col'>
       <div className='flex items-center'>
-        <ul className="group flex flex-col items-center h-screen p-2 gap-5 bg-gradient-to-b from-neutral-700 to-neutral-800 text-white transition-[width, padding] duration-500 overflow-hidden w-15 hover:w-60 hover:p-5 hover:items-stretch hover:gap-5">
+        <ul className="group flex flex-col items-center h-screen p-2 gap-3 bg-gradient-to-b from-neutral-700 to-neutral-800 text-white transition-[width, padding] duration-500 overflow-hidden w-15 hover:w-60 hover:p-5 hover:items-stretch hover:gap-5">
           <div className="rounded-full mx-auto">
             <img
               className="rounded-full w-full max-w-20"
@@ -56,6 +57,13 @@ async function NavLinksAdmin() {
             </Link>
           </li>
           
+          <li>
+            <Link href="/admin/admin-staff" className='flex items-center flex-nowrap gap-2 w-fit'>
+              <BuildingIcon className='text-3xl' />
+              <span className='hidden group-hover:block text-nowrap'>Admin & Staff</span>
+            </Link>
+          </li>
+
           <li>
             <Link href="/admin/faculty" className='flex items-center flex-nowrap gap-2 w-fit'>
               <GiTeacher className='text-3xl' />
