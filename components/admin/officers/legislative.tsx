@@ -82,11 +82,11 @@ export default function LegislativeOverview({ document }: { document: any }) {
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
+      formData.set("id_name", editOfficerName ?? null);
       const result = await editLegislativePOST(formData);
       setEditOfficerForm(false);
       setBase64Image("");
       setImage("");
-      handleEditDocument("");
       if (result.success) {
         CreatePopup("Successfully edited officer", "success");
       } else {

@@ -47,7 +47,6 @@ export default function CommitteesOverview({ document }: { document: any }) {
     formData.set("id_committee_name", editCommitteeName ?? null);
     const result = await editCommitteePOST(formData);
     setEditOfficerForm(false);
-    handleEditDocument("");
     if (result.success) {
       CreatePopup("Successfully edited committee", "success");
     } else {
