@@ -20,7 +20,7 @@ export default async function DocumentData(id?: string, page?: number) {
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
 
     return { documents, pagination };
   } else {
@@ -30,7 +30,7 @@ export default async function DocumentData(id?: string, page?: number) {
       .eq("id", parseInt(id));
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
@@ -60,7 +60,7 @@ export async function DocumentSearch(
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 
@@ -73,7 +73,7 @@ export async function DocumentSearch(
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 
@@ -86,7 +86,7 @@ export async function DocumentSearch(
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
 
     return { documents, pagination };
   }
@@ -97,8 +97,7 @@ export async function DocumentSearch(
     .range(from, to)
     .order("id", { ascending: false });
 
-  let pagination =
-    count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
@@ -114,7 +113,7 @@ export async function AnnouncementData(id?: string, page?: number) {
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
 
     return { documents, pagination };
   } else {
@@ -124,15 +123,12 @@ export async function AnnouncementData(id?: string, page?: number) {
       .eq("id", parseInt(id));
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
 
-export async function AnnouncementSearch(
-  title?: string,
-  page?: number,
-) {
+export async function AnnouncementSearch(title?: string, page?: number) {
   title == "" || title == null
     ? (title = undefined)
     : (title = "%" + title + "%");
@@ -149,7 +145,7 @@ export async function AnnouncementSearch(
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 
@@ -159,8 +155,7 @@ export async function AnnouncementSearch(
     .range(from, to)
     .order("id", { ascending: false });
 
-  let pagination =
-    count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
@@ -176,7 +171,7 @@ export async function EventsData(id?: string, page?: number) {
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
 
     return { documents, pagination };
   } else {
@@ -186,15 +181,12 @@ export async function EventsData(id?: string, page?: number) {
       .eq("id", parseInt(id));
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
 
-export async function EventsSearch(
-  title?: string,
-  page?: number,
-) {
+export async function EventsSearch(title?: string, page?: number) {
   title == "" || title == null
     ? (title = undefined)
     : (title = "%" + title + "%");
@@ -211,7 +203,7 @@ export async function EventsSearch(
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 
@@ -221,8 +213,7 @@ export async function EventsSearch(
     .range(from, to)
     .order("id", { ascending: false });
 
-  let pagination =
-    count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
@@ -238,7 +229,7 @@ export async function SlatesData(id?: string, page?: number) {
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
 
     return { documents, pagination };
   } else {
@@ -248,15 +239,12 @@ export async function SlatesData(id?: string, page?: number) {
       .eq("id", parseInt(id));
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
 
-export async function SlatesSearch(
-  title?: string,
-  page?: number,
-) {
+export async function SlatesSearch(title?: string, page?: number) {
   title == "" || title == null
     ? (title = undefined)
     : (title = "%" + title + "%");
@@ -273,7 +261,7 @@ export async function SlatesSearch(
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 
@@ -283,8 +271,7 @@ export async function SlatesSearch(
     .range(from, to)
     .order("id", { ascending: false });
 
-  let pagination =
-    count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
@@ -300,7 +287,7 @@ export async function AdminStaffData(id?: string, page?: number) {
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
 
     return { documents, pagination };
   } else {
@@ -310,15 +297,12 @@ export async function AdminStaffData(id?: string, page?: number) {
       .eq("id", parseInt(id));
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
 
-export async function AdminStaffSearch(
-  title?: string,
-  page?: number,
-) {
+export async function AdminStaffSearch(title?: string, page?: number) {
   title == "" || title == null
     ? (title = undefined)
     : (title = "%" + title + "%");
@@ -335,7 +319,7 @@ export async function AdminStaffSearch(
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 
@@ -345,8 +329,7 @@ export async function AdminStaffSearch(
     .range(from, to)
     .order("id", { ascending: false });
 
-  let pagination =
-    count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
@@ -359,28 +342,27 @@ export async function FacultyData(id?: string, page?: number) {
       .from("faculty")
       .select("*", { count: "exact", head: false })
       .range(from, to)
+      .order("department", { ascending: true })
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
 
     return { documents, pagination };
   } else {
     let { data: documents, count } = await supabase
       .from("faculty")
       .select("*")
+      .order("department", { ascending: false })
       .eq("id", parseInt(id));
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
 
-export async function FacultySearch(
-  title?: string,
-  page?: number,
-) {
+export async function FacultySearch(title?: string, page?: number) {
   title == "" || title == null
     ? (title = undefined)
     : (title = "%" + title + "%");
@@ -394,10 +376,11 @@ export async function FacultySearch(
       .select("*", { count: "exact", head: false })
       .range(from, to)
       .ilike("name", title)
+      .order("department", { ascending: true })
       .order("id", { ascending: false });
 
     let pagination =
-      count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 
@@ -405,9 +388,9 @@ export async function FacultySearch(
     .from("faculty")
     .select("*", { count: "exact", head: false })
     .range(from, to)
+    .order("department", { ascending: true })
     .order("id", { ascending: false });
 
-  let pagination =
-    count != null ? Math.ceil((count) / (ITEMS_PER_PAGE + 1)) : 1;
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }

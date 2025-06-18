@@ -22,9 +22,9 @@ export default function ProtectedPage() {
 
   return (
     <>
-      <div className="flex h-fit w-1/2 flex-col gap-4 rounded-2xl bg-white/80 p-6">
+      <div className="flex h-fit w-full xl:w-1/2 flex-col gap-4 rounded-2xl bg-white/80 p-6">
         <div className="text-2xl font-semibold text-black">Data Count</div>
-        <div className="grid grid-cols-4 justify-around gap-x-3 gap-y-8">
+        <div className="grid grid-cols-2 sm:grid-cols-3 xl:grid-cols-4 justify-around gap-x-3 gap-y-8">
           {tables &&
             typeof tables === "object" &&
             Object.entries(tables).map(
