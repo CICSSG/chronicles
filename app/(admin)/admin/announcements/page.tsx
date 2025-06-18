@@ -60,11 +60,14 @@ export default function Documents() {
 
   useEffect(() => {
     if (base64Image) {
+      CreatePopup("Image uploading");
       imgurUpload(base64Image)
         .then((result) => {
           setImage(`${result.data.link}`);
+          CreatePopup("Image upload successful!", "success");
         })
         .catch((err) => {
+          CreatePopup("Image failed to upload. Try Again", "error");
           // handle error if needed
         });
     }
@@ -89,6 +92,7 @@ export default function Documents() {
           AnnouncementData().then(({ documents, pagination }) => {
             setDocuments(documents ?? null);
             setPagination(pagination);
+            CreatePopup("Data updated");
           });
           // console.log("Change received!", payload);
         },
@@ -106,7 +110,7 @@ export default function Documents() {
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (image == "" && base64Image != "") {
-      alert("Image was not uploaded yet, try again");
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
@@ -115,16 +119,16 @@ export default function Documents() {
       setImage("");
       setCreateForm(false);
       if (result.success) {
-        CreatePopup("Successfully created announcement");
+        CreatePopup("Successfully created announcement", "success");
       } else {
-        CreatePopup(result.message || "Failed to create faculty");
+        CreatePopup("Failed to create announcement", "error");
       }
     }
   };
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (image == "" && base64Image != "") {
-      alert("Image was not uploaded yet, try again");
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
@@ -134,26 +138,27 @@ export default function Documents() {
       setImage("");
       handleEditDocument("");
       if (result.success) {
-        CreatePopup("Successfully edited announcement");
+        CreatePopup("Successfully edited announcement", "success");
       } else {
-        CreatePopup(result.message || "Failed to create faculty");
+        CreatePopup("Failed to edit announcement. Try again", "error");
       }
     }
   };
+  
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (image == "" && base64Image != "") {
-      alert("Image was not uploaded yet, try again");
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await deleteAnnouncementPOST(formData);
       setBase64Image("");
       setImage("");
-      setCreateForm(false);
+      setDeleteForm(false);
       if (result.success) {
-        CreatePopup("Successfully deleted annoucement");
+        CreatePopup("Successfully deleted annoucement", "success");
       } else {
-        CreatePopup(result.message || "Failed to create faculty");
+        CreatePopup("Failed to delete announcement", "error");
       }
     }
   };

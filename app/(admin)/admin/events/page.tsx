@@ -14,11 +14,7 @@ import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
 import { EventsData, EventsSearch } from "@/components/admin/documents-data";
-import {
-  createEventPOST,
-  deleteEventPOST,
-  editEventPOST,
-} from "@/app/actions";
+import { createEventPOST, deleteEventPOST, editEventPOST } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
@@ -26,6 +22,7 @@ import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
 import DynamicInputFieldsProjectHead from "@/components/admin/dynamic-input-field-project-head";
 import DynamicInputFieldsHighlights from "@/components/admin/dynamic-input-field-highlights";
+import { CreatePopup } from "@/components/admin/alert-fragment";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -58,13 +55,15 @@ export default function Events() {
 
   useEffect(() => {
     if (base64Image) {
+      CreatePopup("Image uploading");
       imgurUpload(base64Image)
         .then((result) => {
-          console.log(result)
           setImage(`${result.data.link}`);
+          CreatePopup("Image upload successful!", "success");
         })
         .catch((err) => {
-          console.log(err)
+          CreatePopup("Image failed to upload. Try Again", "error");
+          // handle error if needed
         });
     }
   }, [base64Image]);
@@ -88,6 +87,7 @@ export default function Events() {
           EventsData().then(({ documents, pagination }) => {
             setDocuments(documents ?? null);
             setPagination(pagination);
+            CreatePopup("Data updated");
           });
           // console.log("Change received!", payload);
         },
@@ -102,6 +102,60 @@ export default function Events() {
   useEffect(() => {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
   }, [editDocument]);
+
+  const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await createEventPOST(formData);
+      setBase64Image("");
+      setImage("");
+      setCreateForm(false);
+      if (result.success) {
+        CreatePopup("Successfully created event", "success");
+      } else {
+        CreatePopup("Failed to create event", "error");
+      }
+    }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await editEventPOST(formData);
+      setEditForm(false);
+      setBase64Image("");
+      setImage("");
+      handleEditDocument("");
+      if (result.success) {
+        CreatePopup("Successfully edited event", "success");
+      } else {
+        CreatePopup("Failed to edit event. Try again", "error");
+      }
+    }
+  };
+  const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await deleteEventPOST(formData);
+      setBase64Image("");
+      setImage("");
+      setDeleteForm(false);
+      if (result.success) {
+        CreatePopup("Successfully deleted event", "success");
+      } else {
+        CreatePopup("Failed to delete event", "error");
+      }
+    }
+  };
 
   const handleEditDocument = (id: string) => {
     if (id == "") {
@@ -351,16 +405,7 @@ export default function Events() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? "");
-                    createEventPOST(formData);
-                    setBase64Image("");
-                    setImage("");
-                    setCreateForm(false);
-                  }
+                  handleCreateSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -587,17 +632,7 @@ export default function Events() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "" && base64Image != "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? "");
-                    editEventPOST(formData);
-                    setEditForm(false);
-                    setBase64Image("");
-                    setImage("");
-                    handleEditDocument("");
-                  }
+                  handleEditSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -634,7 +669,7 @@ export default function Events() {
                           </div>
                         </div>
 
-                        <div className="grow basis-0 mt-4 flex w-full flex-col gap-4">
+                        <div className="mt-4 flex w-full grow basis-0 flex-col gap-4">
                           <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
@@ -875,7 +910,12 @@ export default function Events() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={deleteEventPOST}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleDeleteSubmit(e);
+                }}
+              >
                 <input
                   type="text"
                   name="id"

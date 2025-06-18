@@ -21,6 +21,7 @@ import {
 import { ExclamationTriangleIcon } from "@heroicons/react/20/solid";
 import DynamicInputFieldsCommitteeHead from "./dynamic-input-field-committee-head";
 import DynamicInputFieldsCommittee from "./dynamic-input-field-committee";
+import { CreatePopup } from "../alert-fragment";
 
 export default function CommitteesOverview({ document }: { document: any }) {
   const [createOfficerForm, setCreateOfficerForm] = useState(false);
@@ -29,6 +30,41 @@ export default function CommitteesOverview({ document }: { document: any }) {
   const [deleteForm, setDeleteForm] = useState(false);
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteCommitteeName, setDeleteCommitteeName] = useState("");
+
+  const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const result = await createCommitteePOST(formData);
+    setCreateOfficerForm(false);
+    if (result.success) {
+      CreatePopup("Successfully created committee", "success");
+    } else {
+      CreatePopup("Failed to create committee", "error");
+    }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    formData.set("id_committee_name", editCommitteeName ?? null);
+    const result = await editCommitteePOST(formData);
+    setEditOfficerForm(false);
+    handleEditDocument("");
+    if (result.success) {
+      CreatePopup("Successfully edited committee", "success");
+    } else {
+      CreatePopup("Failed to edit committee. Try again", "error");
+    }
+  };
+
+  const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const result = await deleteCommitteePOST(formData);
+    setDeleteForm(false);
+    if (result.success) {
+      CreatePopup("Successfully deleted committee", "success");
+    } else {
+      CreatePopup("Failed to delete committee", "error");
+    }
+  };
 
   function handleEditDocument(name: string) {
     setEditOfficerForm(true);
@@ -138,9 +174,7 @@ export default function CommitteesOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  const formData = new FormData(e.currentTarget);
-                  createCommitteePOST(formData);
-                  setCreateOfficerForm(false);
+                  handleCreateSubmit(e)
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -250,10 +284,7 @@ export default function CommitteesOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  const formData = new FormData(e.currentTarget);
-                  formData.set("id_committee_name", editCommitteeName ?? null);
-                  editCommitteePOST(formData);
-                  setEditOfficerForm(false);
+                  handleEditSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -377,7 +408,10 @@ export default function CommitteesOverview({ document }: { document: any }) {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={deleteCommitteePOST}>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                handleDeleteSubmit(e);
+              }}>
                 <input
                   type="text"
                   name="id"

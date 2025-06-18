@@ -6,7 +6,6 @@ import {
   DialogPanel,
   DialogTitle,
   Select,
-  Textarea,
 } from "@headlessui/react";
 import { DocumentIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
@@ -16,11 +15,8 @@ import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
 import { FacultyData, FacultySearch } from "@/components/admin/documents-data";
 import {
-  createAnnouncementPOST,
   createFacultyPOST,
-  deleteAnnouncementPOST,
   deleteFacultyPOST,
-  editAnnouncementPOST,
   editFacultyPOST,
 } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
@@ -62,11 +58,14 @@ export default function Faculty() {
 
   useEffect(() => {
     if (base64Image) {
+      CreatePopup("Image uploading");
       imgurUpload(base64Image)
         .then((result) => {
           setImage(`${result.data.link}`);
+          CreatePopup("Image upload successful!", "success");
         })
         .catch((err) => {
+          CreatePopup("Image failed to upload. Try Again", "error");
           // handle error if needed
         });
     }
@@ -91,6 +90,7 @@ export default function Faculty() {
           FacultyData().then(({ documents, pagination }) => {
             setDocuments(documents ?? null);
             setPagination(pagination);
+            CreatePopup("Data updated");
           });
           // console.log("Change received!", payload);
         },
@@ -108,7 +108,7 @@ export default function Faculty() {
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (image == "" && base64Image != "") {
-      alert("Image was not uploaded yet, try again");
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
@@ -117,45 +117,45 @@ export default function Faculty() {
       setImage("");
       setCreateForm(false);
       if (result.success) {
-        CreatePopup("Successfully created faculty member");
+        CreatePopup("Successfully created faculty member", "success");
       } else {
-        CreatePopup(result.message || "Failed to create faculty");
+        CreatePopup("Failed to create faculty member", "error");
       }
     }
   };
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (image == "" && base64Image != "") {
-      alert("Image was not uploaded yet, try again");
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
-      const result = await editFacultyPOST(formData)
+      const result = await editFacultyPOST(formData);
       setEditForm(false);
       setBase64Image("");
       setImage("");
       handleEditDocument("");
       if (result.success) {
-        CreatePopup("Successfully deleted faculty member");
+        CreatePopup("Successfully edited faculty member", "success");
       } else {
-        CreatePopup(result.message || "Failed to create faculty");
+        CreatePopup("Failed to edit faculty member. Try again", "error");
       }
     }
   };
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (image == "" && base64Image != "") {
-      alert("Image was not uploaded yet, try again");
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await deleteFacultyPOST(formData);
       setBase64Image("");
       setImage("");
-      setCreateForm(false);
+      setDeleteForm(false);
       if (result.success) {
-        CreatePopup("Successfully deleted faculty member");
+        CreatePopup("Successfully deleted faculty member", "success");
       } else {
-        CreatePopup(result.message || "Failed to create faculty");
+        CreatePopup("Failed to delete faculty member", "error");
       }
     }
   };
@@ -639,7 +639,9 @@ export default function Faculty() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 "scheme-light",
                               )}
-                              defaultValue={editDocument && editDocument[0].department}
+                              defaultValue={
+                                editDocument && editDocument[0].department
+                              }
                             >
                               <option value="" disabled selected>
                                 ---Select Department---
@@ -662,7 +664,9 @@ export default function Faculty() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 "scheme-light",
                               )}
-                              defaultValue={editDocument && editDocument[0].work_type}
+                              defaultValue={
+                                editDocument && editDocument[0].work_type
+                              }
                             >
                               <option value="" disabled selected>
                                 ---Select Work Type---
@@ -764,10 +768,12 @@ export default function Faculty() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form onSubmit={(e) => {
-                e.preventDefault()
-                handleDeleteSubmit(e)
-              }}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleDeleteSubmit(e);
+                }}
+              >
                 <input
                   type="text"
                   name="id"

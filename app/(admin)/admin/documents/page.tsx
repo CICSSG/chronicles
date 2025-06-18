@@ -10,7 +10,7 @@ import {
   Textarea,
 } from "@headlessui/react";
 import { DocumentIcon } from "@heroicons/react/20/solid";
-import { ChevronDownIcon, Search } from "lucide-react";
+import { ChevronDownIcon } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
@@ -27,6 +27,7 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
+import { CreatePopup } from "@/components/admin/alert-fragment";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -40,7 +41,6 @@ const options = [
   { option: "Formal Document", value: "formal-document" },
   { option: "Resolution", value: "resolution" },
 ];
-
 
 export default function Documents() {
   const [page, setPage] = useQueryState("page", parseAsInteger);
@@ -57,11 +57,31 @@ export default function Documents() {
   const [pagination, setPagination] = useState(1);
 
   const pages = [
-    (page ?? 1) <= 3 ? 1 : (page ?? 1) > pagination - 2 ? pagination - 4 : (page ?? 1) - 2,
-    (page ?? 1) <= 3 ? 2 : (page ?? 1) > pagination - 2 ? pagination - 3 : (page ?? 1) - 1,
-    (page ?? 1) <= 3 ? 3 : (page ?? 1) > pagination - 2 ? pagination - 2 : (page ?? 1),
-    (page ?? 1) <= 3 ? 4 : (page ?? 1) > pagination - 2? pagination - 1 : (page ?? 1) + 1,
-    (page ?? 1) <= 3 ? 5 : (page ?? 1) > pagination - 2? pagination : (page ?? 1) + 2,
+    (page ?? 1) <= 3
+      ? 1
+      : (page ?? 1) > pagination - 2
+        ? pagination - 4
+        : (page ?? 1) - 2,
+    (page ?? 1) <= 3
+      ? 2
+      : (page ?? 1) > pagination - 2
+        ? pagination - 3
+        : (page ?? 1) - 1,
+    (page ?? 1) <= 3
+      ? 3
+      : (page ?? 1) > pagination - 2
+        ? pagination - 2
+        : (page ?? 1),
+    (page ?? 1) <= 3
+      ? 4
+      : (page ?? 1) > pagination - 2
+        ? pagination - 1
+        : (page ?? 1) + 1,
+    (page ?? 1) <= 3
+      ? 5
+      : (page ?? 1) > pagination - 2
+        ? pagination
+        : (page ?? 1) + 2,
   ];
 
   const setCurrentPageHandler = (value: number) => {
@@ -83,9 +103,10 @@ export default function Documents() {
           DocumentData().then(({ documents, pagination }) => {
             setDocuments(documents ?? null);
             setPagination(pagination);
-            setPage(1)
+            setPage(1);
             setTitle(null);
             setDocumentType(null);
+            CreatePopup("Data updated");
           });
           // console.log("Change received!", payload);
         },
@@ -100,6 +121,39 @@ export default function Documents() {
   useEffect(() => {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
   }, [editDocument]);
+
+  const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const result = await createNewDocument(formData);
+    setCreateForm(false);
+    if (result.success) {
+      CreatePopup("Successfully created document", "success");
+    } else {
+      CreatePopup("Failed to create document", "error");
+    }
+  };
+
+  const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const result = await editDocumentPOST(formData);
+    setEditForm(false);
+    handleEditDocument("");
+    if (result.success) {
+      CreatePopup("Successfully edited document", "success");
+    } else {
+      CreatePopup("Failed to edit document. Try again", "error");
+    }
+  };
+  const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    const result = await deleteDocumentPOST(formData);
+    setDeleteForm(false);
+    if (result.success) {
+      CreatePopup("Successfully deleted annoucement", "success");
+    } else {
+      CreatePopup("Failed to delete announcement", "error");
+    }
+  };
 
   const handleEditDocument = (id: string) => {
     if (id == "") {
@@ -143,8 +197,7 @@ export default function Documents() {
 
   useEffect(() => {
     setPage(1);
-  }, [title, documentType])
-  
+  }, [title, documentType]);
 
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
@@ -249,9 +302,7 @@ export default function Documents() {
             {documents?.map((data, i) => (
               <tr className="w-full" key={i}>
                 <th className="text-nowrap">{data.title}</th>
-                <td className="text-nowrap">
-                  {data.date}
-                </td>
+                <td className="text-nowrap">{data.date}</td>
                 <td className="text-nowrap">{data.document_type}</td>
                 <td className="max-w-2xl truncate">{data.description}</td>
                 <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
@@ -285,9 +336,7 @@ export default function Documents() {
               passHref
               shallow
               replace
-              onClick={() =>
-                setCurrentPageHandler(pages[0])
-              }
+              onClick={() => setCurrentPageHandler(pages[0])}
             >
               {pages[0]}
             </Link>
@@ -297,9 +346,7 @@ export default function Documents() {
               passHref
               shallow
               replace
-              onClick={() =>
-                setCurrentPageHandler(pages[1])
-              }
+              onClick={() => setCurrentPageHandler(pages[1])}
             >
               {pages[1]}
             </Link>
@@ -312,9 +359,7 @@ export default function Documents() {
             passHref
             shallow
             replace
-            onClick={() =>
-              setCurrentPageHandler(pages[2])
-            }
+            onClick={() => setCurrentPageHandler(pages[2])}
           >
             {pages[2]}
           </Link>
@@ -326,9 +371,7 @@ export default function Documents() {
             passHref
             shallow
             replace
-            onClick={() =>
-              setCurrentPageHandler(pages[3])
-            }
+            onClick={() => setCurrentPageHandler(pages[3])}
           >
             {pages[3]}
           </Link>
@@ -340,9 +383,7 @@ export default function Documents() {
             passHref
             shallow
             replace
-            onClick={() =>
-              setCurrentPageHandler(pages[4])
-            }
+            onClick={() => setCurrentPageHandler(pages[4])}
           >
             {pages[4]}
           </Link>
@@ -361,7 +402,12 @@ export default function Documents() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={createNewDocument}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleCreateSubmit(e);
+                }}
+              >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
@@ -503,7 +549,12 @@ export default function Documents() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={editDocumentPOST}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleEditSubmit(e);
+                }}
+              >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
                     <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-amber-100 sm:mx-0 sm:size-10">
@@ -640,7 +691,6 @@ export default function Documents() {
                             />
                           </Field>
                         </div>
-
                       </div>
                     </div>
                   </div>
@@ -685,7 +735,12 @@ export default function Documents() {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={deleteDocumentPOST}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleDeleteSubmit(e);
+                }}
+              >
                 <input
                   type="text"
                   name="id"

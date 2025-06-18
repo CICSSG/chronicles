@@ -15,8 +15,13 @@ import { ArrowLeftCircleIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { imgurUpload } from "@/utils/imgur-upload";
 import clsx from "clsx";
-import { createJuniorOfficerPOST, deleteJuniorOfficerPOST, editJuniorOfficerPOST } from "@/app/actions";
+import {
+  createJuniorOfficerPOST,
+  deleteJuniorOfficerPOST,
+  editJuniorOfficerPOST,
+} from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/20/solid";
+import { CreatePopup } from "../alert-fragment";
 
 export default function JuniorOfficerOverview({ document }: { document: any }) {
   const [createOfficerForm, setCreateOfficerForm] = useState(false);
@@ -30,18 +35,6 @@ export default function JuniorOfficerOverview({ document }: { document: any }) {
   const [base64Image, setBase64Image] = useState<string>("");
   const [image, setImage] = useState<string>("");
 
-  useEffect(() => {
-    if (base64Image) {
-      imgurUpload(base64Image)
-        .then((result) => {
-          setImage(`${result.data.link}`);
-        })
-        .catch((err) => {
-          // handle error if needed
-        });
-    }
-  }, [base64Image]);
-
   const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     setImage("");
     const file = e.target.files?.[0];
@@ -51,10 +44,82 @@ export default function JuniorOfficerOverview({ document }: { document: any }) {
     reader.readAsDataURL(file);
   };
 
+  useEffect(() => {
+    if (base64Image) {
+      CreatePopup("Image uploading");
+      imgurUpload(base64Image)
+        .then((result) => {
+          setImage(`${result.data.link}`);
+          CreatePopup("Image upload successful!", "success");
+        })
+        .catch((err) => {
+          CreatePopup("Image failed to upload. Try Again", "error");
+          // handle error if needed
+        });
+    }
+  }, [base64Image]);
+
+  const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+        if (image == "" && base64Image != "") {
+          CreatePopup("Image was not uploaded yet. Please wait", "error");
+        } else {
+          const formData = new FormData(e.currentTarget);
+          formData.set("image", image ?? "");
+          const result = await createJuniorOfficerPOST(formData);
+          setBase64Image("");
+          setImage("");
+          setCreateOfficerForm(false);
+          if (result.success) {
+            CreatePopup("Successfully created junior officer", "success");
+          } else {
+            CreatePopup("Failed to create junior officer", "error");
+          }
+        }
+      };
+  
+    const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      if (image == "" && base64Image != "") {
+        CreatePopup("Image was not uploaded yet. Please wait", "error");
+      } else {
+        const formData = new FormData(e.currentTarget);
+        formData.set("image", image ?? "");
+        const result = await editJuniorOfficerPOST(formData);
+        setEditOfficerForm(false);
+        setBase64Image("");
+        setImage("");
+        handleEditDocument("");
+        if (result.success) {
+          CreatePopup("Successfully edited junior officer", "success");
+        } else {
+          CreatePopup("Failed to edit junior officer. Try again", "error");
+        }
+      }
+    };
+  
+    const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+      if (image == "" && base64Image != "") {
+        CreatePopup("Image was not uploaded yet. Please wait", "error");
+      } else {
+        const formData = new FormData(e.currentTarget);
+        formData.set("image", image ?? "");
+        const result = await deleteJuniorOfficerPOST(formData);
+        setBase64Image("");
+        setImage("");
+        setDeleteForm(false);
+        if (result.success) {
+          CreatePopup("Successfully deleted junior officer", "success");
+        } else {
+          CreatePopup("Failed to delete junior officer", "error");
+        }
+      }
+    };
+
   function handleEditDocument(name: string) {
     const junior_officers = document?.junior_officers || [];
-    
-    const filtered = junior_officers.filter((officer: { name: string }) => officer.name == name);
+
+    const filtered = junior_officers.filter(
+      (officer: { name: string }) => officer.name == name,
+    );
 
     setEditOfficerForm(true);
     setBase64Image("");
@@ -167,16 +232,7 @@ export default function JuniorOfficerOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "" && base64Image != "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? null);
-                    createJuniorOfficerPOST(formData);
-                    setBase64Image("");
-                    setImage("");
-                    setCreateOfficerForm(false);
-                  }
+                  handleCreateSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -303,10 +359,7 @@ export default function JuniorOfficerOverview({ document }: { document: any }) {
       </Dialog>
 
       {/* Edit Officer */}
-      <Dialog
-        open={editOfficerForm}
-        onClose={() => setEditOfficerForm(false)}
-      >
+      <Dialog open={editOfficerForm} onClose={() => setEditOfficerForm(false)}>
         <DialogBackdrop
           transition
           className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
@@ -320,17 +373,7 @@ export default function JuniorOfficerOverview({ document }: { document: any }) {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  if (image == "" && base64Image != "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("id_name", editOfficerName ?? null);
-                    formData.set("image", image ?? null);
-                    editJuniorOfficerPOST(formData);
-                    setBase64Image("");
-                    setImage("");
-                    setEditOfficerForm(false);
-                  }
+                  handleEditSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -475,7 +518,10 @@ export default function JuniorOfficerOverview({ document }: { document: any }) {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form action={deleteJuniorOfficerPOST}>
+              <form onSubmit={(e) => {
+                e.preventDefault();
+                handleDeleteSubmit(e);
+              }}>
                 <input
                   type="text"
                   name="id"
