@@ -10,6 +10,7 @@ import { Edit } from "lucide-react";
 import { SignedIn } from "@clerk/nextjs";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Suspense } from "react";
+import UrgentAnnouncement from "@/components/urgent-announcement";
 
 const defaultUrl = process.env.VERCEL_URL
   ? `https://${process.env.VERCEL_URL}`
@@ -51,10 +52,7 @@ export default async function RootLayout({
           <Link href={"/admin"} className="fixed bottom-4 right-4 bg-neutral-100 p-4 rounded-full hover:bg-neutral-200 hover:cursor-pointer z-20"><Edit/></Link>
         </SignedIn>
         {/* TODO ANNOUNCEMENTS */}
-        {/* <div className="flex flex-row justify-center gap-2 w-full px-3 py-3 text-xl font-bold">
-          <h1>ANNOUCNEMTN</h1>
-          <div>asd</div>
-        </div> */}
+        <UrgentAnnouncement />
         
         <div className="flex w-full flex-col items-center gap-5">
           <div className="font-space flex min-h-dvh min-w-dvw flex-col items-center bg-neutral-800 font-semibold">
