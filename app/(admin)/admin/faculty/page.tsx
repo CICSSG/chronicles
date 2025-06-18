@@ -96,12 +96,11 @@ export default function Faculty() {
         },
       )
       .subscribe();
-
     return () => {
       taskListener.unsubscribe();
     };
   }, []);
-
+  
   useEffect(() => {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
   }, [editDocument]);
@@ -221,7 +220,7 @@ export default function Faculty() {
         <div className="flex flex-row">
           <div className="w-full max-w-2xs px-4">
             <Field>
-              <Label className="text-sm/6 font-medium text-white">Title</Label>
+              <Label className="text-sm/6 font-medium text-white">Name</Label>
               <Input
                 name="title"
                 className={clsx(
