@@ -71,12 +71,12 @@ async function NavLinksAdmin() {
             </Link>
           </li>
 
-          {/* <li>
+          <li>
             <Link href="/admin/users" className='flex items-center flex-nowrap gap-2 w-fit'>
               <PiUsersFill className='text-3xl' />
               <span className='hidden group-hover:block'>Users</span>
             </Link>
-          </li> */}
+          </li>
 
           <div className='mt-auto flex flex-col flex-nowrap gap-2 items-center group-hover:items-stretch'>
             {/* <li>
