@@ -281,7 +281,7 @@ export async function AdminStaffData(id?: string, page?: number) {
 
   if (id == null) {
     let { data: documents, count } = await supabase
-      .from("adminstaff")
+      .from("admin_staff")
       .select("*", { count: "exact", head: false })
       .range(from, to)
       .order("id", { ascending: false });
@@ -292,7 +292,7 @@ export async function AdminStaffData(id?: string, page?: number) {
     return { documents, pagination };
   } else {
     let { data: documents, count } = await supabase
-      .from("adminstaff")
+      .from("admin_staff")
       .select("*")
       .eq("id", parseInt(id));
 
@@ -312,7 +312,7 @@ export async function AdminStaffSearch(title?: string, page?: number) {
 
   if (title != undefined) {
     let { data: documents, count } = await supabase
-      .from("adminstaff")
+      .from("admin_staff")
       .select("*", { count: "exact", head: false })
       .range(from, to)
       .ilike("title", title)
@@ -324,7 +324,7 @@ export async function AdminStaffSearch(title?: string, page?: number) {
   }
 
   let { data: documents, count } = await supabase
-    .from("adminstaff")
+    .from("admin_staff")
     .select("*", { count: "exact", head: false })
     .range(from, to)
     .order("id", { ascending: false });

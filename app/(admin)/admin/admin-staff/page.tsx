@@ -16,8 +16,6 @@ import {
   AdminStaffData,
   AdminStaffSearch,
 } from "@/components/admin/documents-data";
-import { editEventPOST } from "@/app/actions";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
@@ -25,6 +23,7 @@ import { imgurUpload } from "@/utils/imgur-upload";
 import Image from "next/image";
 import DynamicInputFieldsStaff from "@/components/admin/dynamic-input-field-staff";
 import { CreatePopup } from "@/components/admin/alert-fragment";
+import { editAdminStaffPOST } from "@/app/actions";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -49,36 +48,90 @@ export interface AdminStaffDocumentData {
 }
 
 export default function AdminStaff() {
-  const pathname = usePathname();
-  const [page, setPage] = useQueryState("page", parseAsInteger);
-  const [title, setTitle] = useQueryState("title");
+  const [id, setId] = useState(0);
   // const [createForm, setCreateForm] = useState(false);
   // const [deleteForm, setDeleteForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
   const [documents, setDocuments] = useState<AdminStaffDocumentData | null>(
     null,
   );
-  const [pagination, setPagination] = useState(1);
 
-  const setCurrentPageHandler = (value: number) => {
-    setPage(value);
+  const [deanBase64Image, setDeanBase64Image] = useState<string>("");
+  const [deanImage, setDeanImage] = useState<string>("");
+  const [associateDeanBase64Image, setAssociateDeanBase64Image] =
+    useState<string>("");
+  const [associateDeanImage, setAssociateDeanImage] = useState<string>("");
+
+  const handleDeanImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setDeanBase64Image(reader.result as string);
+    reader.readAsDataURL(file);
   };
+
+  useEffect(() => {
+    if (deanBase64Image) {
+      CreatePopup("Image uploading");
+      imgurUpload(deanBase64Image)
+        .then((result) => {
+          setDeanImage(`${result.data.link}`);
+          CreatePopup("Image upload successful!", "success");
+        })
+        .catch((err) => {
+          CreatePopup("Image failed to upload. Try Again", "error");
+          // handle error if needed
+        });
+    }
+  }, [deanBase64Image]);
+
+  const handleAssocDeanImageChange = (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setAssociateDeanBase64Image(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  useEffect(() => {
+    if (associateDeanBase64Image) {
+      CreatePopup("Image uploading");
+      imgurUpload(associateDeanBase64Image)
+        .then((result) => {
+          setAssociateDeanImage(`${result.data.link}`);
+          CreatePopup("Image upload successful!", "success");
+        })
+        .catch((err) => {
+          CreatePopup("Image failed to upload. Try Again", "error");
+          // handle error if needed
+        });
+    }
+  }, [associateDeanBase64Image]);
 
   useEffect(() => {
     AdminStaffData().then(({ documents, pagination }) => {
       setDocuments(documents && documents[0] ? documents[0] : null);
-      setPagination(pagination);
+      setDeanImage(documents && documents[0].dean.image);
+      setId(documents && documents[0].id);
+      setAssociateDeanImage(documents && documents[0].associate_dean.image);
     });
 
     const taskListener = supabase
       .channel("public:data")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "adminstaff" },
+        { event: "*", schema: "public", table: "admin_staff" },
         (payload) => {
           AdminStaffData().then(({ documents, pagination }) => {
             setDocuments(documents && documents[0] ? documents[0] : null);
-            setPagination(pagination);
+            setDeanImage(documents && documents[0].dean.image);
+            setAssociateDeanImage(
+              documents && documents[0].associate_dean.image,
+            );
+            setId(documents && documents[0].id);
+            CreatePopup("Data updated");
           });
           // console.log("Change received!", payload);
         },
@@ -90,32 +143,18 @@ export default function AdminStaff() {
     };
   }, []);
 
-  const clearFilters = () => {
-    setPage(1);
-    setTitle(null);
-
-    AdminStaffData().then(({ documents, pagination }) => {
-      setDocuments(documents && documents[0] ? documents[0] : null);
-      setPagination(pagination);
-    });
-  };
-
-  useEffect(() => {
-    AdminStaffSearch(title ?? undefined, page ?? undefined).then(
-      ({ documents }) => {
-        setDocuments(documents && documents[0] ? documents[0] : null);
-      },
-    );
-  }, [page, title]);
-
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
-    const result = await editEventPOST(formData);
-    setEditForm(false);
+    formData.set("id", id?.toString() ?? "");
+    formData.set("dean_image", deanImage);
+    formData.set("assoc_dean_image", associateDeanImage);
+    const result = await editAdminStaffPOST(formData);
+
     if (result.success) {
-      CreatePopup("Successfully deleted faculty member");
+      CreatePopup("Successful edit", "success");
+      setEditForm(false);
     } else {
-      CreatePopup(result.message || "Failed to create faculty");
+      CreatePopup("Failed to edit, try again", "error");
     }
   };
 
@@ -137,7 +176,7 @@ export default function AdminStaff() {
           Edit Admin & Staff
         </Button>
 
-        <div className="flex flex-row">
+        {/* <div className="flex flex-row">
           <div className="w-full max-w-2xs px-4">
             <Field>
               <Label className="text-sm/6 font-medium text-white">Title</Label>
@@ -153,13 +192,13 @@ export default function AdminStaff() {
             </Field>
           </div>
 
-          {/* <button
+          <button
             type="button"
             onClick={handleSearch}
             className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white hover:cursor-pointer hover:bg-white/10"
           >
             <Search />
-          </button> */}
+          </button>
           <button
             type="button"
             onClick={clearFilters}
@@ -167,7 +206,7 @@ export default function AdminStaff() {
           >
             Clear Filter
           </button>
-        </div>
+        </div> */}
       </div>
 
       <div className="relative flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-x-auto overflow-y-auto rounded-2xl border bg-white/10 p-4 shadow-xl">
@@ -205,8 +244,8 @@ export default function AdminStaff() {
               <td>
                 <Image
                   src={
-                    documents && documents.dean.image !== ""
-                      ? documents.dean.image
+                    documents && documents.associate_dean.image !== ""
+                      ? documents.associate_dean.image
                       : "/images/NoImage.png"
                   }
                   alt=""
@@ -240,340 +279,6 @@ export default function AdminStaff() {
         </table>
       </div>
 
-      <div className="join">
-        {pagination >= 2 && (
-          <>
-            <Link
-              className="join-item btn"
-              href={{
-                pathname: pathname,
-                query: {
-                  page: (page ?? 1) <= 3 ? 1 : (page ?? 1) - 2,
-                },
-              }}
-              passHref
-              shallow
-              replace
-              onClick={() =>
-                setCurrentPageHandler((page ?? 1) <= 3 ? 1 : (page ?? 1) - 2)
-              }
-            >
-              {(page ?? 1) <= 3 ? "1" : (page ?? 1) - 2}
-            </Link>
-            <Link
-              className="join-item btn"
-              href={{
-                pathname: pathname,
-                query: {
-                  page: (page ?? 1) <= 3 ? 2 : (page ?? 1) - 1,
-                },
-              }}
-              passHref
-              shallow
-              replace
-              onClick={() =>
-                setCurrentPageHandler((page ?? 1) <= 3 ? 2 : (page ?? 1) - 1)
-              }
-            >
-              {(page ?? 1) <= 3 ? "2" : (page ?? 1) - 1}
-            </Link>
-          </>
-        )}
-        {pagination >= 3 && (
-          <Link
-            className="join-item btn"
-            href={{
-              pathname: pathname,
-              query: {
-                page: (page ?? 1) <= 3 ? 3 : page,
-              },
-            }}
-            passHref
-            shallow
-            replace
-            onClick={() =>
-              setCurrentPageHandler((page ?? 1) <= 3 ? 3 : (page ?? 1))
-            }
-          >
-            {(page ?? 1) <= 3 ? "3" : page}
-          </Link>
-        )}
-        {pagination >= 4 && (
-          <Link
-            className="join-item btn"
-            href={{
-              pathname: pathname,
-              query: {
-                page: (page ?? 1) <= 3 ? 4 : (page ?? 1) + 1,
-              },
-            }}
-            passHref
-            shallow
-            replace
-            onClick={() =>
-              setCurrentPageHandler((page ?? 1) <= 3 ? 4 : (page ?? 1) + 1)
-            }
-          >
-            {(page ?? 1) <= 3 ? "4" : (page ?? 1) + 1}
-          </Link>
-        )}
-        {pagination >= 5 && (
-          <Link
-            className="join-item btn"
-            href={{
-              pathname: pathname,
-              query: {
-                page: (page ?? 1) <= 3 ? 5 : (page ?? 1) + 2,
-              },
-            }}
-            passHref
-            shallow
-            replace
-            onClick={() =>
-              setCurrentPageHandler((page ?? 1) <= 3 ? 5 : (page ?? 1) + 2)
-            }
-          >
-            {(page ?? 1) <= 3 ? "5" : (page ?? 1) + 2}
-          </Link>
-        )}
-      </div>
-
-      {/* Create Form */}
-      {/* <Dialog open={createForm} onClose={() => setCreateForm(false)}>
-        <DialogBackdrop
-          transition
-          className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
-        />
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <DialogPanel
-              transition
-              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-3xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
-            >
-              <form
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  if (image == "") {
-                    alert("Image was not uploaded yet, try again");
-                  } else {
-                    const formData = new FormData(e.currentTarget);
-                    formData.set("image", image ?? "");
-                    createEventPOST(formData);
-                    setBase64Image("");
-                    setImage("");
-                    setCreateForm(false);
-                  }
-                }}
-              >
-                <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
-                      <DocumentIcon
-                        aria-hidden="true"
-                        className="size-6 text-green-600"
-                      />
-                    </div>
-                    <div className="mt-3 w-full overflow-y-scroll text-center sm:mt-0 sm:ml-4 sm:text-left">
-                      <DialogTitle
-                        as="h3"
-                        className="text-base font-semibold text-gray-900"
-                      >
-                        New Event
-                      </DialogTitle>
-                      <div className="mt-4 flex w-full flex-row gap-6">
-                        <div className="flex grow basis-0 flex-col gap-4">
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-black">
-                                Title
-                              </Label>
-                              <Input
-                                name="title"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                                required
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-black">
-                                Date
-                              </Label>
-                              <Input
-                                name="date"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                  "scheme-light",
-                                )}
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Academic Year
-                              </Label>
-                              <Input
-                                name="academic_year"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                  "scheme-light",
-                                )}
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-black">
-                                Location
-                              </Label>
-                              <Input
-                                name="location"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                  "scheme-light",
-                                )}
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field>
-                              <Label className="text-sm/6 font-medium text-black">
-                                Description
-                              </Label>
-                              <Textarea
-                                name="description"
-                                className={clsx(
-                                  "mt-3 block w-full resize-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                                rows={8}
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Expenses
-                              </Label>
-                              <Input
-                                name="expenses"
-                                placeholder="Optional"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Documentation Link
-                              </Label>
-                              <Input
-                                name="documentation_link"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-black">
-                                Image
-                              </Label>
-                              <Input
-                                type="file"
-                                onChange={handleImageChange}
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                                accept=".png,.jpg,.jpeg"
-                              />
-                            </Field>
-                            <div className="text-xs font-bold">
-                              {!image && !base64Image ? (
-                                <div className="text-red-400">No image</div>
-                              ) : !image && base64Image ? (
-                                <div className="text-amber-300">
-                                  Image uploading
-                                </div>
-                              ) : (
-                                <div className="text-green-300">
-                                  Image uploaded
-                                </div>
-                              )}
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className="flex grow basis-0 flex-col gap-4">
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-col items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Project Head/s
-                              </Label>
-                              <DynamicInputFieldsProjectHead />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-col items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Highlight Information
-                              </Label>
-                              <DynamicInputFieldsHighlights />
-                            </Field>
-                          </div>
-                        </div>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                  <button
-                    type="submit"
-                    className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-green-500 sm:ml-3 sm:w-auto"
-                  >
-                    Submit
-                  </button>
-                  <button
-                    type="button"
-                    data-autofocus
-                    onClick={() => setCreateForm(false)}
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </DialogPanel>
-          </div>
-        </div>
-      </Dialog> */}
-
       {/* Edit Form */}
       <Dialog open={editForm} onClose={() => setEditForm(false)}>
         <DialogBackdrop
@@ -589,7 +294,7 @@ export default function AdminStaff() {
               <form
                 onSubmit={(e) => {
                   e.preventDefault();
-                  handleEditSubmit(e)
+                  handleEditSubmit(e);
                 }}
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
@@ -610,7 +315,7 @@ export default function AdminStaff() {
 
                       <div className="mt-4 flex w-full flex-row gap-6">
                         <div className="flex flex-col gap-4">
-                          <div className="hidden w-full max-w-md">
+                          <div className="hidden w-full">
                             <Field className="flex flex-row items-center gap-4">
                               <Input
                                 className={clsx(
@@ -625,13 +330,13 @@ export default function AdminStaff() {
                         </div>
 
                         <div className="mt-4 flex w-full grow basis-0 flex-col gap-4">
-                          <div className="w-full max-w-md">
+                          <div className="w-full">
                             <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
                                 Dean
                               </Label>
                               <Input
-                                name="title"
+                                name="dean_name"
                                 className={clsx(
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -642,62 +347,84 @@ export default function AdminStaff() {
                             </Field>
                           </div>
 
-                          <div className="w-full max-w-md">
+                          <div className="w-full">
                             <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-black">
+                              <Label className="text-sm/6 font-medium text-nowrap text-black">
                                 Dean Image
                               </Label>
                               <Input
-                                name="date"
-                                type="text"
+                                type="file"
+                                onChange={handleDeanImageChange}
                                 className={clsx(
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                  "scheme-light",
                                 )}
-                                // defaultValue={
-                                //   editDocument && editDocument[0].date
-                                // }
+                                accept=".png,.jpg,.jpeg"
                               />
                             </Field>
+                            <div className="text-xs font-bold">
+                              {!deanImage && !deanBase64Image ? (
+                                <div className="text-red-400">No image</div>
+                              ) : !deanImage && deanBase64Image ? (
+                                <div className="text-amber-300">
+                                  Image uploading
+                                </div>
+                              ) : (
+                                <div className="text-green-300">
+                                  Image uploaded
+                                </div>
+                              )}
+                            </div>
                           </div>
 
-                          <div className="w-full max-w-md">
+                          <div className="w-full">
                             <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-nowrap text-black">
                                 Associate Dean
                               </Label>
                               <Input
-                                name="academic_year"
+                                name="assoc_dean_name"
                                 type="text"
                                 className={clsx(
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                   "scheme-light",
                                 )}
-                                // defaultValue={
-                                //   editDocument && editDocument[0].academic_year
-                                // }
+                                defaultValue={documents?.associate_dean.name}
                               />
                             </Field>
                           </div>
 
-                          <div className="w-full max-w-md">
+                          <div className="w-full">
                             <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-black"></Label>
+                              <Label className="text-sm/6 font-medium text-nowrap text-black">
+                                Associate Dean Image
+                              </Label>
                               <Input
-                                name="location"
-                                type="text"
+                                type="file"
+                                onChange={handleAssocDeanImageChange}
                                 className={clsx(
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                  "scheme-light",
                                 )}
-                                // defaultValue={
-                                //   editDocument && editDocument[0].location
-                                // }
+                                accept=".png,.jpg,.jpeg"
                               />
                             </Field>
+                            <div className="text-xs font-bold">
+                              {!associateDeanImage &&
+                              !associateDeanBase64Image ? (
+                                <div className="text-red-400">No image</div>
+                              ) : !associateDeanImage &&
+                                associateDeanBase64Image ? (
+                                <div className="text-amber-300">
+                                  Image uploading
+                                </div>
+                              ) : (
+                                <div className="text-green-300">
+                                  Image uploaded
+                                </div>
+                              )}
+                            </div>
                           </div>
 
                           <div className="flex grow basis-0 flex-col gap-4">
@@ -727,7 +454,7 @@ export default function AdminStaff() {
                   <button
                     type="button"
                     data-autofocus
-                    // onClick={() => handleEditDocument("")}
+                    onClick={() => setEditForm(false)}
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
                   >
                     Cancel
@@ -738,80 +465,6 @@ export default function AdminStaff() {
           </div>
         </div>
       </Dialog>
-
-      {/* Delete Form */}
-      {/* <Dialog
-        open={deleteForm}
-        onClose={setDeleteForm}
-        className="relative z-10"
-      >
-        <DialogBackdrop
-          transition
-          className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
-        />
-
-        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
-            <DialogPanel
-              transition
-              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
-            >
-              <form action={deleteEventPOST}>
-                <input
-                  type="text"
-                  name="id"
-                  className="hidden"
-                  defaultValue={deleteDocumentId}
-                />
-                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
-                  <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-red-100 sm:mx-0 sm:size-10">
-                      <ExclamationTriangleIcon
-                        aria-hidden="true"
-                        className="size-6 text-red-600"
-                      />
-                    </div>
-                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
-                      <DialogTitle
-                        as="h3"
-                        className="text-base font-semibold text-gray-900"
-                      >
-                        Delete event
-                      </DialogTitle>
-                      <div className="mt-2">
-                        <p className="text-sm text-gray-500">
-                          Are you sure you want to delete{" "}
-                          <span className="font-bold">
-                            {deleteDocumentName}
-                          </span>
-                          ?
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
-                  <button
-                    type="submit"
-                    onClick={() => handleDeleteDocument("", "", false)}
-                    className="inline-flex w-full justify-center rounded-md bg-red-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-red-500 sm:ml-3 sm:w-auto"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    type="button"
-                    data-autofocus
-                    onClick={() => handleDeleteDocument("", "", false)}
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
-                  >
-                    Cancel
-                  </button>
-                </div>
-              </form>
-            </DialogPanel>
-          </div>
-        </div>
-      </Dialog> */}
     </div>
   );
 }

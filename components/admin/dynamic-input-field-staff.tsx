@@ -9,6 +9,7 @@ type InputField = { name: string; position: string; image: string };
 import { useEffect } from "react";
 import { imgurUpload } from "@/utils/imgur-upload";
 import Image from "next/image";
+import { CreatePopup } from "./alert-fragment";
 
 export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
   const [inputs, setInputs] = useState<InputField[]>([]);
@@ -17,7 +18,6 @@ export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
     if (data) {
       try {
         const parsed = typeof data === "string" ? JSON.parse(data) : data;
-        console.log(data);
         if (Array.isArray(parsed)) {
           setInputs(parsed);
         }
@@ -53,21 +53,20 @@ export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
     const { name, value } = event.target;
     let onChangeValue = [...inputs];
 
+    CreatePopup("Image uploading, please wait")
     imgurUpload(base64Image)
       .then((result) => {
-        console.log(result);
-        console.log(onChangeValue)
-        console.log(onChangeValue[index])
-        console.log(onChangeValue[index].name)
-        console.log(onChangeValue[index]["position"])
-        console.log(result.data.link)
-        onChangeValue[index]["image"] = result.data.link;
+        if (result.success) {
+          onChangeValue[index]["image"] = result.data.link;
+          setInputs(onChangeValue);
+          CreatePopup("Image upload successful.", "success")
+        } else {
+          CreatePopup("Image did not upload. Please try again", "error")
+        }
       })
       .catch((err) => {
         console.log(err);
       });
-
-    setInputs(onChangeValue);
   };
 
   const handleDeleteInput = (index: number) => {
@@ -95,13 +94,6 @@ export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
       )}
       {inputs.map((item, index) => (
         <div className="input_container flex flex-row gap-1" key={index}>
-          <Image
-            src={item.image !== "" ? item.image : "/images/NoImage.png"}
-            alt=""
-            width={30}
-            height={30}
-            className="aspect-square"
-          />
           <Input
             name="name"
             type="text"
@@ -125,7 +117,6 @@ export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
           <Input
             name="image"
             type="file"
-            value={item.image}
             className={clsx(
               "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
               "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -151,7 +142,7 @@ export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
         </div>
       ))}
       <input
-        name="highlights"
+        name="staff_data"
         type="text"
         value={JSON.stringify(inputs)}
         className="invisible sr-only"

@@ -1219,6 +1219,41 @@ export async function deleteFacultyPOST(formData: FormData) {
     : { success: true };
 }
 
+// ADMIN & STAFF //
+export async function editAdminStaffPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get('id');
+  const dean_name = formData.get("dean_name");
+  const dean_image = formData.get("dean_image");
+  const assoc_dean_name = formData.get("assoc_dean_name");
+  const assoc_dean_image = formData.get("assoc_dean_image");
+  const staffRaw = formData.get("staff_data");
+  const staff = typeof staffRaw === "string" ? JSON.parse(staffRaw) : staffRaw;
+
+  const { data, error } = await supabase
+    .from('admin_staff')
+    .update({
+      dean: { name: dean_name, image: dean_image },
+      associate_dean: { name: assoc_dean_name, image: assoc_dean_image },
+      staff: staff,
+    })
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
+    .select();
+
+  console.log(id, staff);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}
+
 // QUICK ANNOUNCEMENT //
 export async function createQuickAnnouncementPOST(formData: FormData) {
   const { getToken } = await auth();
@@ -1239,8 +1274,8 @@ export async function createQuickAnnouncementPOST(formData: FormData) {
   const button_visibility =
     formData.get("button_visible") == "on" ? true : false;
 
-    console.log(timer_visibility)
-    console.log(button_visibility)
+  console.log(timer_visibility);
+  console.log(button_visibility);
   if (hasActiveAnnouncement == "false") {
     const { data, error } = await supabase
       .from("urgent_announcement")
@@ -1335,7 +1370,7 @@ export async function editQuickAnnouncementPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
 
-  console.log(error)
+  console.log(error);
   return error
     ? { success: false, message: error?.message }
     : { success: true };

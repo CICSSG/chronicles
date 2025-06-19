@@ -23,9 +23,9 @@ export default function ProtectedPage() {
   }, []);
 
   return (
-    <div className="flex w-full flex-col gap-4 text-black">
+    <div className="grid w-full grid-cols-1 xl:grid-cols-2 gap-4 text-black">
       <QuickUrgentAnnouncementAdmin />
-      <div className="flex h-fit w-full flex-col gap-4 rounded-2xl bg-white/80 p-6 xl:w-1/2">
+      <div className="flex h-fit w-full flex-col gap-4 rounded-2xl bg-white/80 p-6">
         <h1 className="text-2xl font-semibold">Data Count</h1>
         <div className="grid grid-cols-2 justify-around gap-x-3 gap-y-8 sm:grid-cols-3 xl:grid-cols-4">
           {tables &&

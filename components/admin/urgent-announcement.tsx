@@ -176,7 +176,7 @@ export default function QuickUrgentAnnouncementAdmin() {
   };
 
   return (
-    <div className="flex h-fit w-full flex-col gap-4 rounded-2xl bg-white/80 p-6 xl:w-1/2">
+    <div className="flex h-fit w-full flex-col gap-4 rounded-2xl bg-white/80 p-6">
       <h1 className="text-2xl font-semibold underline ring-offset-2">
         Urgent Announcement
       </h1>
@@ -286,7 +286,7 @@ export default function QuickUrgentAnnouncementAdmin() {
                   </div>
                 )}
 
-                <div className="flex flex-row gap-4">
+                <div className="flex flex-row flex-wrap gap-4">
                   <Field className="flex flex-row items-center gap-4">
                     <Label className="text-sm/6 font-medium text-nowrap text-black">
                       Visible Timer
@@ -417,7 +417,7 @@ export default function QuickUrgentAnnouncementAdmin() {
                 </Field>
               </div>
             )}
-            <div className="flex flex-row gap-4">
+            <div className="flex flex-row flex-wrap gap-4">
               <Field className="flex flex-row items-center gap-4">
                 <Label className="text-sm/6 font-medium text-nowrap text-black">
                   Visible Timer
