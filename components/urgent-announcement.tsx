@@ -1,13 +1,26 @@
 "use client";
 import { Button } from "@headlessui/react";
-import { XMarkIcon } from "@heroicons/react/20/solid";
+import { ChevronRightIcon, XMarkIcon } from "@heroicons/react/20/solid";
 import React, { act, useEffect, useRef, useState } from "react";
 import { PublicUrgentAnnounementData } from "./public-documents-data";
+import Link from "next/link";
+
+export type UrgentAnnouncementDocumentData = {
+  id: number;
+  announcement: string;
+  date: string;
+  visibility: boolean;
+  time_visibility: boolean;
+  button_text: string;
+  button_link: string;
+  button_visibility: boolean;
+};
 
 export default function UrgentAnnouncement() {
-  const [documents, setDocuments] = useState<any[] | null>(null);
+  const [documents, setDocuments] = useState<UrgentAnnouncementDocumentData[] | null>(null);
   const [visibility, setVisibility] = useState(false);
   const [timeVisibility, setTimeVisibility] = useState(false);
+  const [buttonVisibility, setButtonVisibility] = useState(false);
   const [time, setTime] = useState<number>(0);
 
   const timerRef = useRef<NodeJS.Timeout | null>(null);
@@ -42,30 +55,44 @@ export default function UrgentAnnouncement() {
 
       setVisibility(activeDocument.visibility);
       setTimeVisibility(activeDocument.time_visibility);
-      const timeRaw = Math.floor((Date.parse(activeDocument.date) - Date.now()) / 1000)
-      console.log(timeRaw)
+      setButtonVisibility(activeDocument.button_visibility);
+
+      const timeRaw = Math.floor(
+        (Date.parse(activeDocument.date) - Date.now()) / 1000,
+      );
       setTime(timeRaw);
     }
   }, [documents]);
-  
-  return (
-    <div
-      className={`relative flex w-full flex-row items-center justify-center gap-4 bg-linear-90 from-blue-100 via-white to-blue-100 px-3 py-3 text-xl font-bold ${visibility == false && "hidden"}`}
-    >
-      <h1 className="font-semibold">{documents && documents[0].announcement}</h1>
-      <div className={`${!timeVisibility && "hidden"}`}>
-        {Countdown(time)}
-      </div>
-      <Button
-        className="absolute right-2 text-black hover:cursor-pointer"
-        onClick={(e) => setVisibility(false)}
-      >
-        <XMarkIcon className="size-8" />
-      </Button>
-    </div>
-  );
-}
 
+  return (
+      <div
+        className={`relative flex w-full flex-col flex-wrap items-center justify-center gap-4 overflow-hidden rounded-b-2xl bg-linear-90 from-blue-100 via-white to-blue-100 px-3 py-1 text-xl font-bold md:flex-row ${visibility == false && "hidden"}`}
+      >
+        <h1 className="text-center font-semibold">
+          {documents && documents[0].announcement}
+        </h1>
+        <div className={`${!timeVisibility && "hidden"}`}>
+          {Countdown(time)}
+        </div>
+        <Link
+          href={documents ? documents[0].button_link : ""}
+          target="_blank"
+          className={`flex flex-row items-center rounded-lg bg-black/90 px-3 py-2 text-white hover:bg-black/80 ${!buttonVisibility && "hidden"}`}
+        >
+          <span className="text-sm font-semibold">
+            {documents && documents[0].button_text}
+          </span>
+          <ChevronRightIcon className="size-6 animate-pulse animate-infinite animate-duration-[2000ms] animate-ease-linear" />
+        </Link>
+        <Button
+          className="absolute right-2 text-black hover:cursor-pointer"
+          onClick={(e) => setVisibility(false)}
+        >
+          <XMarkIcon className="size-8" />
+        </Button>
+      </div>
+    );
+}
 
 function Countdown(timeLeft: number) {
   const [days, setDays] = useState<number>(0);
