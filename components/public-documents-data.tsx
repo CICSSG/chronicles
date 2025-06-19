@@ -91,7 +91,7 @@ export async function PublicSlateDataByID(id?: string) {
 
 export async function PublicAdminStaffData() {
   let { data: documents } = await supabase
-    .from("adminstaff")
+    .from("admin_staff")
     .select("*", { count: "exact", head: false })
     .order("id", { ascending: false });
 

@@ -72,7 +72,7 @@ export default function AdminStaff() {
         </div>
 
         {/* Staff */}
-        <div className="m-auto my-16 flex flex-row flex-wrap *:basis-[40%] justify-around items-center gap-x-4 gap-y-10 w-full">
+        <div className="m-auto my-16 flex flex-row flex-wrap xl:*:basis-[40%] justify-around items-center gap-x-4 gap-y-10 w-full">
           {documents?.staff.map((data, i) => (
             <div
               key={i}
