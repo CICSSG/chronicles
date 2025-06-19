@@ -108,3 +108,35 @@ export async function PublicFacultyData(department: string) {
     
   return { documents };
 }
+
+export async function PublicAnnouncementForHomeData() {
+
+  let { data: documents } = await supabase
+    .from("announcements")
+    .select("date, title")
+    .order("id", { ascending: false })
+    .limit(5);
+
+  type Announcement = { date: string; title: string };
+  let formattedDocument: Announcement[] = [];
+  documents?.forEach((data) => {
+    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const date = new Date(Date.parse(data.date));
+    const monthIndex = date.getMonth();
+    const monthAbbreviation = monthNames[monthIndex]
+    const formattedDate = `${monthAbbreviation} ${date.getDate().toString()} ${date.getFullYear().toString()}`
+    formattedDocument.push({ date: formattedDate, title: data.title });
+  });
+
+  return { documents: formattedDocument };
+}
+
+export async function PublicUrgentAnnounementData() {
+  let { data: documents } = await supabase
+    .from("urgent_announcement")
+    .select("*", { count: "exact", head: false })
+    .order("id", { ascending: false })
+    .limit(1)
+
+  return { documents };
+}
