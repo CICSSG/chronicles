@@ -46,7 +46,7 @@ const Slate = () => {
   }, [page]);
 
   return (
-    <div className="flex flex-col gap-4 *:rounded-2xl">
+    <div className="flex flex-col gap-4 *:rounded-2xl rounded-xl bg-white/80 p-8">
       <div className="flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-neutral-300 *:px-8 *:py-8 *:shadow-xl">
         <div className="bg-[url(/images/noise.png)]">
           <h2 className="text-3xl font-bold">CICSSG Slate</h2>
