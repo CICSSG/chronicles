@@ -13,6 +13,8 @@ const supabase = createClient(
 
 export default function ProtectedPage() {
   const [tables, setTables] = useState();
+  
+
 
   useEffect(() => {
     GetTableRows()

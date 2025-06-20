@@ -3,16 +3,14 @@ import type { Metadata } from "next";
 import { ClerkProvider, SignedIn } from "@clerk/nextjs";
 import { Space_Grotesk, Inter } from "next/font/google";
 import "/app/globals.css";
-import { currentUser } from "@clerk/nextjs/server";
-import { permanentRedirect } from "next/navigation";
+import { redirect } from "next/navigation";
 import NavLinksAdmin from "@/components/admin/navlinksadmin";
 import Link from "next/link";
-import { InfoIcon, User } from "lucide-react";
+import { User } from "lucide-react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Analytics } from "@vercel/analytics/next";
-import AdminAlerts from "@/components/admin/alerts";
-import { Button } from "@headlessui/react";
 import AlertFragment from "@/components/admin/alert-fragment";
+import { checkRole } from "@/utils/roles";
 
 const spaceGrotesk = Space_Grotesk({
   display: "swap",
@@ -37,11 +35,10 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const user = await currentUser();
-  const userid = user?.id;
-
-  if (!user) {
-    permanentRedirect("/");
+  const isAdmin = await checkRole('admin')
+  const isData = await checkRole('data')
+  if (!isAdmin && !isData) {
+    redirect('/')
   }
 
   return (
@@ -66,7 +63,7 @@ export default async function RootLayout({
             <div className="flex min-h-screen w-full flex-row bg-black/30">
               {/* Navbar */}
               <div className="peer fixed z-9999">
-                <NavLinksAdmin />
+                <NavLinksAdmin/>
               </div>
 
               {/* Page Content */}
