@@ -243,7 +243,6 @@ export async function createEventPOST(formData: FormData) {
   const location = formData.get("location");
   const expenses = formData.get("expenses");
   const description = formData.get("description");
-  const documentationLink = formData.get("documentation_link");
   const highlightsRaw = formData.get("highlights");
   const highlights =
     typeof highlightsRaw === "string"
@@ -268,7 +267,6 @@ export async function createEventPOST(formData: FormData) {
         expenses: expenses,
         highlights: highlights,
         description: description,
-        link: documentationLink,
       },
     ])
     .select();
@@ -297,7 +295,6 @@ export async function editEventPOST(formData: FormData) {
   const location = formData.get("location");
   const expenses = formData.get("expenses");
   const description = formData.get("description");
-  const documentationLink = formData.get("documentation_link");
   const highlightsRaw = formData.get("highlights");
   const highlights =
     typeof highlightsRaw === "string"
@@ -325,7 +322,6 @@ export async function editEventPOST(formData: FormData) {
         expenses: expenses,
         highlights: highlights,
         description: description,
-        link: documentationLink,
       })
       .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
       .select();
@@ -346,7 +342,6 @@ export async function editEventPOST(formData: FormData) {
         expenses: expenses,
         highlights: highlights,
         description: description,
-        link: documentationLink,
       })
       .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
       .select();
