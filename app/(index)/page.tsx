@@ -158,7 +158,7 @@ export default function Home() {
                       alt=""
                       width={500}
                       height={500}
-                      className="rounded-box h-72 w-full object-cover border-2 border-black/70"
+                      className="rounded-box h-72 w-fit object-contain border-2 border-black/70"
                     />
                   </div>
                 ))
