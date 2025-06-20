@@ -91,7 +91,7 @@ export async function PublicSlateDataByID(id?: string) {
 
 export async function PublicAdminStaffData() {
   let { data: documents } = await supabase
-    .from("adminstaff")
+    .from("admin_staff")
     .select("*", { count: "exact", head: false })
     .order("id", { ascending: false });
 
@@ -129,6 +129,17 @@ export async function PublicAnnouncementForHomeData() {
   });
 
   return { documents: formattedDocument };
+}
+
+export async function PublicEventsForHomeData() {
+
+  let { data: documents } = await supabase
+    .from("events")
+    .select("id, image")
+    .order("id", { ascending: false })
+    .limit(8);
+
+  return { documents };
 }
 
 export async function PublicUrgentAnnounementData() {

@@ -243,7 +243,6 @@ export async function createEventPOST(formData: FormData) {
   const location = formData.get("location");
   const expenses = formData.get("expenses");
   const description = formData.get("description");
-  const documentationLink = formData.get("documentation_link");
   const highlightsRaw = formData.get("highlights");
   const highlights =
     typeof highlightsRaw === "string"
@@ -268,7 +267,6 @@ export async function createEventPOST(formData: FormData) {
         expenses: expenses,
         highlights: highlights,
         description: description,
-        link: documentationLink,
       },
     ])
     .select();
@@ -297,7 +295,6 @@ export async function editEventPOST(formData: FormData) {
   const location = formData.get("location");
   const expenses = formData.get("expenses");
   const description = formData.get("description");
-  const documentationLink = formData.get("documentation_link");
   const highlightsRaw = formData.get("highlights");
   const highlights =
     typeof highlightsRaw === "string"
@@ -325,7 +322,6 @@ export async function editEventPOST(formData: FormData) {
         expenses: expenses,
         highlights: highlights,
         description: description,
-        link: documentationLink,
       })
       .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
       .select();
@@ -346,7 +342,6 @@ export async function editEventPOST(formData: FormData) {
         expenses: expenses,
         highlights: highlights,
         description: description,
-        link: documentationLink,
       })
       .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
       .select();
@@ -355,6 +350,38 @@ export async function editEventPOST(formData: FormData) {
       ? { success: false, message: error?.message }
       : { success: true };
   }
+}
+
+export async function editEventImagePOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+  const imagesRaw = formData.get("images_data");
+  const images = imagesRaw ? JSON.parse(imagesRaw as string) : [];
+
+  // const externalLinksRaw = formData.get("external_links");
+  // const externalLinks = externalLinksRaw ? JSON.parse(externalLinksRaw as string) : [];
+
+  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
+
+  const { data, error } = await supabase
+    .from("events")
+    .update({
+      images: images,
+    })
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
+    .select();
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
 }
 
 export async function deleteEventPOST(formData: FormData) {
@@ -1230,7 +1257,7 @@ export async function editAdminStaffPOST(formData: FormData) {
     { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
   );
 
-  const id = formData.get('id');
+  const id = formData.get("id");
   const dean_name = formData.get("dean_name");
   const dean_image = formData.get("dean_image");
   const assoc_dean_name = formData.get("assoc_dean_name");
@@ -1239,7 +1266,7 @@ export async function editAdminStaffPOST(formData: FormData) {
   const staff = typeof staffRaw === "string" ? JSON.parse(staffRaw) : staffRaw;
 
   const { data, error } = await supabase
-    .from('admin_staff')
+    .from("admin_staff")
     .update({
       dean: { name: dean_name, image: dean_image },
       associate_dean: { name: assoc_dean_name, image: assoc_dean_image },

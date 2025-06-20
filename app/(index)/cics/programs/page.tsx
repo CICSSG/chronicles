@@ -214,7 +214,7 @@ export default function Programs() {
                 <h1 className="text-2xl font-bold">Core Subjects</h1>
               </div>
               <div className="collapse-content text-sm">
-                <div className="grid grid-cols-2 gap-6">
+                <div className="grid grid-cols-1 gap-6 xl:grid-cols-2">
                   {Object.entries(data.coreSubjects).map(
                     ([name, data]: [string, any], i: number) => (
                       <div key={i}>

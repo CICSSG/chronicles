@@ -2,24 +2,30 @@
 import {
   PublicAnnouncementForHomeData,
   PublicDocumentData,
+  PublicEventsForHomeData,
 } from "@/components/public-documents-data";
-import { ChevronDownIcon } from "@heroicons/react/20/solid";
+import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
   const [announcements, setAnnouncements] = useState<any[] | null>(null);
+  const [events, setEvents] = useState<any[] | null>(null);
 
   useEffect(() => {
     PublicAnnouncementForHomeData().then(({ documents }) => {
       setAnnouncements(documents ?? null);
     });
+
+    PublicEventsForHomeData().then(({ documents }) => {
+      setEvents(documents ?? null);
+    });
   }, []);
 
   return (
     <>
-      <div className="m-auto flex max-w-full grow flex-col gap-5 text-2xl lg:flex-row xl:max-w-10/12">
+      <div className="m-auto flex max-w-full grow flex-col gap-5 text-2xl xl:flex-row 2xl:max-w-10/12">
         {/* Left 2 Columns */}
         <div className="flex grow-6 basis-0 flex-col gap-5">
           <div className="flex grow flex-col justify-between overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-blue-100 p-5 transition-all md:flex-row md:items-center md:p-1">
@@ -80,25 +86,25 @@ export default function Home() {
             <div className="*md:text-2xl *: relative left-0 mx-auto max-w-4xl text-white *:absolute *:aspect-[9/16] *:w-3xs *:rounded-2xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:p-4 *:transition-all *:hover:scale-102 *:md:w-xs">
               <Link
                 href={"/resolutions"}
-                className="xl: 3xl:-left-6 top-25 left-2/12 z-4 scale-90 sm:top-20 sm:-left-4 sm:z-4 sm:scale-80 sm:-rotate-12 sm:text-center md:top-24 md:left-8 md:scale-90 md:text-left lg:left-5 xl:top-26 xl:scale-95"
+                className="xl: 3xl:-left-6 top-25 left-2/12 z-4 scale-90 sm:top-20 sm:-left-4 sm:z-4 sm:scale-80 sm:-rotate-12 sm:text-center md:top-24 md:left-8 md:scale-90 md:text-left lg:left-6 xl:top-26 xl:scale-95"
               >
                 Resolutions
               </Link>
               <Link
                 href={"/executive-orders"}
-                className="top-5 left-2/12 z-3 scale-80 sm:top-4 sm:left-1/12 sm:z-2 sm:scale-80 sm:-rotate-8 md:top-8 md:left-2/12 md:scale-90 xl:top-6 xl:left-1/5 xl:scale-95"
+                className="top-5 left-2/12 z-3 scale-80 sm:top-4 sm:left-1/12 sm:z-2 sm:scale-80 sm:-rotate-8 md:top-8 md:left-2/12 md:scale-90 lg:left-1/6 lg:top-5 xl:top-6 xl:left-1/5 xl:scale-95"
               >
                 Executive Orders
               </Link>
               <Link
                 href={"/ordinances"}
-                className="3xl:right-40 -top-10 right-1/6 z-2 scale-70 sm:-top-8 sm:right-2/12 sm:z-1 sm:scale-80 sm:rotate-3 md:right-1/6 md:scale-90 lg:-top-7 lg:right-1/12 xl:right-2/12 xl:scale-95"
+                className="3xl:right-40 -top-10 right-1/6 z-2 scale-70 sm:-top-8 sm:right-2/12 sm:z-1 sm:scale-80 sm:rotate-3 md:right-1/6 md:scale-90 lg:-top-9 lg:right-3/12 xl:right-2/12 xl:scale-95"
               >
                 Ordinances
               </Link>
               <Link
                 href={"/formal-documents"}
-                className="3xl:-right-10 -top-24 right-1/6 z-1 scale-60 sm:top-16 sm:-right-2 sm:z-3 sm:scale-80 sm:rotate-12 md:-right-8 md:scale-90 lg:-right-7 xl:-right-8 xl:scale-95"
+                className="3xl:-right-10 -top-24 right-1/6 z-1 scale-60 sm:top-16 sm:-right-2 sm:z-3 sm:scale-80 sm:rotate-12 md:-right-8 md:scale-90 lg:-right-2 xl:-right-8 xl:scale-95"
               >
                 Formal Documents
               </Link>
@@ -108,7 +114,6 @@ export default function Home() {
         {/* Right Column 3 Rows */}
         <div className="flex grow-3 basis-0 flex-col gap-5">
           {/* Announcements */}
-          {/* TODO FIX LAYOUT ON SCREEN SIZES */}
           <Link
             href={"/announcements"}
             className="flex min-h-96 grow-[2.5] basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-blue-100 p-5 pb-12 transition-all hover:scale-102 md:min-h-fit"
@@ -144,33 +149,20 @@ export default function Home() {
           >
             <h2 className="lg:text-right">Events</h2>
             <div className="carousel carousel-center rounded-box m-auto min-h-fit gap-4">
-              <div className="carousel-item">
-                <Image
-                  src="/images/TextImage.jpg"
-                  alt="Pizza"
-                  width={500}
-                  height={500}
-                  className="rounded-box h-48 w-full object-cover"
-                />
-              </div>
-              <div className="carousel-item">
-                <Image
-                  src="/images/TextImage.jpg"
-                  alt="Pizza"
-                  width={500}
-                  height={500}
-                  className="rounded-box h-48 w-full object-cover"
-                />
-              </div>
-              <div className="carousel-item">
-                <Image
-                  src="/images/TextImage.jpg"
-                  alt="Pizza"
-                  width={500}
-                  height={500}
-                  className="rounded-box h-48 w-full object-cover"
-                />
-              </div>
+                {/* <div className="absolute top-0 left-0 w-full h-full bg-linear-90 from-blue-200/50 via-blue-200/0 to-blue-200/50"></div> */}
+              {events &&
+                events.map((data) => (
+                  <div className="carousel-item" key={data.id}>
+                    <Image
+                      src={data.image}
+                      alt=""
+                      width={500}
+                      height={500}
+                      className="rounded-box h-72 w-full object-cover border-2 border-black/70"
+                    />
+                  </div>
+                ))
+              }
             </div>
           </Link>
           {/* Contact Us */}

@@ -14,7 +14,7 @@ import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
 import { EventsData, EventsSearch } from "@/components/admin/documents-data";
-import { createEventPOST, deleteEventPOST, editEventPOST } from "@/app/actions";
+import { createEventPOST, deleteEventPOST, editEventImagePOST, editEventPOST } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
@@ -23,6 +23,7 @@ import { imgurUpload } from "@/utils/imgur-upload";
 import DynamicInputFieldsProjectHead from "@/components/admin/dynamic-input-field-project-head";
 import DynamicInputFieldsHighlights from "@/components/admin/dynamic-input-field-highlights";
 import { CreatePopup } from "@/components/admin/alert-fragment";
+import DynamicInputFieldsEventImages from "@/components/admin/dynamic-input-field-event-images";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -36,9 +37,12 @@ export default function Events() {
   const [createForm, setCreateForm] = useState(false);
   const [deleteForm, setDeleteForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
+  const [editImageForm, setEditImageForm] = useState(false);
   const [documents, setDocuments] = useState<any[] | null>(null);
   const [editFormId, setEditFormId] = useState("");
+  const [editImageFormId, setEditImageFormId] = useState("");
   const [editDocument, setEditDocument] = useState<any | null>(null);
+  const [editImage, setEditImage] = useState<any | null>(null);
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
   const [pagination, setPagination] = useState(1);
@@ -103,6 +107,10 @@ export default function Events() {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
   }, [editDocument]);
 
+  useEffect(() => {
+    editImageFormId != "" ? setEditImageForm(true) : setEditImageForm(false);
+  }, [editImage]);
+
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (image == "" && base64Image != "") {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
@@ -139,6 +147,30 @@ export default function Events() {
       }
     }
   };
+
+  const handleImageEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+
+    const minimalFormData = new FormData();
+    const idValue = formData.get("id");
+    if (typeof idValue === "string") {
+      minimalFormData.set("id", idValue);
+    }
+    const imagesValue = formData.get("images_data");
+    if (typeof imagesValue === "string") {
+      minimalFormData.set("images_data", imagesValue);
+    }
+
+    const result = await editEventImagePOST(minimalFormData);
+    setEditImageForm(false);
+    handleEditImages("");
+    if (result.success) {
+      CreatePopup("Successfully edited event images", "success");
+    } else {
+      CreatePopup("Failed to edit event images. Try again", "error");
+    }
+  };
+
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (image == "" && base64Image != "") {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
@@ -166,6 +198,18 @@ export default function Events() {
       EventsData(id).then(({ documents, pagination }) => {
         setEditDocument(documents);
         setEditFormId(id);
+      });
+    }
+  };
+
+  const handleEditImages = (id: string) => {
+    if (id == "") {
+      setEditImageFormId(id);
+      setEditImageForm(false);
+    } else {
+      EventsData(id).then(({ documents, pagination }) => {
+        setEditImage(documents);
+        setEditImageFormId(id);
       });
     }
   };
@@ -231,13 +275,6 @@ export default function Events() {
             </Field>
           </div>
 
-          {/* <button
-            type="button"
-            onClick={handleSearch}
-            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white hover:cursor-pointer hover:bg-white/10"
-          >
-            <Search />
-          </button> */}
           <button
             type="button"
             onClick={clearFilters}
@@ -276,6 +313,12 @@ export default function Events() {
                     className="grow-1 basis-0 bg-amber-200 text-black hover:cursor-pointer hover:bg-amber-100"
                   >
                     Edit
+                  </Button>
+                  <Button
+                    onClick={() => handleEditImages(data.id)}
+                    className="grow-1 basis-0 bg-blue-200 text-black hover:cursor-pointer hover:bg-blue-100"
+                  >
+                    Images
                   </Button>
                   <Button
                     onClick={() =>
@@ -516,22 +559,6 @@ export default function Events() {
                               <Input
                                 name="expenses"
                                 placeholder="Optional"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Documentation Link
-                              </Label>
-                              <Input
-                                name="documentation_link"
                                 type="text"
                                 className={clsx(
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
@@ -790,25 +817,6 @@ export default function Events() {
 
                           <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Documentation Link
-                              </Label>
-                              <Input
-                                name="documentation_link"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                                defaultValue={
-                                  editDocument && editDocument[0].link
-                                }
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
                                 Image
                               </Label>
@@ -882,6 +890,91 @@ export default function Events() {
                     type="button"
                     data-autofocus
                     onClick={() => handleEditDocument("")}
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  >
+                    Cancel
+                  </button>
+                </div>
+              </form>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
+
+      {/* Edit Images Form */}
+      <Dialog open={editImageForm} onClose={() => setEditImageForm(false)}>
+        <DialogBackdrop
+          transition
+          className="fixed inset-0 bg-gray-500/75 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
+        />
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-full items-end justify-center p-4 text-center sm:items-center sm:p-0">
+            <DialogPanel
+              transition
+              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-3xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+            >
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleImageEditSubmit(e);
+                }}
+              >
+                <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-amber-100 sm:mx-0 sm:size-10">
+                      <DocumentIcon
+                        aria-hidden="true"
+                        className="size-6 text-amber-600"
+                      />
+                    </div>
+                    <div className="mt-3 w-full overflow-y-scroll text-center sm:mt-0 sm:ml-4 sm:text-left">
+                      <DialogTitle
+                        as="h3"
+                        className="text-base font-semibold text-gray-900"
+                      >
+                        Edit Event Images
+                      </DialogTitle>
+
+                      <div className="mt-4 flex w-full flex-row gap-6">
+                        <div className="flex flex-col gap-4">
+                          <div className="hidden w-full max-w-md">
+                            <Field className="flex flex-row items-center gap-4">
+                              <Input
+                                className={clsx(
+                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                )}
+                                defaultValue={editImage && editImage[0].id}
+                                name="id"
+                              ></Input>
+                            </Field>
+                          </div>
+                        </div>
+
+                        <div className="mt-4 flex w-full grow basis-0 flex-col gap-4">
+                          <div className="w-full">
+                            <Field className="flex flex-row items-center gap-4">
+                              <DynamicInputFieldsEventImages
+                                data={editImage && editImage[0].images}
+                              />
+                            </Field>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                  <button
+                    type="submit"
+                    className="inline-flex w-full justify-center rounded-md bg-amber-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-amber-500 sm:ml-3 sm:w-auto"
+                  >
+                    Edit File
+                  </button>
+                  <button
+                    type="button"
+                    data-autofocus
+                    onClick={() => handleEditImages("")}
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
                   >
                     Cancel
