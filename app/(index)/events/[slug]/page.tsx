@@ -91,7 +91,7 @@ export default function Page() {
           )}
         </div>
       </div>
-      <div className="flex grow-2 basis-0 flex-col gap-8 rounded-2xl bg-neutral-300 bg-[url(/images/noise.png)] p-12 text-black/80">
+      <div className="flex grow-2 3xl:grow-3 basis-0 flex-col gap-8 rounded-2xl bg-neutral-300 bg-[url(/images/noise.png)] p-12 text-black/80">
         <div className="flex flex-col 2xl:flex-row gap-4">
           <Image
             src={document && document.image}
