@@ -3,7 +3,7 @@ import nodemailer from 'nodemailer';
 import Mail from 'nodemailer/lib/mailer';
 
 export async function POST(request: NextRequest) {
-  const { email, name, message, concern } = await request.json();
+  const { email, name, message, concern, gender, phone, person } = await request.json();
 
   const transport = nodemailer.createTransport({
     service: 'gmail',
@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     from: process.env.MY_EMAIL,
     to: process.env.MY_EMAIL,
     cc: email,
-    subject: `[${concern.toUpperCase()}] Message from ${name} (${email})`,
+    subject: `[${concern.toUpperCase()} - ${person.toUpperCase()}] Message from ${gender.toUpperCase()} ${name} (${email} ${phone != "" ? "- " + phone : null})`,
     text: message,
   };
 

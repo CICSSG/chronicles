@@ -207,8 +207,11 @@ const ContactUs = () => {
                   {...register('concern', { required: true })}
                 >
                   <option value=""></option>
+                  <option value="inquiry">Inquiry</option>
                   <option value="enrollment">Enrollment</option>
-                  <option value=""></option>
+                  <option value="payment">Payment</option>
+                  <option value="other">Other</option>
+                  
                 </select>
                 <ChevronDownIcon
                   aria-hidden="true"
