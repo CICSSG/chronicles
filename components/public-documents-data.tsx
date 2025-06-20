@@ -131,6 +131,17 @@ export async function PublicAnnouncementForHomeData() {
   return { documents: formattedDocument };
 }
 
+export async function PublicEventsForHomeData() {
+
+  let { data: documents } = await supabase
+    .from("events")
+    .select("id, image")
+    .order("id", { ascending: false })
+    .limit(8);
+
+  return { documents };
+}
+
 export async function PublicUrgentAnnounementData() {
   let { data: documents } = await supabase
     .from("urgent_announcement")
