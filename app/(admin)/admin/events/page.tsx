@@ -150,14 +150,25 @@ export default function Events() {
 
   const handleImageEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
-      const result = await editEventImagePOST(formData);
-      setEditImageForm(false);
-      handleEditImages("");
-      if (result.success) {
-        CreatePopup("Successfully edited event images", "success");
-      } else {
-        CreatePopup("Failed to edit event images. Try again", "error");
-      }
+
+    const minimalFormData = new FormData();
+    const idValue = formData.get("id");
+    if (typeof idValue === "string") {
+      minimalFormData.set("id", idValue);
+    }
+    const imagesValue = formData.get("images_data");
+    if (typeof imagesValue === "string") {
+      minimalFormData.set("images_data", imagesValue);
+    }
+
+    const result = await editEventImagePOST(minimalFormData);
+    setEditImageForm(false);
+    handleEditImages("");
+    if (result.success) {
+      CreatePopup("Successfully edited event images", "success");
+    } else {
+      CreatePopup("Failed to edit event images. Try again", "error");
+    }
   };
 
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {

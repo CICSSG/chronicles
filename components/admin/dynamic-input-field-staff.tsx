@@ -130,6 +130,7 @@ export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
               "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
             )}
             onChange={(event) => handleImageChange(event, index)}
+            accept=".png,.jpg,.jpeg"
           />
           {index === inputs.length - 1 && (
             <button
