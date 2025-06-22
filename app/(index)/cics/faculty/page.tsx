@@ -30,7 +30,7 @@ export default function Faculty() {
 
 
   return (
-    <div className="flex flex-col gap-8 rounded-xl bg-white/80 p-8">
+    <div className="flex flex-col gap-8 xl:rounded-xl xl:bg-white/80 xl:p-8">
       <div className="flex flex-col gap-6">
         <h1 className="text-3xl font-bold">Faculty</h1>
         {/* <p className="text-lg font-normal">
@@ -57,7 +57,7 @@ export default function Faculty() {
                 height={200}
                 className="rounded-xl border-2 border-black/60 shadow-lg shadow-blue-300"
               />
-              <p className="text-xl font-bold">{data.name}</p>
+              <p className="text-xl font-bold mt-1.5">{data.name}</p>
               <p className="text-lg font-normal">{data.work_type}</p>
               <p className="text-base font-semibold">Specializations:</p>
               <p className="text-base font-normal">

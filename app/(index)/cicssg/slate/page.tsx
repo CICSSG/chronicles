@@ -46,13 +46,13 @@ const Slate = () => {
   }, [page]);
 
   return (
-    <div className="flex flex-col gap-4 *:rounded-2xl rounded-xl bg-white/80 p-8">
-      <div className="flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-neutral-300 *:px-8 *:py-8 *:shadow-xl">
+    <div className="flex flex-col gap-4 *:rounded-2xl xl:rounded-xl xl:bg-white/80 xl:p-8">
+      <div className="flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-white/80 *:xl:bg-neutral-300 *:px-8 *:py-8 *:xl:shadow-xl">
         <div className="bg-[url(/images/noise.png)]">
           <h2 className="text-3xl font-bold">CICSSG Slate</h2>
         </div>
       </div>
-      <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80">
+      <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] xl:p-6 text-black/80">
         <Suspense>
           <div className="no-scrollbar grid grid-cols-1 gap-4 overflow-x-auto *:rounded-xl *:bg-white/80 *:p-4 xl:grid-cols-2 3xl:grid-cols-3">
             {/* Card */}

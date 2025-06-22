@@ -17,7 +17,7 @@ export default function AdminStaff() {
   }, []);
 
   return (
-    <div className="flex flex-col gap-8 rounded-xl bg-white/80 p-8">
+    <div className="flex flex-col gap-8 xl:rounded-xl xl:bg-white/80 xl:p-8">
         <div className="flex flex-col gap-6">
           <h1 className="text-3xl">Admin & Staff</h1>
           {/* <p className="text-lg font-normal">

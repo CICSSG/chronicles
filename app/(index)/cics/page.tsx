@@ -3,7 +3,7 @@ import Image from "next/image";
 
 const About = () => {
   return (
-    <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-8">
+    <div className="grid grid-cols-1 gap-4 *:xl:rounded-xl *:xl:bg-white/80 *:xl:p-8">
       <div className="flex flex-col gap-10 text-justify">
         <Image
           src="/images/DLSUD-rotonda.jpg"

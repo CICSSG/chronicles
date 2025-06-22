@@ -43,7 +43,7 @@ const data: orgData[] = [
 
 export default function StudentOrganization() {
   return (
-    <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-8 lg:grid-cols-2">
+    <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:xl:p-8 lg:grid-cols-2">
       {data.map((data, i) => (
         <div key={i} className="flex flex-col gap-4 p-6">
           <Image

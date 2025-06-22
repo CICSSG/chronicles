@@ -2,7 +2,7 @@ import Image from "next/image";
 
 export default function Departments() {
   return (
-    <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-8">
+    <div className="grid grid-cols-1 gap-4 *:xl:rounded-xl *:xl:bg-white/80 *:xl:p-8">
       <div className="flex flex-col gap-8 p-6">
         <div className="flex flex-col gap-4">
           <h2 className="text-3xl font-bold">Departments</h2>

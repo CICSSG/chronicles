@@ -160,7 +160,7 @@ const programs: ProgramData[] = [
 
 export default function Programs() {
   return (
-    <div className="flex flex-col gap-4 rounded-xl bg-white/80 p-8">
+    <div className="flex flex-col gap-4 xl:rounded-xl xl:bg-white/80 xl:p-8">
       <h1 className="text-3xl font-bold">Programs</h1>
       <p className="text-justify text-lg font-normal">{programDescription}</p>
 
