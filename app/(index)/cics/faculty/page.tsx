@@ -33,12 +33,12 @@ export default function Faculty() {
     <div className="flex flex-col gap-8 rounded-xl bg-white/80 p-8">
       <div className="flex flex-col gap-6">
         <h1 className="text-3xl font-bold">Faculty</h1>
-        <p className="text-lg font-normal">
+        {/* <p className="text-lg font-normal">
           Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem ut
           distinctio assumenda neque quia, labore optio doloremque recusandae
           voluptates ipsam commodi delectus fugit porro, omnis iste nesciunt ab.
           Laudantium, libero.
-        </p>
+        </p> */}
       </div>
       <hr />
 
