@@ -483,6 +483,14 @@ export async function editGovernorPOST(formData: FormData) {
   const id = formData.get("id");
   const name = formData.get("name");
   const image = formData.get("image");
+  const responsibilitiesRaw = formData.get("responsibilities_data");
+  const responsibilities =
+    typeof responsibilitiesRaw === "string"
+      ? JSON.parse(responsibilitiesRaw)
+      : responsibilitiesRaw;
+  const contactRaw = formData.get("contact_data");
+  const contact =
+    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
 
   const { error } = await supabase
     .from("slate")
@@ -491,6 +499,9 @@ export async function editGovernorPOST(formData: FormData) {
         governor: {
           name: name,
           image: image,
+          position: "Governor",
+          responsibilities: responsibilities,
+          contact: contact,
         },
       },
     ])
@@ -516,6 +527,14 @@ export async function editViceGovernorPOST(formData: FormData) {
   const id = formData.get("id");
   const name = formData.get("name");
   const image = formData.get("image");
+  const responsibilitiesRaw = formData.get("responsibilities_data");
+  const responsibilities =
+    typeof responsibilitiesRaw === "string"
+      ? JSON.parse(responsibilitiesRaw)
+      : responsibilitiesRaw;
+  const contactRaw = formData.get("contact_data");
+  const contact =
+    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
 
   const { error } = await supabase
     .from("slate")
@@ -524,6 +543,9 @@ export async function editViceGovernorPOST(formData: FormData) {
         vice_governor: {
           name: name,
           image: image,
+          position: "Vice Governor",
+          responsibilities: responsibilities,
+          contact: contact,
         },
       },
     ])
@@ -610,6 +632,14 @@ export async function createOfficerPOST(formData: FormData) {
   const name = formData.get("name");
   const position = formData.get("position");
   const image = formData.get("image");
+  const responsibilitiesRaw = formData.get("responsibilities_data");
+  const responsibilities =
+    typeof responsibilitiesRaw === "string"
+      ? JSON.parse(responsibilitiesRaw)
+      : responsibilitiesRaw;
+  const contactRaw = formData.get("contact_data");
+  const contact_info =
+    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
 
   const { data } = await supabase
     .from("slate")
@@ -617,7 +647,7 @@ export async function createOfficerPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
   const directorate = data?.[0]?.directorate || [];
-  directorate.push({ name, position, image });
+  directorate.push({ name, position, image, responsibilities, contact_info });
 
   const { error } = await supabase
     .from("slate")
@@ -651,6 +681,14 @@ export async function editOfficerPOST(formData: FormData) {
   const name = formData.get("name");
   const position = formData.get("position");
   const image = formData.get("image");
+  const responsibilitiesRaw = formData.get("responsibilities_data");
+  const responsibilities =
+    typeof responsibilitiesRaw === "string"
+      ? JSON.parse(responsibilitiesRaw)
+      : responsibilitiesRaw;
+  const contactRaw = formData.get("contact_data");
+  const contact_info =
+    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
 
   const { data } = await supabase
     .from("slate")
@@ -660,7 +698,7 @@ export async function editOfficerPOST(formData: FormData) {
   const directorate = data?.[0]?.directorate || [];
 
   filtered = directorate.map((item: any) =>
-    item.name === id_name ? { name, position, image } : item,
+    item.name === id_name ? { name, position, image, responsibilities, contact_info } : item,
   );
 
   const { error } = await supabase
@@ -728,7 +766,10 @@ export async function createLegislativePOST(formData: FormData) {
 
   const id = formData.get("id");
   const name = formData.get("name");
-  const image = formData.get("image");
+  const image = formData.get("image");const responsibilitiesRaw = formData.get("responsibilities_data");
+  const contactRaw = formData.get("contact_data");
+  const contact_info =
+    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
 
   const { data } = await supabase
     .from("slate")
@@ -736,7 +777,7 @@ export async function createLegislativePOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
   const legislative = data?.[0]?.legislative || [];
-  legislative.push({ name, image });
+  legislative.push({ name, image, contact_info });
 
   const { error } = await supabase
     .from("slate")
@@ -769,6 +810,9 @@ export async function editLegislativePOST(formData: FormData) {
   const id_name = formData.get("id_name");
   const name = formData.get("name");
   const image = formData.get("image");
+  const contactRaw = formData.get("contact_data");
+  const contact_info =
+    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
 
   const { data } = await supabase
     .from("slate")
@@ -778,7 +822,7 @@ export async function editLegislativePOST(formData: FormData) {
   const legislative = data?.[0]?.legislative || [];
 
   filtered = legislative.map((item: any) =>
-    item.name === id_name ? { name, image } : item,
+    item.name === id_name ? { name, image, contact_info } : item,
   );
 
   const { error } = await supabase
@@ -848,6 +892,11 @@ export async function createJuniorOfficerPOST(formData: FormData) {
   const name = formData.get("name");
   const position = formData.get("position");
   const image = formData.get("image");
+  const responsibilitiesRaw = formData.get("responsibilities_data");
+  const responsibilities =
+    typeof responsibilitiesRaw === "string"
+      ? JSON.parse(responsibilitiesRaw)
+      : responsibilitiesRaw;
 
   const { data } = await supabase
     .from("slate")
@@ -855,7 +904,7 @@ export async function createJuniorOfficerPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
   const junior_officers = data?.[0]?.junior_officers || [];
-  junior_officers.push({ name, position, image });
+  junior_officers.push({ name, position, image, responsibilities });
 
   const { error } = await supabase
     .from("slate")
@@ -889,6 +938,11 @@ export async function editJuniorOfficerPOST(formData: FormData) {
   const name = formData.get("name");
   const position = formData.get("position");
   const image = formData.get("image");
+  const responsibilitiesRaw = formData.get("responsibilities_data");
+  const responsibilities =
+    typeof responsibilitiesRaw === "string"
+      ? JSON.parse(responsibilitiesRaw)
+      : responsibilitiesRaw;
 
   const { data } = await supabase
     .from("slate")
@@ -898,7 +952,7 @@ export async function editJuniorOfficerPOST(formData: FormData) {
   const junior_officers = data?.[0]?.junior_officers || [];
 
   filtered = junior_officers.map((item: any) =>
-    item.name === id_name ? { name, position, image } : item,
+    item.name === id_name ? { name, position, image, responsibilities } : item,
   );
 
   const { error } = await supabase

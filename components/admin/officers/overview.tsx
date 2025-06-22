@@ -22,6 +22,8 @@ import {
 } from "@/app/actions";
 import { imgurUpload } from "@/utils/imgur-upload";
 import { CreatePopup } from "../alert-fragment";
+import DynamicInputFieldsResponsibilities from "../dynamic-input-field-responsibilities";
+import DynamicInputFieldsContactInfo from "../dynamic-input-field-contact-info";
 
 export default function OfficersOverview({ document }: { document: any }) {
   const [editImageForm, setImageForm] = useState(false);
@@ -84,7 +86,9 @@ export default function OfficersOverview({ document }: { document: any }) {
     setImage(document?.adviser?.image || "");
   };
 
-  const handleEditAdviserSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEditAdviserSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     if (image == "" && base64Image != "") {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
@@ -107,7 +111,9 @@ export default function OfficersOverview({ document }: { document: any }) {
     setImage(document?.governor?.image || "");
   };
 
-  const handleEditGovernorSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEditGovernorSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     if (image == "" && base64Image != "") {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
@@ -130,7 +136,9 @@ export default function OfficersOverview({ document }: { document: any }) {
     setImage(document?.vice_governor?.image || "");
   };
 
-  const handleEditViceGovernorSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleEditViceGovernorSubmit = async (
+    e: React.FormEvent<HTMLFormElement>,
+  ) => {
     if (image == "" && base64Image != "") {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
@@ -652,6 +660,24 @@ export default function OfficersOverview({ document }: { document: any }) {
                             )}
                           </div>
                         </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-row items-center gap-4">
+                            <DynamicInputFieldsResponsibilities
+                              data={
+                                document && document.governor.responsibilities
+                              }
+                            />
+                          </Field>
+                        </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-row items-center gap-4">
+                            <DynamicInputFieldsContactInfo
+                              data={document && document.governor.contact_info}
+                            />
+                          </Field>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -782,6 +808,24 @@ export default function OfficersOverview({ document }: { document: any }) {
                               </div>
                             )}
                           </div>
+                        </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-row items-center gap-4">
+                            <DynamicInputFieldsResponsibilities
+                              data={
+                                document && document.vice_governor.responsibilities
+                              }
+                            />
+                          </Field>
+                        </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-row items-center gap-4">
+                            <DynamicInputFieldsContactInfo
+                              data={document && document.vice_governor.contact_info}
+                            />
+                          </Field>
                         </div>
                       </div>
                     </div>

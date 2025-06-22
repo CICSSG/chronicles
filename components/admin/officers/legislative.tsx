@@ -21,12 +21,14 @@ import {
 } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/20/solid";
 import { CreatePopup } from "../alert-fragment";
+import { ContactInfo } from "./executive";
+import DynamicInputFieldsContactInfo from "../dynamic-input-field-contact-info";
 
 export default function LegislativeOverview({ document }: { document: any }) {
   const [createOfficerForm, setCreateOfficerForm] = useState(false);
   const [editOfficerForm, setEditOfficerForm] = useState(false);
   const [editOfficerName, setEditOfficerName] = useState("");
-  const [editOfficerPosition, setEditOfficerPosition] = useState("");
+  const [editOfficerContact, setEditOfficerContact] = useState<ContactInfo[]>();
   const [deleteForm, setDeleteForm] = useState(false);
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
@@ -123,7 +125,7 @@ export default function LegislativeOverview({ document }: { document: any }) {
     setEditOfficerForm(true);
     setBase64Image("");
     setEditOfficerName(filtered[0]?.name || "");
-    setEditOfficerPosition(filtered[0]?.position || "");
+    setEditOfficerContact(filtered[0]?.contact_info || {});
     setImage(filtered[0]?.image || "");
   }
 
@@ -312,6 +314,12 @@ export default function LegislativeOverview({ document }: { document: any }) {
                               </div>
                             )}
                           </div>
+
+                          <div className="w-full max-w-md">
+                            <Field className="flex flex-row items-center gap-4">
+                              <DynamicInputFieldsContactInfo />
+                            </Field>
+                          </div>
                         </div>
                       </div>
                     </div>
@@ -438,6 +446,14 @@ export default function LegislativeOverview({ document }: { document: any }) {
                               </div>
                             )}
                           </div>
+                        </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-row items-center gap-4">
+                            <DynamicInputFieldsContactInfo
+                              data={editOfficerContact}
+                            />
+                          </Field>
                         </div>
                       </div>
                     </div>

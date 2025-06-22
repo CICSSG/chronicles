@@ -21,12 +21,22 @@ import {
 } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/20/solid";
 import { CreatePopup } from "../alert-fragment";
+import DynamicInputFieldsResponsibilities from "../dynamic-input-field-responsibilities";
+import DynamicInputFieldsContactInfo from "../dynamic-input-field-contact-info";
+
+export type ContactInfo = {
+  platform: string;
+  link: string;
+};
 
 export default function ExecutiveOverview({ document }: { document: any }) {
   const [createOfficerForm, setCreateOfficerForm] = useState(false);
   const [editOfficerForm, setEditOfficerForm] = useState(false);
   const [editOfficerName, setEditOfficerName] = useState("");
   const [editOfficerPosition, setEditOfficerPosition] = useState("");
+  const [editOfficerResponsibilities, setEditOfficerResponsibilities] =
+    useState<string[]>();
+  const [editOfficerContact, setEditOfficerContact] = useState<ContactInfo[]>();
   const [deleteForm, setDeleteForm] = useState(false);
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
@@ -59,22 +69,22 @@ export default function ExecutiveOverview({ document }: { document: any }) {
   }, [base64Image]);
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-      if (image == "" && base64Image != "") {
-        CreatePopup("Image was not uploaded yet. Please wait", "error");
+    if (image == "" && base64Image != "") {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    } else {
+      const formData = new FormData(e.currentTarget);
+      formData.set("image", image ?? "");
+      const result = await createOfficerPOST(formData);
+      setBase64Image("");
+      setImage("");
+      setCreateOfficerForm(false);
+      if (result.success) {
+        CreatePopup("Successfully created officer", "success");
       } else {
-        const formData = new FormData(e.currentTarget);
-        formData.set("image", image ?? "");
-        const result = await createOfficerPOST(formData);
-        setBase64Image("");
-        setImage("");
-        setCreateOfficerForm(false);
-        if (result.success) {
-          CreatePopup("Successfully created officer", "success");
-        } else {
-          CreatePopup("Failed to create officer", "error");
-        }
+        CreatePopup("Failed to create officer", "error");
       }
-    };
+    }
+  };
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (image == "" && base64Image != "") {
@@ -124,6 +134,8 @@ export default function ExecutiveOverview({ document }: { document: any }) {
     setBase64Image("");
     setEditOfficerName(filtered[0]?.name || "");
     setEditOfficerPosition(filtered[0]?.position || "");
+    setEditOfficerResponsibilities(filtered[0]?.responsibilities || []);
+    setEditOfficerContact(filtered[0]?.contact_info || {});
     setImage(filtered[0]?.image || "");
   }
 
@@ -331,6 +343,18 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                             )}
                           </div>
                         </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-row items-center gap-4">
+                            <DynamicInputFieldsResponsibilities />
+                          </Field>
+                        </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-row items-center gap-4">
+                            <DynamicInputFieldsContactInfo />
+                          </Field>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -474,6 +498,22 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                             )}
                           </div>
                         </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-row items-center gap-4">
+                            <DynamicInputFieldsResponsibilities
+                              data={editOfficerResponsibilities}
+                            />
+                          </Field>
+                        </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-row items-center gap-4">
+                            <DynamicInputFieldsContactInfo
+                              data={editOfficerContact}
+                            />
+                          </Field>
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -517,10 +557,12 @@ export default function ExecutiveOverview({ document }: { document: any }) {
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
-              <form onSubmit={(e) => {
-                e.preventDefault();
-                handleDeleteSubmit(e);
-              }}>
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                  handleDeleteSubmit(e);
+                }}
+              >
                 <input
                   type="text"
                   name="id"
