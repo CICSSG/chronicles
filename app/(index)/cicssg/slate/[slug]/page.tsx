@@ -18,6 +18,14 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 
+const LegislativeResponsibilities = {
+  position: "Legislative Council",
+  responsibilities: [
+    "Writes and passes ordinances that promotes the general welfare of the college and its students of the college and its students and other concerns.",
+    "Oversees the implementation of ordinances for college projects.",
+  ],
+};
+
 export default function Page() {
   const NO_DATA_MESSAGE = "No data available";
   const params = useParams();
@@ -41,17 +49,40 @@ export default function Page() {
     });
   }, [slug]);
 
-  const handleViewResponsibilities = (position: string | null) => {
-    if (position != null) {
-      const data = document.directorate.find(
-        (item: { position?: string }) =>
-          item.position && item.position.includes(position),
-      );
+  const handleCloseDialog = () => {
+    setResponsibilitiesData(null);
+  };
 
-      setResponsibilitiesData(data);
-    } else {
-      setResponsibilitiesData(null);
+  const handleViewResponsibilitiesGovVgov = (position: string) => {
+    if (position == "Governor") {
+      setResponsibilitiesData(document.governor);
     }
+
+    if (position == "Vice Governor") {
+      setResponsibilitiesData(document.vice_governor);
+    }
+  };
+
+  const handleViewResponsibilitiesLegislative = () => {
+    setResponsibilitiesData(LegislativeResponsibilities);
+  };
+
+  const handleViewResponsibilitiesDirectorate = (position: string) => {
+    const data = document.directorate.find(
+      (item: { position?: string }) =>
+        item.position && item.position.includes(position),
+    );
+
+    setResponsibilitiesData(data);
+  };
+
+  const handleViewResponsibilitiesJuniorOfficer = (position: string) => {
+    const data = document.junior_officers.find(
+      (item: { position?: string }) =>
+        item.position && item.position.includes(position),
+    );
+
+    setResponsibilitiesData(data);
   };
 
   useEffect(() => {
@@ -133,6 +164,16 @@ export default function Page() {
                 />
                 <h1 className="text-xl font-bold">Governor</h1>
                 <p className="text-xl font-medium">{document.governor.name}</p>
+                {document.governor.responsibilities && (
+                  <Button
+                    onClick={() =>
+                      handleViewResponsibilitiesGovVgov("Governor")
+                    }
+                    className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
+                  >
+                    Responsibilities
+                  </Button>
+                )}
               </div>
             )}
             {document && document.vice_governor && (
@@ -152,6 +193,16 @@ export default function Page() {
                 <p className="text-xl font-medium">
                   {document.vice_governor.name}
                 </p>
+                {document.vice_governor.responsibilities && (
+                  <Button
+                    onClick={() =>
+                      handleViewResponsibilitiesGovVgov("Vice Governor")
+                    }
+                    className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
+                  >
+                    Responsibilities
+                  </Button>
+                )}
               </div>
             )}
           </div>
@@ -193,7 +244,7 @@ export default function Page() {
                       </p>
                       <Button
                         onClick={() =>
-                          handleViewResponsibilities(data.position)
+                          handleViewResponsibilitiesDirectorate(data.position)
                         }
                         className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
                       >
@@ -209,7 +260,17 @@ export default function Page() {
         {/* Legislative Council */}
         {document && document.legislative && (
           <div className="flex flex-col items-center gap-8">
-            <h1 className="text-4xl">Legislative Council</h1>
+            <div className="flex flex-col xl:flex-row gap-4">
+              <h1 className="text-4xl flex flex-row gap-4">Legislative Council <span className="hidden xl:block">-</span></h1>
+            <Button
+              onClick={() =>
+                handleViewResponsibilitiesLegislative()
+              }
+              className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
+            >
+              Responsibilities
+            </Button>
+            </div>
             {document.legislative.length == 0 && (
               <span className="text-center text-xl font-normal">
                 {NO_DATA_MESSAGE}
@@ -279,6 +340,14 @@ export default function Page() {
                       <p className="mt-auto text-center text-xl font-medium">
                         {data.name}
                       </p>
+                      <Button
+                        onClick={() =>
+                          handleViewResponsibilitiesJuniorOfficer(data.position)
+                        }
+                        className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
+                      >
+                        Responsibilities
+                      </Button>
                     </div>
                   ),
                 )}
@@ -318,7 +387,23 @@ export default function Page() {
                         ))}
                       </p>
                     </div>
-                    <div className="collapse-content text-sm">
+                    <div className="collapse-content flex flex-col gap-3 text-sm">
+                      {committeeData.responsibilities.length > 0 && (
+                        <div className="flex flex-col gap-3">
+                          <h1 className="text-xl font-semibold">
+                            Responsibilities
+                          </h1>
+                          <ul className="list list-inside list-disc text-lg font-normal">
+                            {committeeData.responsibilities.map(
+                              (data: string, i: number) => (
+                                <li key={i}>{data}</li>
+                              ),
+                            )}
+                          </ul>
+                          <hr />
+                        </div>
+                      )}
+                      <h1 className="text-xl font-semibold">Committees</h1>
                       <ul className="list *:text-lg">
                         {committeeData.committees.map(
                           (data: string, i: number) => (
@@ -339,15 +424,14 @@ export default function Page() {
 
       <Dialog
         open={viewResponsibilities}
-        onClose={() => handleViewResponsibilities(null)}
+        onClose={() => handleCloseDialog()}
         className="relative z-10"
       >
-
         <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
-          <div className="flex flex-col min-h-dvh items-center justify-center p-4 text-center sm:items-center sm:p-0">
+          <div className="flex min-h-dvh flex-col items-center justify-center p-4 text-center sm:items-center sm:p-0">
             <DialogPanel
               transition
-              className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 w-full sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+              className="relative w-full transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
             >
               <form
                 onSubmit={(e) => {
@@ -370,9 +454,11 @@ export default function Page() {
                         {responsibilitiesData?.position}
                       </DialogTitle>
                       <div className="mt-2">
-                        <ul className="list list-disc list-inside">
+                        <ul className="list list-inside list-disc">
                           {responsibilitiesData?.responsibilities ? null : (
-                            <li className="text-sm text-black/80">No data found.</li>
+                            <li className="text-sm text-black/80">
+                              No data found.
+                            </li>
                           )}
                           {responsibilitiesData?.responsibilities?.map(
                             (data: string, i: number) => (
@@ -390,7 +476,7 @@ export default function Page() {
                   <button
                     type="button"
                     data-autofocus
-                    onClick={() => handleViewResponsibilities(null)}
+                    onClick={() => handleCloseDialog()}
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
                   >
                     Close
