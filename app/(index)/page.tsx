@@ -86,7 +86,7 @@ export default function Home() {
             <div className="*md:text-2xl *: relative left-0 mx-auto max-w-4xl text-white *:absolute *:aspect-[9/16] *:w-3xs *:rounded-2xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:p-4 *:transition-all *:hover:scale-102 *:md:w-xs">
               <Link
                 href={"/resolutions"}
-                className="xl: 3xl:-left-6 top-25 left-2/12 z-4 scale-90 sm:top-20 sm:-left-4 sm:z-4 sm:scale-80 sm:-rotate-12 sm:text-center md:top-24 md:left-8 md:scale-90 md:text-left lg:left-6 xl:top-26 xl:scale-95"
+                className="3xl:-left-6 top-25 left-2/12 z-4 scale-90 sm:top-20 sm:-left-4 sm:z-4 sm:scale-80 sm:-rotate-12 sm:text-center md:top-24 md:left-8 md:scale-90 md:text-left lg:left-6 xl:top-26 xl:scale-95"
               >
                 Resolutions
               </Link>

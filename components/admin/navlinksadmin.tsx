@@ -3,7 +3,7 @@ import { currentUser } from "@clerk/nextjs/server";
 import Link from "next/link";
 import React from "react";
 
-import { RiDashboardLine } from "react-icons/ri";
+import { RiContactsBook2Line, RiDashboardLine } from "react-icons/ri";
 import { FiLogOut, FiUser } from "react-icons/fi";
 import { IoDocuments } from "react-icons/io5";
 import { GiPoliceOfficerHead, GiTeacher } from "react-icons/gi";
@@ -38,62 +38,77 @@ async function NavLinksAdmin() {
           </li>
           <li>
             <Link
-              href="/admin/documents?page=1"
+              href="/admin/contacts"
               className="flex w-fit flex-nowrap items-center gap-2"
             >
-              <IoDocuments className="text-3xl" />
-              <span className="hidden group-hover:block">Documents</span>
+              <RiContactsBook2Line className="w-fit text-3xl" />
+              <span className="hidden group-hover:block">Contact</span>
             </Link>
           </li>
-          <li>
-            <Link
-              href="/admin/announcements"
-              className="flex w-fit flex-nowrap items-center gap-2"
-            >
-              <MegaphoneIcon className="size-7 text-3xl" />
-              <span className="hidden group-hover:block">Announcements</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/admin/events"
-              className="flex w-fit flex-nowrap items-center gap-2"
-            >
-              <CalendarDaysIcon className="size-7 text-3xl" />
-              <span className="hidden group-hover:block">Events</span>
-            </Link>
-          </li>
-          <li>
-            <Link
-              href="/admin/officers"
-              className="flex w-fit flex-nowrap items-center gap-2"
-            >
-              <GiPoliceOfficerHead className="text-3xl" />
-              <span className="hidden group-hover:block">Slate</span>
-            </Link>
-          </li>
+          {(user?.publicMetadata.role == "data" || user?.publicMetadata.role == "admin") && (
+            <>
+              <li>
+                <Link
+                  href="/admin/documents?page=1"
+                  className="flex w-fit flex-nowrap items-center gap-2"
+                >
+                  <IoDocuments className="text-3xl" />
+                  <span className="hidden group-hover:block">Documents</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/announcements"
+                  className="flex w-fit flex-nowrap items-center gap-2"
+                >
+                  <MegaphoneIcon className="size-7 text-3xl" />
+                  <span className="hidden group-hover:block">
+                    Announcements
+                  </span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/events"
+                  className="flex w-fit flex-nowrap items-center gap-2"
+                >
+                  <CalendarDaysIcon className="size-7 text-3xl" />
+                  <span className="hidden group-hover:block">Events</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/officers"
+                  className="flex w-fit flex-nowrap items-center gap-2"
+                >
+                  <GiPoliceOfficerHead className="text-3xl" />
+                  <span className="hidden group-hover:block">Slate</span>
+                </Link>
+              </li>
 
-          <li>
-            <Link
-              href="/admin/admin-staff"
-              className="flex w-fit flex-nowrap items-center gap-2"
-            >
-              <BuildingIcon className="text-3xl" />
-              <span className="hidden text-nowrap group-hover:block">
-                Admin & Staff
-              </span>
-            </Link>
-          </li>
+              <li>
+                <Link
+                  href="/admin/admin-staff"
+                  className="flex w-fit flex-nowrap items-center gap-2"
+                >
+                  <BuildingIcon className="text-3xl" />
+                  <span className="hidden text-nowrap group-hover:block">
+                    Admin & Staff
+                  </span>
+                </Link>
+              </li>
 
-          <li>
-            <Link
-              href="/admin/faculty"
-              className="flex w-fit flex-nowrap items-center gap-2"
-            >
-              <GiTeacher className="text-3xl" />
-              <span className="hidden group-hover:block">Faculty</span>
-            </Link>
-          </li>
+              <li>
+                <Link
+                  href="/admin/faculty"
+                  className="flex w-fit flex-nowrap items-center gap-2"
+                >
+                  <GiTeacher className="text-3xl" />
+                  <span className="hidden group-hover:block">Faculty</span>
+                </Link>
+              </li>
+            </>
+          )}
 
           {user?.publicMetadata.role == "admin" && (
             <li>
@@ -109,9 +124,12 @@ async function NavLinksAdmin() {
 
           <div className="mt-auto flex flex-col flex-nowrap items-center gap-2 group-hover:items-stretch">
             <li>
-              <Link href="/admin/profile" className='flex items-center flex-nowrap gap-2 w-fit'>
-                <FiUser className='text-3xl' />
-                <span className='hidden group-hover:block'>Profile</span>
+              <Link
+                href="/admin/profile"
+                className="flex w-fit flex-nowrap items-center gap-2"
+              >
+                <FiUser className="text-3xl" />
+                <span className="hidden group-hover:block">Profile</span>
               </Link>
             </li>
             <SignOutButton>
