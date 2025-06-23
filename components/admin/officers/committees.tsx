@@ -22,6 +22,7 @@ import { ExclamationTriangleIcon } from "@heroicons/react/20/solid";
 import DynamicInputFieldsCommitteeHead from "./dynamic-input-field-committee-head";
 import DynamicInputFieldsCommittee from "./dynamic-input-field-committee";
 import { CreatePopup } from "../alert-fragment";
+import DynamicInputFieldsResponsibilities from "../dynamic-input-field-responsibilities";
 
 export default function CommitteesOverview({ document }: { document: any }) {
   const [createOfficerForm, setCreateOfficerForm] = useState(false);
@@ -223,6 +224,14 @@ export default function CommitteesOverview({ document }: { document: any }) {
                             />
                           </Field>
                         </div>
+                        <div className="w-full max-w-md grow basis-0">
+                          <Field className="flex flex-col items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-black">
+                              Responsibilities
+                            </Label>
+                            <DynamicInputFieldsResponsibilities />
+                          </Field>
+                        </div>
                       </div>
                       <div className="mt-4 flex w-full flex-row gap-4">
                         <div className="w-full max-w-md grow basis-0">
@@ -332,6 +341,15 @@ export default function CommitteesOverview({ document }: { document: any }) {
                               required
                               defaultValue={editCommitteeName}
                             />
+                          </Field>
+                        </div>
+                        <div className="w-full max-w-md grow basis-0">
+                          <Field className="flex flex-col items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-black">
+                              Responsibilities
+                            </Label>
+                            <DynamicInputFieldsResponsibilities
+                            data={document && document.committees[editCommitteeName]?.responsibilities}/>
                           </Field>
                         </div>
                       </div>

@@ -74,6 +74,19 @@ const AdminOfficers = () => {
     }
   };
 
+  const handleRemoveRole = async (e: React.FormEvent<HTMLFormElement>) => {
+    const formData = new FormData(e.currentTarget);
+    CreatePopup("Updating user");
+    const result = await removeRole(formData);
+
+    if (result.success) {
+      handleFetchUsers();
+      CreatePopup("Successful edit", "success");
+    } else {
+      CreatePopup("Failed to edit, try again", "error");
+    }
+  };
+
   const handleCreateUser = (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
     createUser(formData)
@@ -137,16 +150,18 @@ const AdminOfficers = () => {
             <th>Username</th>
             <th>Role</th>
             <th>Actions</th>
+            <th></th>
           </thead>
 
           <tbody>
             {users.map((userData) => {
               if (user.id != userData.id && userData.username != "governor") {
+                console.log(user.publicMetadata.role)
                 return (
                   <tr key={userData.id} className="w-fit">
                     <td>{userData.username}</td>
                     <td>{userData.publicMetadata.role as string}</td>
-                    <td className="grid grid-cols-2 gap-2 text-center *:rounded-lg *:border *:px-2 *:py-2">
+                    <td className="grid grid-flow-col gap-2 text-center *:rounded-lg *:border *:px-2 *:py-2">
                       {userData.publicMetadata.role != "admin" && (
                         <form
                           onSubmit={(e) => {
@@ -175,6 +190,23 @@ const AdminOfficers = () => {
                         </form>
                       )}
 
+                      {user.publicMetadata.role == "admin" || user.publicMetadata.role == "data" ? null : (
+                        <form
+                          onSubmit={(e) => {
+                            e.preventDefault();
+                            handleRemoveRole(e);
+                          }}
+                          className="bg-red-800 hover:cursor-pointer hover:bg-red-700"
+                        >
+                          <input type="hidden" value={userData.id} name="id" />
+                          <button type="submit">Remove Role</button>
+                        </form>
+                      )}
+                    </td>
+
+                    
+
+                    <td className="text-center *:rounded-lg *:border *:px-2 *:py-2">
                       <form
                         onSubmit={(e) => {
                           e.preventDefault();
@@ -337,10 +369,7 @@ const AdminOfficers = () => {
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">
                           Are you sure you want to delete{" "}
-                          <span className="font-bold">
-                            {deleteUsername}
-                          </span>
-                          ?
+                          <span className="font-bold">{deleteUsername}</span>?
                         </p>
                       </div>
                       <div className="hidden">

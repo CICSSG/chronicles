@@ -501,7 +501,7 @@ export async function editGovernorPOST(formData: FormData) {
           image: image,
           position: "Governor",
           responsibilities: responsibilities,
-          contact: contact,
+          contact_info: contact,
         },
       },
     ])
@@ -545,7 +545,7 @@ export async function editViceGovernorPOST(formData: FormData) {
           image: image,
           position: "Vice Governor",
           responsibilities: responsibilities,
-          contact: contact,
+          contact_info: contact,
         },
       },
     ])
@@ -1022,6 +1022,11 @@ export async function createCommitteePOST(formData: FormData) {
   const committee_name = formData.get("committee_name");
   const head = formData.get("committee_head_list");
   const committees = formData.get("committee_list");
+  const responsibilitiesRaw = formData.get("responsibilities_data");
+  const responsibilities =
+    typeof responsibilitiesRaw === "string"
+      ? JSON.parse(responsibilitiesRaw)
+      : responsibilitiesRaw;
 
   const { data } = await supabase
     .from("slate")
@@ -1032,6 +1037,7 @@ export async function createCommitteePOST(formData: FormData) {
   if (typeof committee_name === "string") {
     committee[committee_name] = {
       head: JSON.parse(head as string) || [],
+      responsibilities: responsibilities,
       committees: JSON.parse(committees as string) || [],
     };
   }
@@ -1073,6 +1079,11 @@ export async function editCommitteePOST(formData: FormData) {
   const committee_name = formData.get("committee_name");
   const head = formData.get("committee_head_list");
   const committees = formData.get("committee_list");
+  const responsibilitiesRaw = formData.get("responsibilities_data");
+  const responsibilities =
+    typeof responsibilitiesRaw === "string"
+      ? JSON.parse(responsibilitiesRaw)
+      : responsibilitiesRaw;
 
   const { data } = await supabase
     .from("slate")
@@ -1087,11 +1098,13 @@ export async function editCommitteePOST(formData: FormData) {
     if (committee_name === id_committee_name) {
       committee[id_committee_name] = {
         head: JSON.parse(head as string) || [],
+        responsibilities: responsibilities,
         committees: JSON.parse(committees as string) || [],
       };
     } else {
       committee[committee_name] = {
         head: JSON.parse(head as string) || [],
+        responsibilities: responsibilities,
         committees: JSON.parse(committees as string) || [],
       };
       delete committee[id_committee_name];
