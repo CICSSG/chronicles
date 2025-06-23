@@ -345,19 +345,19 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                         </div>
 
                         <div className="w-full max-w-md">
-                          <Label className="text-sm/6 font-medium text-black">
-                            Responsibilities
-                          </Label>
                           <Field className="flex flex-row items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-black">
+                              Responsibilities
+                            </Label>
                             <DynamicInputFieldsResponsibilities />
                           </Field>
                         </div>
 
                         <div className="w-full max-w-md">
-                          <Label className="text-sm/6 font-medium text-black">
-                            Contact Info
-                          </Label>
                           <Field className="flex flex-row items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-black">
+                              Contact Info
+                            </Label>
                             <DynamicInputFieldsContactInfo />
                           </Field>
                         </div>
@@ -506,10 +506,10 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                         </div>
 
                         <div className="w-full max-w-md">
-                          <Label className="text-sm/6 font-medium text-black">
-                            Responsibilities
-                          </Label>
                           <Field className="flex flex-row items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-black">
+                              Responsibilities
+                            </Label>
                             <DynamicInputFieldsResponsibilities
                               data={editOfficerResponsibilities}
                             />
@@ -517,10 +517,10 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                         </div>
 
                         <div className="w-full max-w-md">
-                          <Label className="text-sm/6 font-medium text-black">
-                            Contact Info
-                          </Label>
                           <Field className="flex flex-row items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-black">
+                              Contact Info
+                            </Label>
                             <DynamicInputFieldsContactInfo
                               data={editOfficerContact}
                             />
