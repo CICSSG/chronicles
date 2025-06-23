@@ -10,7 +10,8 @@ import { User } from "lucide-react";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
 import { Analytics } from "@vercel/analytics/next";
 import AlertFragment from "@/components/admin/alert-fragment";
-import { checkRole } from "@/utils/roles";
+import { currentUser } from "@clerk/nextjs/server";
+
 
 const spaceGrotesk = Space_Grotesk({
   display: "swap",
@@ -35,9 +36,8 @@ export default async function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const isAdmin = await checkRole('admin')
-  const isData = await checkRole('data')
-  if (!isAdmin && !isData) {
+  const user = await currentUser()
+  if (!user) {
     redirect('/')
   }
 

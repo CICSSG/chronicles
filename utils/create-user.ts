@@ -11,7 +11,6 @@ export async function createUser(formData: FormData): Promise<any> {
         username: username,
         password: password,
         skip_password_checks: true,
-        public_metadata: { role: "data" },
       }),
     });
     const response = await res.json();
