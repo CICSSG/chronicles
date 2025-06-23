@@ -156,12 +156,12 @@ const AdminOfficers = () => {
           <tbody>
             {users.map((userData) => {
               if (user.id != userData.id && userData.username != "governor") {
-                console.log(user.publicMetadata.role)
+                console.log(userData.publicMetadata.role)
                 return (
                   <tr key={userData.id} className="w-fit">
                     <td>{userData.username}</td>
                     <td>{userData.publicMetadata.role as string}</td>
-                    <td className="grid grid-flow-col gap-2 text-center *:rounded-lg *:border *:px-2 *:py-2">
+                    <td className="grid grid-cols-2 gap-2 text-center *:rounded-lg *:border *:px-2 *:py-2">
                       {userData.publicMetadata.role != "admin" && (
                         <form
                           onSubmit={(e) => {
@@ -190,7 +190,7 @@ const AdminOfficers = () => {
                         </form>
                       )}
 
-                      {user.publicMetadata.role == "admin" || user.publicMetadata.role == "data" ? null : (
+                      {userData.publicMetadata.role == "admin" || userData.publicMetadata.role == "data" ? (
                         <form
                           onSubmit={(e) => {
                             e.preventDefault();
@@ -201,7 +201,7 @@ const AdminOfficers = () => {
                           <input type="hidden" value={userData.id} name="id" />
                           <button type="submit">Remove Role</button>
                         </form>
-                      )}
+                      ) : null}
                     </td>
 
                     
