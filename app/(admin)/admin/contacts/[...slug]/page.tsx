@@ -4,7 +4,8 @@ import React, { useEffect, useState } from "react";
 import { SlatesData } from "@/components/admin/documents-data";
 import { createClient } from "@supabase/supabase-js";
 import { CreatePopup } from "@/components/admin/alert-fragment";
-import { Button } from "@headlessui/react";
+import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
+import { InformationCircleIcon } from "@heroicons/react/24/outline";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,6 +22,17 @@ export default function Page() {
         : "";
 
   const [document, setDocument] = useState<any | null>(null);
+  const [contactData, setContactData] = useState<any | null>(null);
+  const [contactDialog, setContactDialog] = useState(false);
+
+  useEffect(() => {
+    if (contactData != null) {
+      setContactDialog(true);
+    } else {
+      setContactDialog(false);
+      setContactData(null);
+    }
+  }, [contactData]);
 
   useEffect(() => {
     if (!slug) return;
@@ -48,22 +60,50 @@ export default function Page() {
     };
   }, [slug]);
 
+  const handleCloseDialog = () => {
+    setContactData(null);
+  };
+
   const handleViewDocument = (name: string, type: string) => {
     if (type == "GVG") {
       if (name == "Governor") {
+        const data = document.governor;
+        data.position = "Governor";
+
+        setContactData(data);
       }
 
       if (name == "Vice Governor") {
+        const data = document.vice_governor;
+        data.position = "Vice Governor";
+
+        setContactData(data);
       }
     }
 
     if (type == "Executive") {
+      const data = document.directorate.find(
+        (item: { name?: string }) => item.name && item.name.includes(name),
+      );
+
+      setContactData(data);
     }
 
     if (type == "Legislative") {
+      const data = document.legislative.find(
+        (item: { name?: string }) => item.name && item.name.includes(name),
+      );
+      data.position = "Legislative Councilor";
+
+      setContactData(data);
     }
 
     if (type == "Junior Officer") {
+      const data = document.junior_officers.find(
+        (item: { name?: string }) => item.name && item.name.includes(name),
+      );
+
+      setContactData(data);
     }
   };
   return (
@@ -203,6 +243,81 @@ export default function Page() {
           </tbody>
         </table>
       </div>
+
+      <Dialog
+        open={contactDialog}
+        onClose={() => handleCloseDialog()}
+        className="relative z-10"
+      >
+        <div className="fixed inset-0 z-10 w-screen overflow-y-auto">
+          <div className="flex min-h-dvh flex-col items-center justify-center p-4 text-center sm:items-center sm:p-0">
+            <DialogPanel
+              transition
+              className="relative w-full transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:max-w-lg data-closed:sm:translate-y-0 data-closed:sm:scale-95"
+            >
+              <form
+                onSubmit={(e) => {
+                  e.preventDefault();
+                }}
+              >
+                <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
+                  <div className="sm:flex sm:items-start">
+                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-blue-100 sm:mx-0 sm:size-10">
+                      <InformationCircleIcon
+                        aria-hidden="true"
+                        className="size-6 text-blue-600"
+                      />
+                    </div>
+                    <div className="mt-3 text-center sm:mt-0 sm:ml-4 sm:text-left">
+                      <DialogTitle
+                        as="h3"
+                        className="text-base font-semibold text-gray-900"
+                      >
+                        {contactData?.name}
+                      </DialogTitle>
+                      <p className="text-sm/2 font-normal text-black/50">
+                        {contactData?.position}
+                      </p>
+                      <div className="mt-2">
+                        <ul className="list list-inside list-disc">
+                          {contactData?.contact_info ? null : (
+                            <li className="text-sm text-black/80">
+                              No data found.
+                            </li>
+                          )}
+                          {contactData?.contact_info?.map(
+                            (
+                              data: { platform: string; link: string },
+                              i: number,
+                            ) => (
+                              <li key={i} className="text-sm text-black/80 font-semibold">
+                                {data.platform}:{" "}
+                                <a href={data.link} target="_blank" className="font-normal text-blue-400 hover:text-blue-300">
+                                  {data.link}
+                                </a>
+                              </li>
+                            ),
+                          )}
+                        </ul>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                  <button
+                    type="button"
+                    data-autofocus
+                    onClick={() => handleCloseDialog()}
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                  >
+                    Close
+                  </button>
+                </div>
+              </form>
+            </DialogPanel>
+          </div>
+        </div>
+      </Dialog>
     </div>
   );
 }
