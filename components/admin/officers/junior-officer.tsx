@@ -336,7 +336,7 @@ export default function JuniorOfficerOverview({ document }: { document: any }) {
                           </div>
 
                           <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
+                            <Field className="flex flex-col items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
                                 Responsibilities
                               </Label>
@@ -390,10 +390,10 @@ export default function JuniorOfficerOverview({ document }: { document: any }) {
               >
                 <div className="max-h-[800px] overflow-y-auto bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
-                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-green-100 sm:mx-0 sm:size-10">
+                    <div className="mx-auto flex size-12 shrink-0 items-center justify-center rounded-full bg-amber-100 sm:mx-0 sm:size-10">
                       <DocumentIcon
                         aria-hidden="true"
-                        className="size-6 text-green-600"
+                        className="size-6 text-amber-600"
                       />
                     </div>
                     <div className="mt-3 w-full overflow-y-scroll text-center sm:mt-0 sm:ml-4 sm:text-left">
@@ -488,7 +488,7 @@ export default function JuniorOfficerOverview({ document }: { document: any }) {
                           </div>
 
                           <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
+                            <Field className="flex flex-col items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
                                 Responsibilities
                               </Label>
