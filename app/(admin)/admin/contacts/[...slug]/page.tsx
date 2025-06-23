@@ -280,7 +280,7 @@ export default function Page() {
                       </p>
                       <div className="mt-2">
                         <ul className="list list-inside list-disc">
-                          {contactData?.contact_info ? null : (
+                          {contactData?.contact_info?.length > 0 ? null : (
                             <li className="text-sm text-black/80">
                               No data found.
                             </li>
