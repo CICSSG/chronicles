@@ -1,33 +1,14 @@
 "use client";
 import {
   Button,
-  Dialog,
-  DialogBackdrop,
-  DialogPanel,
-  DialogTitle,
-  Textarea,
 } from "@headlessui/react";
-import { DocumentIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
 import { redirect, usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
-import { Field, Input, Label } from "@headlessui/react";
-import clsx from "clsx";
-import { SlatesData, SlatesSearch } from "@/components/admin/documents-data";
-import {
-  createEventPOST,
-  createSlatePOST,
-  deleteEventPOST,
-  deleteSlatePOST,
-  editEventPOST,
-} from "@/app/actions";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import { SlatesData } from "@/components/admin/documents-data";
 import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
-import { imgurUpload } from "@/utils/imgur-upload";
-import DynamicInputFieldsProjectHead from "@/components/admin/dynamic-input-field-project-head";
-import DynamicInputFieldsHighlights from "@/components/admin/dynamic-input-field-highlights";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 
 const supabase = createClient(
@@ -38,28 +19,8 @@ const supabase = createClient(
 export default function Contacts() {
   const pathname = usePathname();
   const [page, setPage] = useQueryState("page", parseAsInteger);
-  const [title, setTitle] = useQueryState("title");
-  const [createForm, setCreateForm] = useState(false);
-  const [deleteForm, setDeleteForm] = useState(false);
   const [documents, setDocuments] = useState<any[] | null>(null);
-  const [deleteDocumentId, setDeleteDocumentId] = useState("");
-  const [deleteDocumentName, setDeleteDocumentName] = useState("");
   const [pagination, setPagination] = useState(1);
-  const [base64Image, setBase64Image] = useState<string>("");
-  const [image, setImage] = useState<string>("");
-
-  useEffect(() => {
-    if (base64Image) {
-      imgurUpload(base64Image)
-        .then((result) => {
-          console.log(result);
-          setImage(`${result.data.link}`);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [base64Image]);
 
   const setCurrentPageHandler = (value: number) => {
     setPage(value);
@@ -96,60 +57,6 @@ export default function Contacts() {
     redirect(`/admin/contacts/${id}`);
   };
 
-  const handleDeleteDocument = (id: string, name: string, open: boolean) => {
-    setDeleteDocumentId(id);
-    setDeleteDocumentName(name);
-    setDeleteForm(open);
-  };
-
-  const clearFilters = () => {
-    setPage(1);
-    setTitle(null);
-
-    SlatesData().then(({ documents, pagination }) => {
-      setDocuments(documents ?? null);
-      setPagination(pagination);
-    });
-  };
-
-  useEffect(() => {
-    SlatesSearch(title ?? undefined, page ?? undefined).then(
-      ({ documents }) => {
-        setDocuments(documents ?? null);
-      },
-    );
-  }, [page, title]);
-
-  const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
-      CreatePopup("Image was not uploaded yet. Please wait", "error");
-    } else {
-      const formData = new FormData(e.currentTarget);
-      formData.set("image", image ?? "");
-      const result = await createSlatePOST(formData);
-      setBase64Image("");
-      setImage("");
-      setCreateForm(false);
-      if (result.success) {
-        CreatePopup("Successfully created slate", "success");
-      } else {
-        CreatePopup("Failed to create slate", "error");
-      }
-    }
-  };
-
-  const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    const formData = new FormData(e.currentTarget);
-    const result = await deleteSlatePOST(formData);
-    setBase64Image("");
-    setImage("");
-    setDeleteForm(false);
-    if (result.success) {
-      CreatePopup("Successfully deleted slate", "success");
-    } else {
-      CreatePopup("Failed to delete slate", "error");
-    }
-  };
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
       <div className="flex grow-0 basis-0 flex-row items-center justify-between">
