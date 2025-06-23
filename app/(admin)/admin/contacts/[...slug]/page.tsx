@@ -290,11 +290,27 @@ export default function Page() {
                               data: { platform: string; link: string },
                               i: number,
                             ) => (
-                              <li key={i} className="text-sm text-black/80 font-semibold">
+                              <li
+                                key={i}
+                                className="text-sm font-semibold text-black/80"
+                              >
                                 {data.platform}:{" "}
-                                <a href={data.link} target="_blank" className="font-normal text-blue-400 hover:text-blue-300">
-                                  {data.link}
-                                </a>
+                                {data.platform == "Email" ||
+                                data.platform == "Contact Number" ? (
+                                  <span
+                                    className="font-normal text-black/80"
+                                  >
+                                    {data.link}
+                                  </span>
+                                ) : (
+                                  <a
+                                    href={data.link}
+                                    target="_blank"
+                                    className="font-normal text-blue-400 hover:text-blue-300"
+                                  >
+                                    {data.link}
+                                  </a>
+                                )}
                               </li>
                             ),
                           )}

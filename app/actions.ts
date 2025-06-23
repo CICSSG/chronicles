@@ -1037,7 +1037,7 @@ export async function createCommitteePOST(formData: FormData) {
   if (typeof committee_name === "string") {
     committee[committee_name] = {
       head: JSON.parse(head as string) || [],
-      responsibilities: JSON.parse(responsibilities as string) || [],
+      responsibilities: responsibilities,
       committees: JSON.parse(committees as string) || [],
     };
   }
@@ -1098,13 +1098,13 @@ export async function editCommitteePOST(formData: FormData) {
     if (committee_name === id_committee_name) {
       committee[id_committee_name] = {
         head: JSON.parse(head as string) || [],
-        responsibilities: JSON.parse(responsibilities as string) || [],
+        responsibilities: responsibilities,
         committees: JSON.parse(committees as string) || [],
       };
     } else {
       committee[committee_name] = {
         head: JSON.parse(head as string) || [],
-        responsibilities: JSON.parse(responsibilities as string) || [],
+        responsibilities: responsibilities,
         committees: JSON.parse(committees as string) || [],
       };
       delete committee[id_committee_name];
