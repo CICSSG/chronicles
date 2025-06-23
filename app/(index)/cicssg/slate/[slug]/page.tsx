@@ -164,7 +164,7 @@ export default function Page() {
                 />
                 <h1 className="text-xl font-bold">Governor</h1>
                 <p className="text-xl font-medium">{document.governor.name}</p>
-                {document.governor.responsibilities && (
+                {document.governor.responsibilities?.length > 0 && (
                   <Button
                     onClick={() =>
                       handleViewResponsibilitiesGovVgov("Governor")
@@ -193,7 +193,7 @@ export default function Page() {
                 <p className="text-xl font-medium">
                   {document.vice_governor.name}
                 </p>
-                {document.vice_governor.responsibilities && (
+                {document.vice_governor.responsibilities?.length > 0 && (
                   <Button
                     onClick={() =>
                       handleViewResponsibilitiesGovVgov("Vice Governor")
@@ -260,16 +260,25 @@ export default function Page() {
         {/* Legislative Council */}
         {document && document.legislative && (
           <div className="flex flex-col items-center gap-8">
-            <div className="flex flex-col xl:flex-row gap-4">
-              <h1 className="text-4xl flex flex-row gap-4">Legislative Council <span className="hidden xl:block">-</span></h1>
-            <Button
-              onClick={() =>
-                handleViewResponsibilitiesLegislative()
-              }
-              className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
-            >
-              Responsibilities
-            </Button>
+            <div className="flex flex-col gap-4 xl:flex-row">
+              {document.legislative.length > 0 ? (
+                <>
+                  <h1 className="flex flex-row gap-4 text-4xl">
+                    Legislative Council{" "}
+                    <span className="hidden xl:block">-</span>
+                  </h1>
+                  <Button
+                    onClick={() => handleViewResponsibilitiesLegislative()}
+                    className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
+                  >
+                    Responsibilities
+                  </Button>
+                </>
+              ) : (
+                <h1 className="flex flex-row gap-4 text-4xl">
+                  Legislative Council
+                </h1>
+              )}
             </div>
             {document.legislative.length == 0 && (
               <span className="text-center text-xl font-normal">

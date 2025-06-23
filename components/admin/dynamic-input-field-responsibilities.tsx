@@ -53,17 +53,13 @@ export default function DynamicInputFieldsResponsibilities({
 
   return (
     <div className="container flex flex-col gap-2">
-      {inputs.length === 0 ? (
+      {inputs.length === 0 && (
         <button
           onClick={() => handleAddInput()}
           className="rounded-md bg-green-500 px-3 py-1.5 text-sm font-bold text-nowrap text-white"
         >
           Add Responsibility
         </button>
-      ) : (
-        <div className="flex flex-row justify-around gap-1 text-sm font-semibold text-black">
-          <span>Responsibility</span>
-        </div>
       )}
       {inputs.map((item, index) => (
         <div className="input_container flex flex-row gap-1" key={index}>
