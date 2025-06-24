@@ -83,28 +83,28 @@ export default function Home() {
           {/* Documents */}
           <div className="h-72 overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-blue-100 transition-all">
             <h2 className="pt-5 pl-5">Documents</h2>
-            <div className="md:text-3xl 3xl:text-4xl relative left-0 mx-auto max-w-4xl text-white *:absolute *:aspect-[9/16] *:w-3xs *:rounded-4xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:md:px-6 *:px-4 *:py-4 *:transition-all *:hover:scale-102 *:md:w-xs">
+            <div className="relative left-0 mx-auto max-w-4xl text-white *:absolute *:aspect-[9/16] *:w-3xs *:rounded-4xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:px-4 *:py-4 *:transition-all md:text-3xl *:md:w-xs *:md:px-6 xl:text-4xl *:2xl:scale-95 *:2xl:hover:scale-102">
               <Link
                 href={"/resolutions"}
-                className="3xl:left-2 3xl:-rotate-25 3xl:top-24 top-25 left-2/12 z-4 scale-90 sm:top-20 sm:-left-4 sm:z-4 sm:scale-80 sm:-rotate-12 sm:text-center md:top-24 md:left-8 md:scale-90 md:text-left lg:left-6 xl:top-26 xl:scale-95"
+                className="3xl:left-2 3xl:-rotate-25 3xl:top-24 top-25 left-2/12 z-4 scale-90 sm:top-20 sm:-left-4 sm:z-4 sm:scale-80 sm:-rotate-12 sm:text-center md:top-18 md:left-0 md:scale-70 md:-rotate-20 md:text-left md:hover:scale-73 lg:top-20 lg:left-6 lg:scale-80 lg:hover:scale-85 xl:top-14 xl:left-3 xl:scale-70 xl:-rotate-25 xl:hover:scale-75"
               >
                 Resolutions
               </Link>
               <Link
                 href={"/executive-orders"}
-                className="3xl:-rotate-10 3xl:left-[24.5%] 3xl:top-0 top-6 left-2/12 z-3 scale-80 sm:top-4 sm:left-1/12 sm:z-2 sm:scale-80 sm:-rotate-8 md:top-8 md:left-2/12 md:scale-90 lg:top-5 lg:left-1/6 xl:top-6 xl:left-1/5 xl:scale-95"
+                className="3xl:-rotate-10 3xl:left-[24.5%] 3xl:top-0 top-6 left-2/12 z-3 scale-80 sm:top-4 sm:left-1/12 sm:z-2 sm:scale-80 sm:-rotate-8 md:top-6 md:left-[24%] md:scale-70 md:hover:scale-73 lg:top-5 lg:left-3/12 lg:scale-80 lg:hover:scale-85 xl:top-0 xl:left-[22%] xl:scale-70 xl:hover:scale-75"
               >
                 Executive Orders
               </Link>
               <Link
                 href={"/ordinances"}
-                className="3xl:right-30 3xl: -top-10 right-1/6 z-2 scale-70 sm:-top-8 sm:right-2/12 sm:z-1 sm:scale-80 sm:rotate-3 md:right-1/6 md:scale-90 lg:-top-9 lg:right-3/12 xl:right-2/12 xl:scale-95"
+                className="3xl:right-30 3xl: -top-10 right-1/6 z-2 scale-70 sm:-top-8 sm:right-2/12 sm:z-1 sm:scale-80 sm:rotate-3 md:right-[4%] md:top-2 md:scale-70 md:hover:scale-73 lg:top-0 lg:right-[14%] lg:scale-80 lg:hover:scale-85 xl:-top-4 xl:right-[10%] xl:scale-70 xl:hover:scale-75"
               >
                 Ordinances
               </Link>
               <Link
                 href={"/formal-documents"}
-                className="3xl:-right-10 3xl:rotate-20 -top-24 right-1/6 z-1 scale-60 sm:top-16 sm:-right-2 sm:z-3 sm:scale-80 sm:rotate-12 md:-right-8 md:scale-90 lg:-right-2 xl:-right-8 xl:scale-95"
+                className="3xl:-right-10 3xl:rotate-20 -top-24 right-1/6 z-1 scale-60 sm:top-16 sm:-right-2 sm:z-3 sm:scale-80 sm:rotate-25 md:-right-16 md:scale-70 md:hover:scale-73 lg:-right-2 lg:scale-80 lg:hover:scale-85 xl:top-14 xl:-right-10 xl:scale-70 xl:rotate-20 xl:hover:scale-75"
               >
                 Formal Documents
               </Link>
