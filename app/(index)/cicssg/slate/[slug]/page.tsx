@@ -95,7 +95,7 @@ export default function Page() {
   }, [responsibilitiesData]);
 
   return (
-    <div className="flex w-full flex-col gap-4 *:rounded-2xl md:flex-row">
+    <div className="flex w-full flex-col gap-4 *:rounded-2xl xl:flex-row">
       <div className="sticky flex grow-1 basis-0 flex-col gap-4 text-black/60 *:rounded-2xl *:bg-neutral-100 *:px-6 *:py-8 *:shadow-xl">
         <div className="bg-[url(/images/noise.png)]">
           <Link

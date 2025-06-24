@@ -13,7 +13,7 @@ export default function RootLayout({
     return <>{children}</>;
   }
   return (
-    <div className="flex w-full flex-col gap-4 *:rounded-2xl md:flex-row">
+    <div className="flex flex-col gap-4 *:rounded-2xl md:flex-row w-full">
       <div className="sticky flex grow-1 basis-0 flex-col gap-4 text-black/60 *:rounded-2xl *:bg-neutral-300 *:px-6 *:py-8 *:shadow-xl">
         <div className="rounded-2xl bg-neutral-300 bg-[url(/images/noise.png)] px-6 py-8">
           <h2 className="text-4xl font-bold">

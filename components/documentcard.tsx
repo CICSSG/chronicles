@@ -36,7 +36,7 @@ export function DocumentCard({
           width={400}
           height={400}
           alt=""
-          className="aspect-square rounded-lg border-4 border-black object-cover mx-auto"
+          className="aspect-square rounded-lg object-cover mx-auto"
         />
       )}
       <h1 className="text-2xl font-bold">{Title}</h1>
@@ -144,7 +144,7 @@ export function AnnouncementCard({
           width={400}
           height={400}
           alt=""
-          className="aspect-square rounded-lg border-4 border-black object-cover mx-auto"
+          className="aspect-square rounded-lg object-cover mx-auto"
         />
       )}
       <h1 className="text-2xl font-bold lg:min-h-[3.975rem]">{Title}</h1>
@@ -186,7 +186,7 @@ export default function EventCard({
           width={400}
           height={400}
           alt=""
-          className="aspect-square rounded-lg border-4 border-black object-cover mx-auto"
+          className="aspect-square rounded-lg object-cover mx-auto"
         />
       )}
       <h1 className="text-2xl font-bold lg:min-h-[3.9725rem] ">{Title}</h1>
@@ -219,7 +219,7 @@ export function SlateCard({
           alt=""
           width={250}
           height={250}
-          className="rounded-lg border-4 border-black object-cover grow-1 basis-0 aspect-square md:aspect-auto mx-auto"
+          className="rounded-lg object-cover grow-1 basis-0 aspect-square md:aspect-auto mx-auto"
         />
       )}
       <h1 className="text-2xl font-bold md:min-h-[3.9725rem] text-center">Academic Year <br /><p className="font-normal">{AcademicYear}</p></h1>

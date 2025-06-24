@@ -252,7 +252,7 @@ const ContactUs = () => {
               <span className={`text-black/40 text-sm ${character == 0 ? 'hidden': null}`}>{CONCERN_CHARACTERS_MAX - character} characters left</span>
             </div>
 
-            <button type="submit" className="py-3 rounded-full bg-neutral-900 text-xl text-white font-semibold bg-[url(/images/noise.png)] hover:cursor-pointer hover:bg-neutral-950 hover:scale-105">
+            <button type="submit" className="py-3 rounded-full bg-neutral-900 text-xl text-white font-semibold bg-[url(/images/noise.png)] hover:cursor-pointer hover:bg-neutral-950">
               Submit
             </button>
           </form>

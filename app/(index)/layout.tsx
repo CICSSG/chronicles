@@ -1,7 +1,7 @@
 import { SpeedInsights } from "@vercel/speed-insights/next";
 import { Analytics } from "@vercel/analytics/next";
 
-import { Space_Grotesk, Inter } from "next/font/google";
+import { Space_Grotesk, Inter, Roboto } from "next/font/google";
 import Link from "next/link";
 import "/app/globals.css";
 import Footer from "@/components/footer";
@@ -35,6 +35,12 @@ const inter = Inter({
   variable: "--font-inter",
 });
 
+const roboto = Roboto({
+  display: "swap",
+  subsets: ["latin"],
+  variable: "--font-roboto",
+});
+
 export default async function RootLayout({
   children,
 }: Readonly<{
@@ -59,14 +65,13 @@ export default async function RootLayout({
 
         <div className="flex w-full flex-col items-center gap-5">
           <div className="font-space flex min-h-dvh min-w-dvw flex-col items-center bg-neutral-800 font-semibold">
-            {/* TODO ANNOUNCEMENTS */}
             <UrgentAnnouncement />
-            <div className="3xl:max-w-[1920px] my-10 flex h-full w-full max-w-11/12 flex-col gap-5 lg:px-10 xl:max-w-10/12">
+            <div className="3xl:max-w-[1920px] my-10 flex h-full w-full max-w-11/12 flex-col gap-5 lg:px-10 xl:max-w-10/12 items-center">
               <div className="flex w-full flex-row justify-between py-2 text-xl text-white 2xl:px-8">
                 <NavLinks />
               </div>
 
-              <div className="grow-1 basis-0">
+              <div className="grow-1 basis-0 w-full 2xl:max-w-10/12">
                 <Suspense>
                   <NuqsAdapter>{children}</NuqsAdapter>
                 </Suspense>

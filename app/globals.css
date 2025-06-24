@@ -86,6 +86,10 @@ h1, h2, h3 {
   @apply flex
 }
 
+h6 {
+  font-family: 'Roboto', cursive;
+}
+
 @utility no-scrollbar {
   @apply [scrollbar-width:none] [&::-webkit-scrollbar]:hidden;
 }
