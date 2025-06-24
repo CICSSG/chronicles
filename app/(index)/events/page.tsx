@@ -59,7 +59,7 @@ const Events = () => {
       <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80 rounded-2xl">
         <Suspense>
           <div className="grid grid-cols-1 lg:grid-cols-2
-          2xl:grid-cols-3 3xl:grid-cols-4 gap-4 *:rounded-xl *:bg-white/80 *:p-4 overflow-x-auto no-scrollbar">
+          2xl:grid-cols-3 gap-4 *:rounded-xl *:bg-white/80 *:p-4 overflow-x-auto no-scrollbar">
             {/* Card */}
             {documents?.map((data) => (
               <EventCard
