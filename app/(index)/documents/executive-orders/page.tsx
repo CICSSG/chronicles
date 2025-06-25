@@ -5,8 +5,10 @@ import { DocumentCard, ExecutiveCard } from "@/components/documentcard";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { PublicDocumentData } from "@/components/public-documents-data";
 import Link from "next/link";
+import { DocumentSkeleton } from "@/components/skeleton";
 
 export default function ExecutiveOrders() {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [documents, setDocuments] = useState<any[] | null>(null);
   const [page, setPage] = useQueryState("page", parseAsInteger);
   const [pagination, setPagination] = useState(1);
@@ -44,6 +46,7 @@ export default function ExecutiveOrders() {
       ({ documents, pagination }) => {
         setDocuments(documents ?? null);
         setPagination(pagination);
+        setIsLoaded(true);
       },
     );
   }, [page]);
@@ -52,16 +55,20 @@ export default function ExecutiveOrders() {
     <Suspense>
       <div className="3xl:grid-cols-3 grid w-full grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 xl:grid-cols-2">
         {/* Card */}
-        {documents?.map((data) => (
-          <ExecutiveCard
-            key={data.id}
-            Title={data.title}
-            Date={data.date}
-            URL={data.link}
-            Description={data.description}
-            Author={data.author}
-          />
-        ))}
+        {isLoaded ? (
+          documents?.map((data) => (
+            <ExecutiveCard
+              key={data.id}
+              Title={data.title}
+              Date={data.date}
+              URL={data.link}
+              Description={data.description}
+              Author={data.author}
+            />
+          ))
+        ) : (
+          <DocumentSkeleton amount={3} />
+        )}
       </div>
 
       <div className="join">

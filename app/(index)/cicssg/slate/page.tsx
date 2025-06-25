@@ -1,11 +1,13 @@
 "use client";
 import { SlateCard } from "@/components/documentcard";
 import { PublicSlateData } from "@/components/public-documents-data";
+import { SlateSkeleton } from "@/components/skeleton";
 import Link from "next/link";
 import { parseAsInteger, useQueryState } from "nuqs";
 import React, { Suspense, useEffect, useState } from "react";
 
 const Slate = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [documents, setDocuments] = useState<any[] | null>(null);
   const [page, setPage] = useQueryState("page", parseAsInteger);
   const [pagination, setPagination] = useState(1);
@@ -42,30 +44,35 @@ const Slate = () => {
     PublicSlateData(page).then(({ documents, pagination }) => {
       setDocuments(documents ?? null);
       setPagination(pagination);
+      setIsLoaded(true)
     });
   }, [page]);
 
   return (
     <div className="flex flex-col gap-4 *:rounded-2xl xl:rounded-xl xl:bg-white/80 xl:p-8">
-      <div className="flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-white/80 *:xl:bg-neutral-300 *:px-8 *:py-8 *:xl:shadow-xl">
+      <div className="flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-white/80 *:px-8 *:py-8 *:xl:bg-neutral-300 *:xl:shadow-xl">
         <div className="bg-[url(/images/noise.png)]">
           <h2 className="text-3xl font-bold">CICSSG Slate</h2>
         </div>
       </div>
-      <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] xl:p-6 text-black/80">
+      <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] text-black/80 xl:p-6">
         <Suspense>
-          <div className="no-scrollbar grid grid-cols-1 gap-4 overflow-x-auto *:rounded-xl *:bg-white/80 *:p-4 xl:grid-cols-2 3xl:grid-cols-3">
+          <div className="no-scrollbar 3xl:grid-cols-3 grid grid-cols-1 gap-4 overflow-x-auto *:rounded-xl *:bg-white/80 *:p-4 xl:grid-cols-2">
             {/* Card */}
-            {documents?.map((data) => (
-              <SlateCard
-                key={data.id}
-                AcademicYear={data.academic_year}
-                URL={"/cicssg/slate/" + data.id}
-                ImageLink={
-                  data.image ? data.image : "https://i.imgur.com/6pP0o7C.png"
-                }
-              />
-            ))}
+            {isLoaded ? (
+              documents?.map((data) => (
+                <SlateCard
+                  key={data.id}
+                  AcademicYear={data.academic_year}
+                  URL={"/cicssg/slate/" + data.id}
+                  ImageLink={
+                    data.image ? data.image : "https://i.imgur.com/6pP0o7C.png"
+                  }
+                />
+              ))
+            ) : (
+              <SlateSkeleton amount={3} />
+            )}
           </div>
 
           <div className="join">
