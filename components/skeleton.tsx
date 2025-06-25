@@ -77,3 +77,36 @@ export function DocumentSkeleton({ amount }: { amount: number }) {
     </>
   );
 }
+
+export function AdminStaffSkeleton({ amount }: { amount: number }) {
+  return (
+    <>
+      {Array.from({ length: amount }).map((_, index) => (
+        <div className="flex flex-row gap-4" key={index}>
+          <div className="skeleton h-38 aspect-square"></div>
+          <div className="flex flex-col items-center justify-center gap-2">
+            <div className="skeleton h-4 w-40"></div>
+            <div className="skeleton h-4 w-30"></div>
+          </div>
+        </div>
+      ))}
+    </>
+  );
+}
+
+export function FacultySkeleton({ amount }: { amount: number }) {
+  return (
+    <>
+      {Array.from({ length: amount }).map((_, index) => (
+        <div className="flex flex-col gap-4 px-6 items-center" key={index}>
+          <div className="skeleton w-full aspect-square"></div>
+          <div className="skeleton h-4 w-40"></div>
+            <div className="skeleton h-4 w-20"></div>
+            <div className="skeleton h-4 w-35"></div>
+            <div className="skeleton h-4 w-30"></div>
+            <div className="skeleton h-4 w-40"></div>
+        </div>
+      ))}
+    </>
+  );
+}
