@@ -1,11 +1,13 @@
-'use client'
-import EventCard from '@/components/documentcard';
-import { PublicEventsData } from '@/components/public-documents-data';
-import Link from 'next/link';
-import { parseAsInteger, useQueryState } from 'nuqs';
-import React, { Suspense, useEffect, useState } from 'react'
+"use client";
+import EventCard from "@/components/documentcard";
+import { PublicEventsData } from "@/components/public-documents-data";
+import { EventSkeleton } from "@/components/skeleton";
+import Link from "next/link";
+import { parseAsInteger, useQueryState } from "nuqs";
+import React, { Suspense, useEffect, useState } from "react";
 
 const Events = () => {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [documents, setDocuments] = useState<any[] | null>(null);
   const [page, setPage] = useQueryState("page", parseAsInteger);
   const [pagination, setPagination] = useState(1);
@@ -39,39 +41,39 @@ const Events = () => {
   ];
 
   useEffect(() => {
-    PublicEventsData(page).then(
-      ({ documents, pagination }) => {
-        setDocuments(documents ?? null);
-        setPagination(pagination);
-      },
-    );
+    PublicEventsData(page).then(({ documents, pagination }) => {
+      setDocuments(documents ?? null);
+      setPagination(pagination);
+      setIsLoaded(true);
+    });
   }, [page]);
 
   return (
     <div className="flex flex-col gap-4 *:rounded-2xl">
-      <div className="flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-neutral-300 *:px-8 *:py-8 *:shadow-xl ">
-        <div className="bg-neutral-300 px-6 py-8 rounded-2xl bg-[url(/images/noise.png)]">
-          <h2 className="text-3xl font-bold">
-            Event Archive
-          </h2>
+      <div className="flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:bg-neutral-300 *:px-8 *:py-8 *:shadow-xl">
+        <div className="rounded-2xl bg-neutral-300 bg-[url(/images/noise.png)] px-6 py-8">
+          <h2 className="text-3xl font-bold">Event Archive</h2>
         </div>
       </div>
-      <div className="flex grow-3 basis-0 flex-col gap-4 bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80 rounded-2xl">
+      <div className="flex grow-3 basis-0 flex-col gap-4 rounded-2xl bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80">
         <Suspense>
-          <div className="grid grid-cols-1 lg:grid-cols-2
-          2xl:grid-cols-3 gap-4 *:rounded-xl *:bg-white/80 *:p-4 overflow-x-auto no-scrollbar">
+          <div className="no-scrollbar grid grid-cols-1 gap-4 overflow-x-auto *:rounded-xl *:bg-white/80 *:p-4 lg:grid-cols-2 2xl:grid-cols-3">
             {/* Card */}
-            {documents?.map((data) => (
-              <EventCard
-                key={data.id}
-                Title={data.title}
-                Date={data.date}
-                AcademicYear={data.academic_year}
-                URL={"/events/" + data.id}
-                ImageLink={data.image}
-                Location={data.location}
-              />
-            ))}
+            {isLoaded ? (
+              documents?.map((data) => (
+                <EventCard
+                  key={data.id}
+                  Title={data.title}
+                  Date={data.date}
+                  AcademicYear={data.academic_year}
+                  URL={"/events/" + data.id}
+                  ImageLink={data.image}
+                  Location={data.location}
+                />
+              ))
+            ) : (
+              <EventSkeleton amount={3} />
+            )}
           </div>
 
           <div className="join">
@@ -140,6 +142,6 @@ const Events = () => {
       </div>
     </div>
   );
-}
+};
 
-export default Events
+export default Events;

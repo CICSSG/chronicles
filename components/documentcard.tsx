@@ -159,7 +159,7 @@ export function AnnouncementCard({
           Read More <IoIosArrowForward />{" "}
         </Link>
       </div>
-      <p className="font-medium">{Description}</p>
+      <p className="font-medium text-justify">{Description}</p>
       {Author && (
         <div className="mt-auto text-sm">
           <span className="font-bold">Author/s:</span>{" "}

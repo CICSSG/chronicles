@@ -1,12 +1,15 @@
 "use client";
-import {DocumentCard, ExecutiveCard} from "@/components/documentcard";
+import { DocumentCard, ExecutiveCard } from "@/components/documentcard";
 import NavDocuments from "@/components/nav-documents";
 import { PublicDocumentData } from "@/components/public-documents-data";
+import { DocumentSkeleton } from "@/components/skeleton";
 import Link from "next/link";
 import { parseAsInteger, useQueryState } from "nuqs";
 import React, { Suspense, useEffect, useState } from "react";
 
 export default function Ordinances() {
+  const [isLoaded, setIsLoaded] = useState(false);
+
   const [documents, setDocuments] = useState<any[] | null>(null);
   const [page, setPage] = useQueryState("page", parseAsInteger);
   const [pagination, setPagination] = useState(1);
@@ -43,87 +46,92 @@ export default function Ordinances() {
     PublicDocumentData("ordinance", page).then(({ documents, pagination }) => {
       setDocuments(documents ?? null);
       setPagination(pagination);
+      setIsLoaded(true);
     });
   }, [page]);
 
   return (
     <Suspense>
-          <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 xl:grid-cols-2 3xl:grid-cols-3">
-            {/* Card */}
-            {documents?.map((data) => (
-              <ExecutiveCard
-                key={data.id}
-                Title={data.title}
-                Date={data.date}
-                URL={data.link}
-                Description={data.description}
-                Author={data.author}
-              />
-            ))}
-          </div>
+      <div className="3xl:grid-cols-3 grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-4 xl:grid-cols-2">
+        {/* Card */}
+        {isLoaded ? (
+          documents?.map((data) => (
+            <ExecutiveCard
+              key={data.id}
+              Title={data.title}
+              Date={data.date}
+              URL={data.link}
+              Description={data.description}
+              Author={data.author}
+            />
+          ))
+        ) : (
+          <DocumentSkeleton amount={3} />
+        )}
+      </div>
 
-          <div className="join">
-            {pagination >= 2 && (
-              <>
-                <Link
-                  className="join-item btn"
-                  href={""}
-                  passHref
-                  shallow
-                  replace
-                  onClick={() => setPage(pages[0])}
-                >
-                  {pages[0]}
-                </Link>
-                <Link
-                  className="join-item btn"
-                  href={""}
-                  passHref
-                  shallow
-                  replace
-                  onClick={() => setPage(pages[1])}
-                >
-                  {pages[1]}
-                </Link>
-              </>
-            )}
-            {pagination >= 3 && (
-              <Link
-                className="join-item btn"
-                href={""}
-                passHref
-                shallow
-                replace
-                onClick={() => setPage(pages[2])}
-              >
-                {pages[2]}
-              </Link>
-            )}
-            {pagination >= 4 && (
-              <Link
-                className="join-item btn"
-                href={""}
-                passHref
-                shallow
-                replace
-                onClick={() => setPage(pages[3])}
-              >
-                {pages[3]}
-              </Link>
-            )}
-            {pagination >= 5 && (
-              <Link
-                className="join-item btn"
-                href={""}
-                passHref
-                shallow
-                replace
-                onClick={() => setPage(pages[4])}
-              >
-                {pages[4]}
-              </Link>
-            )}
-          </div>
-        </Suspense>
+      <div className="join">
+        {pagination >= 2 && (
+          <>
+            <Link
+              className="join-item btn"
+              href={""}
+              passHref
+              shallow
+              replace
+              onClick={() => setPage(pages[0])}
+            >
+              {pages[0]}
+            </Link>
+            <Link
+              className="join-item btn"
+              href={""}
+              passHref
+              shallow
+              replace
+              onClick={() => setPage(pages[1])}
+            >
+              {pages[1]}
+            </Link>
+          </>
+        )}
+        {pagination >= 3 && (
+          <Link
+            className="join-item btn"
+            href={""}
+            passHref
+            shallow
+            replace
+            onClick={() => setPage(pages[2])}
+          >
+            {pages[2]}
+          </Link>
+        )}
+        {pagination >= 4 && (
+          <Link
+            className="join-item btn"
+            href={""}
+            passHref
+            shallow
+            replace
+            onClick={() => setPage(pages[3])}
+          >
+            {pages[3]}
+          </Link>
+        )}
+        {pagination >= 5 && (
+          <Link
+            className="join-item btn"
+            href={""}
+            passHref
+            shallow
+            replace
+            onClick={() => setPage(pages[4])}
+          >
+            {pages[4]}
+          </Link>
+        )}
+      </div>
+    </Suspense>
   );
 }
