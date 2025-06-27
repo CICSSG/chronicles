@@ -671,13 +671,13 @@ export default function OfficersOverview({ document }: { document: any }) {
                           </Field>
                         </div>
 
-                        <div className="w-full max-w-md">
+                        {/* <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
                             <DynamicInputFieldsContactInfo
                               data={document && document.governor.contact_info}
                             />
                           </Field>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>
@@ -820,13 +820,13 @@ export default function OfficersOverview({ document }: { document: any }) {
                           </Field>
                         </div>
 
-                        <div className="w-full max-w-md">
+                        {/* <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
                             <DynamicInputFieldsContactInfo
                               data={document && document.vice_governor.contact_info}
                             />
                           </Field>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>

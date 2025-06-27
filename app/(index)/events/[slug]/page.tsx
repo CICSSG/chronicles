@@ -66,14 +66,14 @@ export default function Page() {
           {isLoaded ? (
             document && (
               <>
-                {document.expenses && (
+                {/* {document.expenses && (
                   <h2>
                     Expenses:{" "}
                     <span className="font-bold text-black/80">
                       ₱{document.expenses}
                     </span>
                   </h2>
-                )}
+                )} */}
                 {document.highlights.map(
                   (data: { highlight: string; description: string }) => (
                     <p>

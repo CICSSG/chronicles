@@ -63,7 +63,7 @@ export default function NavLinks() {
             <span className="">[Chronicles]</span>
           </a>
         </div>
-        <div className="flex lg:hidden">
+        <div className="flex xl:hidden">
           <button
             type="button"
             onClick={() => setMobileMenuOpen(true)}
@@ -73,7 +73,10 @@ export default function NavLinks() {
             <Bars3Icon aria-hidden="true" className="size-6" />
           </button>
         </div>
-        <PopoverGroup className="hidden lg:flex lg:gap-x-6 ">
+        <PopoverGroup className="hidden xl:flex lg:gap-x-6 ">
+          <Link href={"/"} className="text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
+            Home
+          </Link>
           <Popover className="relative">
             <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6 hover:cursor-pointer">
               The CICS
@@ -178,7 +181,7 @@ export default function NavLinks() {
         </PopoverGroup>
 
       </nav>
-      <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="lg:hidden">
+      <Dialog open={mobileMenuOpen} onClose={setMobileMenuOpen} className="xl:hidden">
         <div className="fixed inset-0 z-10" />
         <DialogPanel className="fixed inset-y-0 right-0 z-10 w-full overflow-y-auto bg-white px-6 py-6 sm:max-w-sm sm:ring-1 sm:ring-gray-900/10">
           <div className="flex items-center justify-between">

@@ -315,14 +315,14 @@ export default function LegislativeOverview({ document }: { document: any }) {
                             )}
                           </div>
 
-                          <div className="w-full max-w-md">
+                          {/* <div className="w-full max-w-md">
                             <Field className="flex flex-col items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
                                 Contact Info
                               </Label>
                               <DynamicInputFieldsContactInfo />
                             </Field>
-                          </div>
+                          </div> */}
                         </div>
                       </div>
                     </div>
@@ -451,7 +451,7 @@ export default function LegislativeOverview({ document }: { document: any }) {
                           </div>
                         </div>
 
-                        <div className="w-full max-w-md">
+                        {/* <div className="w-full max-w-md">
                           <Field className="flex flex-col items-center gap-4">
                             <Label className="text-sm/6 font-medium text-black">
                               Contact Info
@@ -460,7 +460,7 @@ export default function LegislativeOverview({ document }: { document: any }) {
                               data={editOfficerContact}
                             />
                           </Field>
-                        </div>
+                        </div> */}
                       </div>
                     </div>
                   </div>

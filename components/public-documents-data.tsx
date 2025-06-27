@@ -15,7 +15,7 @@ export async function PublicDocumentData(document_type: string, page?: number | 
 
   let { data: documents, count } = await supabase
     .from("documents")
-    .select("*", { count: "exact", head: false })
+    .select("id, title, date, document_type, description, author, link, image", { count: "exact", head: false })
     .eq("document_type", document_type)
     .range(from, to)
     .order("id", { ascending: false });
@@ -32,7 +32,7 @@ export async function PublicAnnouncementData(page?: number | null) {
 
   let { data: documents, count } = await supabase
     .from("announcements")
-    .select("*", { count: "exact", head: false })
+    .select("id, title, date, link, description, image", { count: "exact", head: false })
     .range(from, to)
     .order("id", { ascending: false });
 
@@ -47,7 +47,7 @@ export async function PublicEventsData(page?: number | null) {
 
   let { data: documents, count } = await supabase
     .from("events")
-    .select("*", { count: "exact", head: false })
+    .select("id, title, image, date, academic_year, location, project_heads, highlights, description, images", { count: "exact", head: false })
     .range(from, to)
     .order("id", { ascending: false });
 
@@ -59,7 +59,7 @@ export async function PublicEventsData(page?: number | null) {
 export async function PublicEventDataByID(id?: string) {
   let { data: documents } = await supabase
     .from("events")
-    .select("*")
+    .select("id, title, image, date, academic_year, location, project_heads, highlights, description, images")
     .eq('id', id)
 
   return { documents };
