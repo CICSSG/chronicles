@@ -44,19 +44,19 @@ export default function CICSSG() {
         <hr />
         <div className="flex flex-col gap-2">
           <h1 className="text-3xl">Emblem</h1>
-          <div className="flex flex-col xl:flex-row gap-8">
+          <div className="flex flex-col gap-8 xl:flex-row">
             <Image
               src={"/images/CICSSG.png"}
               alt=""
               width={300}
               height={300}
-              className="border-2 border-black rounded-xl aspect-square object-contain mx-auto"
+              className="mx-auto aspect-square rounded-xl border-2 border-black object-contain"
             />
             <div>
               <ul className="list h-full list-inside list-disc justify-between py-2 text-xl font-normal">
                 <li className="font-bold">
                   Silver and White
-                  <ul className="list ml-8 list-inside list-disc text-xl font-normal">
+                  <ul className="list ml-12 list-disc text-xl font-normal">
                     <li>
                       These colors embody our commitment to innovation and
                       excellence, blending clarity with progress.
@@ -66,7 +66,7 @@ export default function CICSSG() {
 
                 <li className="font-bold">
                   Panther
-                  <ul className="list ml-8 list-inside list-disc text-xl font-normal">
+                  <ul className="list ml-12 list-disc text-xl font-normal">
                     <li>
                       It symbolizes strength and power, along with intuition and
                       insight that are known traits of a panther.
@@ -76,7 +76,7 @@ export default function CICSSG() {
 
                 <li className="font-bold">
                   Central Processing Unit (CPU)
-                  <ul className="list ml-8 list-inside list-disc text-xl font-normal">
+                  <ul className="list ml-12 list-disc text-xl font-normal">
                     <li>
                       Being the brain of the computer, it symbolizes
                       intelligence and innovation, befitting the college’s

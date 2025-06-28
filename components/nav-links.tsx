@@ -29,6 +29,7 @@ import {
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
+import Image from 'next/image'
 
 const documents = [
   { name: 'Executive Orders', description: 'Executive Orders made by CICSSG', href: '/documents/executive-orders', icon: DocumentTextIcon },
@@ -60,7 +61,12 @@ export default function NavLinks() {
       <nav aria-label="Global" className="mx-auto flex items-center justify-between lg:p-6 lg:px-4">
         <div className="flex lg:flex-1">
           <a href="/" className="-m-1.5 p-1.5">
-            <span className="">[Chronicles]</span>
+            <Image 
+              src={"/images/LOGO.png"}
+              alt=''
+              width={200}
+              height={50}
+            />
           </a>
         </div>
         <div className="flex xl:hidden">
@@ -74,7 +80,7 @@ export default function NavLinks() {
           </button>
         </div>
         <PopoverGroup className="hidden xl:flex lg:gap-x-6 ">
-          <Link href={"/"} className="text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6">
+          <Link href={"/"} className="text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6 mr-2">
             Home
           </Link>
           <Popover className="relative">

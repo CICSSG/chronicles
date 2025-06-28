@@ -217,7 +217,7 @@ export default function Page() {
                 {NO_DATA_MESSAGE}
               </span>
             )}
-            <div className="3xl:grid-cols-4 grid grid-cols-1 justify-evenly gap-10 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 justify-evenly gap-10 md:grid-cols-2 xl:grid-cols-3">
               {document &&
                 document.directorate.map(
                   (
@@ -239,14 +239,14 @@ export default function Page() {
                       <h1 className="text-center text-xl font-bold">
                         {data.position}
                       </h1>
-                      <p className="mt-auto text-center text-xl font-medium">
+                      <p className="text-center text-xl font-medium">
                         {data.name}
                       </p>
                       <Button
                         onClick={() =>
                           handleViewResponsibilitiesDirectorate(data.position)
                         }
-                        className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
+                        className="mt-auto rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
                       >
                         Responsibilities
                       </Button>
@@ -285,7 +285,7 @@ export default function Page() {
                 {NO_DATA_MESSAGE}
               </span>
             )}
-            <div className="3xl:grid-cols-4 grid grid-cols-1 justify-evenly gap-10 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 justify-evenly gap-10 md:grid-cols-2 xl:grid-cols-3">
               {document &&
                 document.legislative &&
                 document.legislative.map(
@@ -305,7 +305,7 @@ export default function Page() {
                       <h1 className="text-center text-xl font-bold">
                         Legislative Councilor
                       </h1>
-                      <p className="mt-auto text-center text-xl font-medium">
+                      <p className="text-center text-xl font-medium">
                         {data.name}
                       </p>
                     </div>
@@ -324,7 +324,7 @@ export default function Page() {
                 {NO_DATA_MESSAGE}
               </span>
             )}
-            <div className="3xl:grid-cols-4 grid grid-cols-1 justify-evenly gap-10 *:basis-[20%] md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 justify-evenly gap-10 *:basis-[20%] md:grid-cols-2 xl:grid-cols-3">
               {document &&
                 document.junior_officers.map(
                   (

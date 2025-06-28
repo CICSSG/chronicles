@@ -35,7 +35,7 @@ export default function AdminStaff() {
           <>
             <div className="flex flex-col justify-around gap-8 *:basis-[40%] lg:mx-0 lg:flex-row">
               {/* Dean */}
-              <div className="flex flex-row items-center gap-4">
+              <div className="flex flex-col items-center gap-4">
                 <Image
                   src={
                     documents && documents.dean.image !== ""
@@ -54,7 +54,7 @@ export default function AdminStaff() {
               </div>
 
               {/* Associate Dean */}
-              <div className="flex flex-row items-center gap-4">
+              <div className="flex flex-col items-center gap-4">
                 <Image
                   src={
                     documents && documents.associate_dean.image !== ""
@@ -76,9 +76,9 @@ export default function AdminStaff() {
             </div>
 
             {/* Staff */}
-            <div className="m-auto my-16 flex w-full flex-row flex-wrap items-center justify-around gap-x-4 gap-y-10 xl:*:basis-[40%]">
+            <div className="m-auto my-16 flex w-full flex-row flex-wrap items-center justify-around gap-x-4 gap-y-10 xl:*:basis-[30%]">
               {documents?.staff.map((data, i) => (
-                <div key={i} className={`flex w-full items-center gap-4`}>
+                <div key={i} className={`flex flex-col w-full items-center gap-4`}>
                   <Image
                     src={data.image !== "" ? data.image : "/images/NoImage.png"}
                     alt=""
@@ -87,8 +87,8 @@ export default function AdminStaff() {
                     className="grow-0 basis-0 rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
                   />
                   <div className="grow basis-0">
-                    <p className={`text-xl font-normal`}>{data.name}</p>
-                    <p className={`text-lg font-semibold`}>{data.position}</p>
+                    <p className={`text-xl font-normal text-center`}>{data.name}</p>
+                    <p className={`text-lg font-semibold text-center`}>{data.position}</p>
                   </div>
                 </div>
               ))}

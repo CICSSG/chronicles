@@ -1,4 +1,5 @@
 "use client";
+import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import React from "react";
@@ -12,10 +13,13 @@ const Footer = () => {
       className={`flex w-full flex-col justify-between gap-12 overflow-hidden rounded-2xl border border-neutral-400 bg-[url(/images/noiselowblack.png)] bg-white/90 bg-linear-to-br from-neutral-100 via-neutral-100 via-70% to-black/25 p-8 py-12 text-2xl md:flex-row m-auto max-w-full 2xl:max-w-10/12`}
     >
       <div className="flex grow basis-0 flex-col justify-around gap-12">
-        <div className="flex flex-col gap-6">
-          <h1 className="text-center text-3xl font-extrabold md:text-left">
-            [Chronicles]
-          </h1>
+        <div className="flex flex-col gap-6 items-center md:items-start">
+          <Image 
+              src={"/images/LOGOBlack.png"}
+              alt=""
+              width={300}
+              height={50}
+            />
           <div className="text-center md:text-left">
             <h6 className="text-xl">Address</h6>
             <h6 className="text-lg font-normal">
