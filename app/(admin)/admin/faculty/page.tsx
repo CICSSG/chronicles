@@ -26,6 +26,7 @@ import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
 import DynamicInputFieldsSpecialization from "@/components/admin/dynamic-input-field-specialization";
 import { CreatePopup } from "@/components/admin/alert-fragment";
+import Image from "next/image";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -87,11 +88,18 @@ export default function Faculty() {
         "postgres_changes",
         { event: "*", schema: "public", table: "faculty" },
         (payload) => {
-          FacultyData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
-            setPagination(pagination);
-            CreatePopup("Data updated");
-          });
+          FacultySearch(title ?? undefined, page ?? undefined).then(
+            ({ documents, pagination }) => {
+              setDocuments(documents ?? null);
+              setPagination(pagination);
+              CreatePopup("Data updated");
+            },
+          );
+          // FacultyData().then(({ documents, pagination }) => {
+          //   setDocuments(documents ?? null);
+          //   setPagination(pagination);
+          //   CreatePopup("Data updated");
+          // });
           // console.log("Change received!", payload);
         },
       )
@@ -100,7 +108,7 @@ export default function Faculty() {
       taskListener.unsubscribe();
     };
   }, []);
-  
+
   useEffect(() => {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
   }, [editDocument]);
@@ -190,8 +198,9 @@ export default function Faculty() {
 
   useEffect(() => {
     FacultySearch(title ?? undefined, page ?? undefined).then(
-      ({ documents }) => {
+      ({ documents, pagination }) => {
         setDocuments(documents ?? null);
+        setPagination(pagination);
       },
     );
   }, [page, title]);
@@ -271,7 +280,17 @@ export default function Faculty() {
           <tbody className="*:border-b *:border-b-black/30 *:hover:bg-white/10">
             {documents?.map((data, i) => (
               <tr className="w-full" key={i}>
-                <td></td>
+                <td>
+                  <Image
+                    src={
+                      data.image == '""' ? "/images/NoImage.png" : data.image
+                    }
+                    alt=""
+                    width={50}
+                    height={50}
+                    className="aspect-square grow-0 basis-0 rounded-xl border-1 border-black/60 object-cover"
+                  />
+                </td>
                 <td className="text-nowrap">{data.name}</td>
                 <td className="text-nowrap">{data.department}</td>
                 <td className="">{data.work_type}</td>

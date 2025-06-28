@@ -231,7 +231,7 @@ export default function AdminStaff() {
                   alt=""
                   width={50}
                   height={50}
-                  className="rounded-xl border-2 border-black/60"
+                  className="rounded-xl border-2 border-black/60 aspect-square object-cover"
                 />
               </td>
               <td className="text-nowrap">
@@ -251,7 +251,7 @@ export default function AdminStaff() {
                   alt=""
                   width={50}
                   height={50}
-                  className="rounded-xl border-2 border-black/60"
+                  className="rounded-xl border-2 border-black/60 aspect-square object-cover"
                 />
               </td>
               <td className="text-nowrap">

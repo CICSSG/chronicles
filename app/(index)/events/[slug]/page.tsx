@@ -44,7 +44,7 @@ export default function Page() {
                 <h1 className="text-3xl font-extrabold text-black/90">
                   {document.title}
                 </h1>
-                <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+                <hr className="rounded-2xl border-2 font-bold text-black/40" />
 
                 <p>{document.date}</p>
                 <p>{document.academic_year}</p>
@@ -53,7 +53,7 @@ export default function Page() {
           ) : (
             <>
               <div className="skeleton h-8 w-full"></div>
-              <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+              <hr className="rounded-2xl border-2 font-bold text-black/40" />
               <div className="skeleton h-6 w-1/2"></div>
               <div className="skeleton h-6 w-full"></div>
             </>
@@ -61,7 +61,7 @@ export default function Page() {
         </div>
         <div className="flex flex-col gap-2 rounded-2xl bg-neutral-100 bg-[url(/images/noise.png)] px-6 py-8 text-lg">
           <h1 className="text-3xl font-extrabold text-black/80">Highlights</h1>
-          <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+          <hr className="rounded-2xl border-2 font-bold text-black/40" />
 
           {isLoaded ? (
             document && (
@@ -99,7 +99,7 @@ export default function Page() {
           <h1 className="text-3xl font-extrabold text-black/80">
             Project Heads
           </h1>
-          <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+          <hr className="rounded-2xl border-2 font-bold text-black/40" />
 
           {isLoaded ? (
             document && (
@@ -144,7 +144,7 @@ export default function Page() {
           </div>
         </div>
 
-        <hr className="border-2" />
+        <hr className="border-2 text-black/40" />
         <div className="flex flex-col gap-4">
           <h1 className="text-center text-3xl xl:text-left">Gallery:</h1>
           <div className="3xl:grid-cols-4 mx-auto grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">

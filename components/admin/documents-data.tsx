@@ -343,6 +343,7 @@ export async function FacultyData(id?: string, page?: number) {
       .select("*", { count: "exact", head: false })
       .range(from, to)
       .order("department", { ascending: true })
+      .order("work_type", {ascending: true})
       .order("id", { ascending: false });
 
     let pagination =
@@ -354,6 +355,7 @@ export async function FacultyData(id?: string, page?: number) {
       .from("faculty")
       .select("*")
       .order("department", { ascending: false })
+      .order("work_type", {ascending: true})
       .eq("id", parseInt(id));
 
     let pagination =
@@ -377,6 +379,7 @@ export async function FacultySearch(title?: string, page?: number) {
       .range(from, to)
       .ilike("name", title)
       .order("department", { ascending: true })
+      .order("work_type", {ascending: true})
       .order("id", { ascending: false });
 
     let pagination =
@@ -389,6 +392,7 @@ export async function FacultySearch(title?: string, page?: number) {
     .select("*", { count: "exact", head: false })
     .range(from, to)
     .order("department", { ascending: true })
+    .order("work_type", {ascending: true})
     .order("id", { ascending: false });
 
   let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;

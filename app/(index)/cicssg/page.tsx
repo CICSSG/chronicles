@@ -5,7 +5,7 @@ export default function CICSSG() {
     <div className="grid grid-cols-1 gap-4 *:rounded-xl *:bg-white/80 *:p-8">
       <div className="flex flex-col gap-10 text-justify">
         <Image
-          src="/images/DLSUD-rotonda.jpg"
+          src="/images/CICSSGAbout.png"
           width={1000}
           height={500}
           alt=""

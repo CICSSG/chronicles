@@ -40,12 +40,12 @@ export function DocumentCard({
         />
       )}
       <h1 className="text-2xl font-bold">{Title}</h1>
-      <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+      <hr className="rounded-2xl border-2 font-bold text-black/40" />
       <div className="flex min-h-12 flex-row items-center">
         <p className="grow basis-0 font-medium">{Date}</p>
         <Link
           href={URL}
-          className="flex flex-row items-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white"
+          className="flex flex-row items-center gap-1 rounded-md bg-black/75 px-4 py-2 hover:bg-black/85 text-white"
           target="_blank"
         >
           Read More <IoIosArrowForward />{" "}
@@ -73,12 +73,12 @@ export function ExecutiveCard({
   return (
     <div className="flex flex-col gap-4 bg-white p-8 rounded-2xl">
       <h1 className="text-2xl font-bold">{Title}</h1>
-      <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+      <hr className="rounded-2xl border-2 font-bold text-black/40" />
       <div className="flex min-h-12 flex-row items-center">
         <p className="grow basis-0 font-medium">{Date}</p>
         <Link
           href={URL}
-          className="flex flex-row items-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white"
+          className="flex flex-row items-center gap-1 rounded-md bg-black/75 px-4 py-2 hover:bg-black/85 text-white"
           target="_blank"
         >
           Read More <IoIosArrowForward />{" "}
@@ -106,12 +106,12 @@ export function TransparencyCard({
   return (
     <div className="flex flex-col gap-4 bg-white p-8 rounded-2xl">
       <h1 className="text-2xl font-bold">{Title}</h1>
-      <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+      <hr className="rounded-2xl border-2 font-bold text-black/40" />
       <div className="flex min-h-12 flex-row items-center">
         <p className="grow basis-0 font-medium">{Date}</p>
         <Link
           href={URL}
-          className="flex flex-row items-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white"
+          className="flex flex-row items-center gap-1 rounded-md bg-black/75 px-4 py-2 hover:bg-black/85 text-white"
           target="_blank"
         >
           Read More <IoIosArrowForward />{" "}
@@ -148,12 +148,12 @@ export function AnnouncementCard({
         />
       )}
       <h1 className="text-2xl font-bold lg:min-h-[3.975rem]">{Title}</h1>
-      <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+      <hr className="rounded-2xl border-2 font-bold text-black/40" />
       <div className="flex min-h-12 flex-row items-center">
         <p className="grow basis-0 font-medium">{Date}</p>
         <Link
           href={URL}
-          className="flex flex-row items-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white"
+          className="flex flex-row items-center gap-1 rounded-md bg-black/75 px-4 py-2 hover:bg-black/85 text-white"
           target="_blank"
         >
           Read More <IoIosArrowForward />{" "}
@@ -190,7 +190,7 @@ export default function EventCard({
         />
       )}
       <h1 className="text-2xl font-bold lg:min-h-[3.9725rem] ">{Title}</h1>
-      <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+      <hr className="rounded-2xl border-2 font-bold text-black/40" />
       <div className="h-full flex min-h-12 flex-col">
         <p className="font-bolder grow basis-0 text-lg">{Location}</p>
         <p className="grow basis-0 text-md font-medium">{Date}</p>
@@ -198,7 +198,7 @@ export default function EventCard({
       </div>
       <Link
         href={URL}
-        className="flex flex-row items-center justify-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white mt-auto"
+        className="flex flex-row items-center justify-center gap-1 rounded-md bg-black/75 px-4 py-2 hover:bg-black/85 text-white mt-auto"
       >
         Read More <IoIosArrowForward />{" "}
       </Link>
@@ -223,13 +223,13 @@ export function SlateCard({
         />
       )}
       <h1 className="text-2xl font-bold md:min-h-[3.9725rem] text-center">Academic Year <br /><p className="font-normal">{AcademicYear}</p></h1>
-      <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+      <hr className="rounded-2xl border-2 font-bold text-black/40" />
       {/* <div className="flex min-h-12 flex-col">
         <p className="grow basis-0 text-sm font-thin"></p>
       </div> */}
       <Link
         href={URL}
-        className="flex flex-row items-center justify-center gap-1 rounded-md bg-blue-200 px-4 py-2 text-black/70 hover:bg-black/80 hover:text-white mt-auto"
+        className="flex flex-row items-center justify-center gap-1 rounded-md bg-black/70 px-4 py-2 hover:bg-black/85 text-white/95 mt-auto"
       >
         View Slate <IoIosArrowForward />{" "}
       </Link>

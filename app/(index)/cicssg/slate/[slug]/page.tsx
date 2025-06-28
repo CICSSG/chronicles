@@ -109,7 +109,7 @@ export default function Page() {
           <h1 className="text-3xl font-extrabold text-black/90">
             Official Slate
           </h1>
-          <hr className="rounded-2xl border-2 font-bold text-blue-300" />
+          <hr className="rounded-2xl border-2 font-bold text-black/40" />
           {document && (
             <>
               <p>Academic Year {document.academic_year}</p>
@@ -135,7 +135,7 @@ export default function Page() {
                     : "https://i.imgur.com/6pP0o7C.png"
                 }
                 alt=""
-                className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
+                className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
               />
               <h1 className="text-xl font-bold">{document.adviser.position}</h1>
               <p className="text-xl font-medium">{document.adviser.name}</p>
@@ -160,7 +160,7 @@ export default function Page() {
                       : "https://i.imgur.com/6pP0o7C.png"
                   }
                   alt=""
-                  className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
+                  className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
                 />
                 <h1 className="text-xl font-bold">Governor</h1>
                 <p className="text-xl font-medium">{document.governor.name}</p>
@@ -187,7 +187,7 @@ export default function Page() {
                       : "https://i.imgur.com/6pP0o7C.png"
                   }
                   alt=""
-                  className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
+                  className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
                 />
                 <h1 className="text-xl font-bold">Vice Governor</h1>
                 <p className="text-xl font-medium">
@@ -234,7 +234,7 @@ export default function Page() {
                             : "https://i.imgur.com/6pP0o7C.png"
                         }
                         alt=""
-                        className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
+                        className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
                       />
                       <h1 className="text-center text-xl font-bold">
                         {data.position}
@@ -300,7 +300,7 @@ export default function Page() {
                             : "https://i.imgur.com/6pP0o7C.png"
                         }
                         alt=""
-                        className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
+                        className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
                       />
                       <h1 className="text-center text-xl font-bold">
                         Legislative Councilor
@@ -341,7 +341,7 @@ export default function Page() {
                         alt=""
                         height={250}
                         width={250}
-                        className="aspect-square w-50 rounded-2xl border-2 border-blue-300 shadow-lg"
+                        className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
                       />
                       <h1 className="text-center text-xl font-bold">
                         {data.position}
@@ -378,7 +378,7 @@ export default function Page() {
                 ([committeeName, committeeData]: [string, any], i: number) => (
                   <div
                     key={i}
-                    className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-neutral-100 from-60% to-blue-50 transition duration-300 hover:scale-101 hover:from-blue-50"
+                    className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-black/2 from-60% to-black/10 transition duration-300 hover:scale-101 hover:from-black/10"
                   >
                     <input type="checkbox" name="my-accordion-2" />
                     <div className="collapse-title font-semibold">

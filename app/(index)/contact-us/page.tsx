@@ -34,10 +34,12 @@ const ContactUs = () => {
         {/* Lets Connect */}
         <div className="flex grow basis-0 flex-col gap-6">
           <h1 className="text-3xl md:text-4xl lg:text-5xl font-bold">Let's connect!</h1>
-          <img
-            src="https://placehold.co/600x400"
+          <Image
+            src={"/images/ContactUs.png"}
             alt=""
-            className="rounded-xl"
+            width={1000}
+            height={600}
+            className="rounded-xl w-full"
           />
 
           <div className="mt-4 relative h-65 2xs:h-60 md:h-60 lg:h-80 mx-auto md:mx-0">

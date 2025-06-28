@@ -20,10 +20,10 @@ export default function Departments() {
 
         <div className="flex flex-col lg:flex-row items-stretch justify-between gap-8">
           <Image
-            src={"/images/NoImage.png"}
+            src={"/images/CSD.png"}
             alt=""
-            width={300}
-            height={180}
+            width={1000}
+            height={500}
             className="h-72 w-full lg:w-0 grow basis-0 rounded-xl border-2 border-black/40 object-cover shadow-lg"
           />
 
@@ -69,10 +69,10 @@ export default function Departments() {
 
         <div className="flex flex-col lg:flex-row-reverse items-stretch justify-between gap-8">
           <Image
-            src={"/images/NoImage.png"}
+            src={"/images/ITD.png"}
             alt=""
-            width={300}
-            height={180}
+            width={1000}
+            height={500}
             className="h-72 w-full lg:w-0 grow basis-0 rounded-xl border-2 border-black/40 object-cover shadow-lg"
           />
 

@@ -55,7 +55,7 @@ export default function Announcements() {
   return (
     <div className="flex w-full flex-col gap-4 *:rounded-2xl">
       <div className="sticky flex grow-1 basis-0 flex-col gap-4 text-black/90 *:rounded-2xl *:px-8 *:py-8 *:shadow-xl">
-        <div className="rounded-2xl bg-neutral-300 bg-linear-to-r from-neutral-100 via-neutral-100 via-70% to-blue-200 px-6 py-8">
+        <div className="rounded-2xl bg-neutral-300 bg-linear-to-r from-black/2 via-black/2 via-70% to-black/20 px-6 py-8">
           <h2 className="text-3xl font-bold">Announcements</h2>
         </div>
       </div>

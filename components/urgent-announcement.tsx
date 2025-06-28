@@ -66,7 +66,7 @@ export default function UrgentAnnouncement() {
 
   return (
       <div
-        className={`relative flex w-full flex-col flex-wrap items-center justify-center gap-4 overflow-hidden rounded-b-2xl bg-linear-90 from-blue-100 via-white to-blue-100 px-3 py-1 text-xl font-bold md:flex-row ${visibility == false && "hidden"}`}
+        className={`relative flex w-full flex-col flex-wrap items-center justify-center gap-4 overflow-hidden rounded-b-2xl bg-linear-90 from-white/80 via-white/95 to-white/80 px-3 py-1 text-xl font-bold md:flex-row ${visibility == false && "hidden"}`}
       >
         <h1 className="text-center font-semibold">
           {documents && documents[0].announcement}

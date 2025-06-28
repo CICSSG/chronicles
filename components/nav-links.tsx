@@ -79,7 +79,7 @@ export default function NavLinks() {
           </Link>
           <Popover className="relative">
             <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6 hover:cursor-pointer">
-              The CICS
+              CICS
               <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
             </PopoverButton>
             <PopoverPanel
@@ -109,7 +109,7 @@ export default function NavLinks() {
           </Popover>
           <Popover className="relative">
             <PopoverButton className="flex items-center gap-x-1 text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6 hover:cursor-pointer">
-              The CICSSG
+              CICSSG
               <ChevronDownIcon aria-hidden="true" className="size-5 flex-none text-gray-400" />
             </PopoverButton>
             <PopoverPanel
@@ -209,7 +209,7 @@ export default function NavLinks() {
 
                 <Disclosure as="div" className="-mx-6">
                   <DisclosureButton className="group flex w-full items-center justify-between rounded-lg py-2 pr-3.5 pl-3 mx-3 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">
-                    The CICS
+                    CICS
                     <ChevronDownIcon aria-hidden="true" className="size-5 flex-none group-data-open:rotate-180 mx-5" />
                   </DisclosureButton>
                   <DisclosurePanel className="mt-2 space-y-2 bg-gray-100 inset-shadow-sm inset-shadow-black/10">
@@ -227,7 +227,7 @@ export default function NavLinks() {
                 </Disclosure>
                 <Disclosure as="div" className="-mx-6">
                   <DisclosureButton className="group flex w-full items-center justify-between rounded-lg py-2 pr-3.5 pl-3 mx-3 text-base/7 font-semibold text-gray-900 hover:bg-gray-50">
-                    The CICSSG
+                    CICSSG
                     <ChevronDownIcon aria-hidden="true" className="size-5 flex-none group-data-open:rotate-180 mx-5" />
                   </DisclosureButton>
                   <DisclosurePanel className="mt-2 space-y-2 bg-gray-100 inset-shadow-sm inset-shadow-black/10">
