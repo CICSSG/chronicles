@@ -28,7 +28,7 @@ export default function Home() {
       <div className="m-auto flex max-w-full grow flex-col gap-5 text-2xl xl:flex-row">
         {/* Left 2 Columns */}
         <div className="flex grow-6 basis-0 flex-col gap-5">
-          <div className="flex grow flex-col justify-between overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-black/25 p-5 transition-all md:flex-row md:items-center md:p-1">
+          <div className="flex grow flex-col justify-between overflow-hidden rounded-2xl bg-[url(/images/noiselowblack.png)] bg-white/90 bg-linear-to-br from-white via-white to-white/60 p-5 transition-all md:flex-row md:items-center md:p-1">
             <div className="bgImage hidden overflow-hidden rounded-2xl md:block">
               <Image
                 src={"/images/HeroPanther.png"}
@@ -81,7 +81,7 @@ export default function Home() {
             </Link>
           </div>
           {/* Documents */}
-          <div className="h-72 overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-black/25 transition-all">
+          <div className="h-72 overflow-hidden rounded-2xl bg-[url(/images/noiselowblack.png)] bg-white/90 bg-linear-to-br from-white via-white to-black/25 transition-all">
             <h2 className="pt-5 pl-5">Documents</h2>
             <div className="relative left-0 mx-auto max-w-4xl text-white *:absolute *:aspect-[9/16] *:w-3xs *:rounded-4xl *:border-2 *:border-white *:bg-neutral-800 *:bg-[url(/images/noise.png)] *:px-4 *:py-4 *:transition-all md:text-3xl *:md:w-xs *:md:px-6 xl:text-4xl *:2xl:scale-95 *:2xl:hover:scale-102">
               <Link
@@ -116,7 +116,7 @@ export default function Home() {
           {/* Announcements */}
           <Link
             href={"/announcements"}
-            className="flex min-h-96 grow-[2.5] basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-black/25 p-5 pb-12 transition-all hover:scale-102 md:min-h-fit"
+            className="flex min-h-96 grow-[2.5] basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-[url(/images/noiselowblack.png)] bg-white/90 bg-linear-to-br from-white via-white to-black/25 p-5 pb-12 transition-all hover:scale-102 md:min-h-fit"
           >
             <h2 className="lg:text-right">Announcements</h2>
             <div className="relative m-auto flex h-fit w-11/12 flex-col overflow-hidden rounded-2xl shadow-2xl">
@@ -146,7 +146,7 @@ export default function Home() {
           {/* Events */}
           <Link
             href={"/events"}
-            className="flex min-h-96 grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-black/25 p-5 transition-all hover:scale-102 md:min-h-fit"
+            className="flex min-h-96 grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-[url(/images/noiselowblack.png)] bg-white/90 bg-linear-to-br from-white via-white to-black/25 p-5 transition-all hover:scale-102 md:min-h-fit "
           >
             <h2 className="lg:text-right">Events</h2>
             <div className="carousel carousel-center rounded-box m-auto min-h-fit gap-4">
@@ -159,7 +159,7 @@ export default function Home() {
                       alt=""
                       width={500}
                       height={500}
-                      className="rounded-box h-72 w-fit border-2 border-black/70 object-contain"
+                      className="rounded-box h-72 w-fit border-2 border-black/70 object-contain "
                     />
                   </div>
                 ))}
@@ -168,7 +168,7 @@ export default function Home() {
           {/* Contact Us */}
           <Link
             href={"/contact-us"}
-            className="relative flex min-h-48 grow-1 basis-0 flex-col justify-between overflow-hidden rounded-2xl bg-neutral-500 p-5 text-white transition-all hover:scale-102 md:min-h-fit"
+            className="relative flex min-h-48 grow-1 basis-0 flex-col justify-between overflow-hidden rounded-2xl bg-white/30 p-5 text-white transition-all hover:scale-102 md:min-h-fit bg-[url(/images/noise.png)]"
           >
             <span className="absolute -top-5 -left-5 z-0 -rotate-12 text-9xl">
               @
