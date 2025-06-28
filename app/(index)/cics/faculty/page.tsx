@@ -66,7 +66,7 @@ export default function Faculty() {
                   alt=""
                   width={200}
                   height={200}
-                  className="rounded-xl border-2 border-black/60 shadow-lg shadow-blue-300"
+                  className="rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
                 />
                 <p className="mt-1.5 text-xl font-bold">{data.name}</p>
                 <p className="text-lg font-normal">{data.work_type}</p>
@@ -107,7 +107,7 @@ export default function Faculty() {
               alt=""
               width={200}
               height={200}
-              className="rounded-xl border-2 border-black/60 shadow-lg shadow-blue-300"
+              className="rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
             />
             <p className="text-xl font-bold">{data.name}</p>
             <p className="text-lg font-normal">{data.work_type}</p>

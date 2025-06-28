@@ -45,7 +45,7 @@ export default function AdminStaff() {
                   alt=""
                   width={150}
                   height={150}
-                  className="rounded-xl border-2 border-black/60 shadow-lg shadow-blue-300"
+                  className="rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
                 />
                 <div className="text-center">
                   <p className="text-xl font-normal">{documents?.dean.name}</p>
@@ -64,7 +64,7 @@ export default function AdminStaff() {
                   alt=""
                   width={150}
                   height={150}
-                  className="rounded-xl border-2 border-black/60 shadow-lg shadow-blue-300"
+                  className="rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
                 />
                 <div className="text-center">
                   <p className="text-xl font-normal">
@@ -84,7 +84,7 @@ export default function AdminStaff() {
                     alt=""
                     width={150}
                     height={150}
-                    className="grow-0 basis-0 rounded-xl border-2 border-black/60 shadow-lg shadow-blue-300"
+                    className="grow-0 basis-0 rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
                   />
                   <div className="grow basis-0">
                     <p className={`text-xl font-normal`}>{data.name}</p>

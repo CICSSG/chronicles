@@ -189,7 +189,7 @@ export default function Programs() {
 
           {/* Course Overview */}
           <div className="grid grid-cols-1 gap-4">
-            <div className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-neutral-100 from-60% to-blue-50 transition duration-300 hover:scale-101 hover:from-blue-50">
+            <div className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-black/2 from-60% to-black/10 transition duration-300 hover:scale-101 hover:from-black/10">
               <input type="checkbox" name="my-accordion-2" />
               <div className="collapse-title font-semibold">
                 <h1 className="text-2xl font-bold">Course Overview</h1>
@@ -208,7 +208,7 @@ export default function Programs() {
 
           {/* Core Subjects */}
           <div className="grid grid-cols-1 gap-4">
-            <div className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-neutral-100 from-60% to-blue-50 transition duration-300 hover:scale-101 hover:from-blue-50">
+            <div className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-black/2 from-60% to-black/10 transition duration-300 hover:scale-101 hover:from-black/10">
               <input type="checkbox" name="my-accordion-2" />
               <div className="collapse-title font-semibold">
                 <h1 className="text-2xl font-bold">Core Subjects</h1>
@@ -234,7 +234,7 @@ export default function Programs() {
 
           {/* Eligibility and Requirements */}
           <div className="grid grid-cols-1 gap-4">
-            <div className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-neutral-100 from-60% to-blue-50 transition duration-300 hover:scale-101 hover:from-blue-50">
+            <div className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-black/2 from-60% to-black/10 transition duration-300 hover:scale-101 hover:from-black/10">
               <input type="checkbox" name="my-accordion-2" />
               <div className="collapse-title font-semibold">
                 <h1 className="text-2xl font-bold">
@@ -262,7 +262,7 @@ export default function Programs() {
 
           {/* Curriculum */}
           <div className="grid grid-cols-1 gap-4">
-            <div className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-neutral-100 from-60% to-blue-50 transition duration-300 hover:scale-101 hover:from-blue-50">
+            <div className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-black/2 from-60% to-black/10 transition duration-300 hover:scale-101 hover:from-black/10">
               <input type="checkbox" name="my-accordion-2" />
               <div className="collapse-title font-semibold">
                 <h1 className="text-2xl font-bold">Curriculum</h1>
