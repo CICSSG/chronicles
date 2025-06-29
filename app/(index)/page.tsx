@@ -10,6 +10,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 
 export default function Home() {
+  const [isLoaded, setIsLoaded] = useState(false);
   const [announcements, setAnnouncements] = useState<any[] | null>(null);
   const [events, setEvents] = useState<any[] | null>(null);
 
@@ -20,6 +21,7 @@ export default function Home() {
 
     PublicEventsForHomeData().then(({ documents }) => {
       setEvents(documents ?? null);
+      setIsLoaded(true)
     });
   }, []);
 
@@ -122,7 +124,8 @@ export default function Home() {
             <div className="relative m-auto flex h-fit w-11/12 flex-col overflow-hidden rounded-2xl shadow-2xl">
               <ChevronDownIcon className="animate-infinite animate-duration-[2000ms] animate-delay-1000 animate-ease-in-out absolute bottom-0 left-1/2 size-8 -translate-x-1/2 animate-bounce" />
               <div className="no-scrollbar flex h-40 snap-y snap-mandatory flex-col overflow-y-scroll">
-                {announcements?.map((data, i) => (
+                {isLoaded ? (
+                  announcements?.map((data, i) => (
                   <div key={i} className="mb-10 h-full snap-center">
                     <div className="h-6 bg-black/50"></div>
                     <div className="h-30 py-4">
@@ -139,7 +142,26 @@ export default function Home() {
                       </div>
                     </div>
                   </div>
-                ))}
+                ))
+                ): (
+                  <div className="mb-10 h-full snap-center">
+                    <div className="h-6 bg-black/50"></div>
+                    <div className="h-30 py-4">
+                      {/* Item */}
+                      <div className="flex h-full flex-row items-center gap-2 px-4">
+                        <h1 className="flex flex-col gap-2 grow-[1.5] basis-0 text-lg font-bold md:text-2xl lg:text-lg">
+                          <div className="skeleton h-5 bg-black/10 w-full"></div>
+                        </h1>
+                        <div className="grow-3 basis-0 text-sm">
+                          <h2 className="flex flex-col gap-2 font-bold md:text-lg lg:text-sm">
+                            <div className="skeleton bg-black/10 h-3 w-full"></div>
+                            <div className="skeleton bg-black/10 h-3 w-3/4"></div>
+                          </h2>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                )}
               </div>
             </div>
           </Link>
@@ -151,7 +173,8 @@ export default function Home() {
             <h2 className="lg:text-right">Events</h2>
             <div className="inline-flex overflow-x-scroll scroll-smooth snap-x carousel-center rounded-box m-auto min-h-fit gap-4 scrollbar-none lg:scrollbar scrollbar-h-3 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thumb-black/50 pb-4">
               {/* <div className="absolute top-0 left-0 w-full h-full bg-linear-90 from-blue-200/50 via-blue-200/0 to-blue-200/50"></div> */}
-              {events &&
+              {isLoaded ? (
+                events &&
                 events.map((data) => (
                   <div className="carousel-item" key={data.id}>
                     <Image
@@ -162,7 +185,13 @@ export default function Home() {
                       className="rounded-box h-72 w-fit border-1 lg:border-2 border-black/70 object-cover"
                     />
                   </div>
-                ))}
+                ))
+              ): (
+                <>
+                  <div className="carousel-item"><div className="skeleton bg-black/10 h-64 w-64"></div></div>
+
+                </>
+              )}
             </div>
           </Link>
           {/* Contact Us */}
