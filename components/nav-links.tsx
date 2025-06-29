@@ -102,10 +102,10 @@ export default function NavLinks() {
                       <item.icon aria-hidden="true" className="size-6 text-gray-600 group-hover:text-blue-600" />
                     </div>
                     <div className="flex-auto">
-                      <a href={item.href} className="block font-semibold text-gray-900">
+                      <Link href={item.href} className="block font-semibold text-gray-900">
                         {item.name}
                         <span className="absolute inset-0" />
-                      </a>
+                      </Link>
                       <p className="mt-1 text-gray-600">{item.description}</p>
                     </div>
                   </div>
@@ -132,10 +132,10 @@ export default function NavLinks() {
                       <item.icon aria-hidden="true" className="size-6 text-gray-600 group-hover:text-blue-600" />
                     </div>
                     <div className="flex-auto">
-                      <a href={item.href} className="block font-semibold text-gray-900">
+                      <Link href={item.href} className="block font-semibold text-gray-900">
                         {item.name}
                         <span className="absolute inset-0" />
-                      </a>
+                      </Link>
                       <p className="mt-1 text-gray-600">{item.description}</p>
                     </div>
                   </div>
@@ -166,10 +166,10 @@ export default function NavLinks() {
                       <item.icon aria-hidden="true" className="size-6 text-gray-600 group-hover:text-blue-600" />
                     </div>
                     <div className="flex-auto">
-                      <a href={item.href} className="block font-semibold text-gray-900">
+                      <Link href={item.href} className="block font-semibold text-gray-900">
                         {item.name}
                         <span className="absolute inset-0" />
-                      </a>
+                      </Link>
                       <p className="mt-1 text-gray-600">{item.description}</p>
                     </div>
                   </div>
