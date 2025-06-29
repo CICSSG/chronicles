@@ -501,7 +501,6 @@ export async function editGovernorPOST(formData: FormData) {
           image: image,
           position: "Governor",
           responsibilities: responsibilities,
-          contact_info: contact,
         },
       },
     ])
@@ -545,7 +544,6 @@ export async function editViceGovernorPOST(formData: FormData) {
           image: image,
           position: "Vice Governor",
           responsibilities: responsibilities,
-          contact_info: contact,
         },
       },
     ])
@@ -647,7 +645,7 @@ export async function createOfficerPOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
   const directorate = data?.[0]?.directorate || [];
-  directorate.push({ name, position, image, responsibilities, contact_info });
+  directorate.push({ name, position, image, responsibilities });
 
   const { error } = await supabase
     .from("slate")
@@ -698,7 +696,7 @@ export async function editOfficerPOST(formData: FormData) {
   const directorate = data?.[0]?.directorate || [];
 
   filtered = directorate.map((item: any) =>
-    item.name === id_name ? { name, position, image, responsibilities, contact_info } : item,
+    item.name === id_name ? { name, position, image, responsibilities } : item,
   );
 
   const { error } = await supabase
@@ -766,7 +764,7 @@ export async function createLegislativePOST(formData: FormData) {
 
   const id = formData.get("id");
   const name = formData.get("name");
-  const image = formData.get("image");const responsibilitiesRaw = formData.get("responsibilities_data");
+  const image = formData.get("image");
   const contactRaw = formData.get("contact_data");
   const contact_info =
     typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
@@ -777,7 +775,7 @@ export async function createLegislativePOST(formData: FormData) {
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
   const legislative = data?.[0]?.legislative || [];
-  legislative.push({ name, image, contact_info });
+  legislative.push({ name, image });
 
   const { error } = await supabase
     .from("slate")
@@ -822,7 +820,7 @@ export async function editLegislativePOST(formData: FormData) {
   const legislative = data?.[0]?.legislative || [];
 
   filtered = legislative.map((item: any) =>
-    item.name === id_name ? { name, image, contact_info } : item,
+    item.name === id_name ? { name, image } : item,
   );
 
   const { error } = await supabase

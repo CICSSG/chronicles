@@ -18,7 +18,7 @@ const programs: ProgramData[] = [
     description:
       "The Bachelor of Science in Computer Science program prepares students to be highly competent and certified in the areas of computing theory and applications; trains them in the areas of abstract reasoning, analytical thinking and research; with track in: Robotics or Mobile and Game Development. Graduates of this program may pursue a meaningful career as an applications developer, CS instructor, researcher, trainer, database programmer/design, mobile applications, games developer or system analyst. ",
     accreditation: "Accredited by PAASCU - Level 1",
-    imageUrl: "/images/ProgramsPlaceholder.png",
+    imageUrl: "/images/ProgramsCS.png",
     courseOverview: [
       "The Bachelor of Science in Computer Science program prepares students to be highly competent and certified in the areas of computing theory and applications; trains them in the areas of abstract reasoning, analytical thinking and research; with track in: Robotics or Mobile and Game Development. Graduates of this program may pursue a meaningful career as an applications developer, CS instructor, researcher, trainer, database programmer/design, mobile applications, games developer or system analyst.",
     ],
@@ -93,7 +93,7 @@ const programs: ProgramData[] = [
     description:
       "The Bachelor of Science in Information Technology program focuses on the rigorous training of students with the latest IT concepts and applications. It provides a practical approach in studying the various facets and latest applications of the IT industry; with track in: Network Technology or Software Technology.",
     accreditation: "Accredited by PAASCU - Level 2",
-    imageUrl: "/images/ProgramsPlaceholder.png",
+    imageUrl: "/images/ProgramsIT.png",
     courseOverview: [
       "The Bachelor of Science in Information Technology program focuses on the rigorous training of students with the latest IT concepts and applications. It provides a practical approach in studying the various facets and latest applications of the IT industry; with track in: Network Technology or Software Technology.",
       "Graduates of this program may pursue a meaningful career as a database administrator, entrepreneur in the IT industry, information security administrator, IT instructor, programmer, trainer or researcher. They can also become successful as researchers, information security/network administrators, technical support specialists or web administrators, web masters or web developers.",
@@ -168,7 +168,7 @@ export default function Programs() {
         <div key={i} className="flex flex-col gap-4">
           <hr />
           <div
-            className="hero h-96 place-items-start overflow-hidden rounded-3xl"
+            className="hero min-h-96 h-fit place-items-start overflow-hidden rounded-3xl"
             style={{
               backgroundImage: `url(${data.imageUrl})`,
             }}
