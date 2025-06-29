@@ -189,7 +189,7 @@ export default function EventCard({
           className="aspect-square rounded-lg object-cover mx-auto"
         />
       )}
-      <h1 className="text-2xl font-bold lg:min-h-[3.9725rem] ">{Title}</h1>
+      <h1 className="grow basis-0 text-xl 3xl:text-2xl font-extrabold h-fit 3xl:min-h-[3.9725rem]">{Title}</h1>
       <hr className="rounded-2xl border-2 font-bold text-black/40" />
       <div className="h-full flex min-h-12 flex-col">
         <p className="font-bolder grow basis-0 text-lg">{Location}</p>

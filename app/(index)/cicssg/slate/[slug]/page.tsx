@@ -217,7 +217,7 @@ export default function Page() {
                 {NO_DATA_MESSAGE}
               </span>
             )}
-            <div className="grid grid-cols-1 justify-evenly gap-10 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 justify-evenly gap-10 md:grid-cols-2 2xl:grid-cols-3">
               {document &&
                 document.directorate.map(
                   (
@@ -285,7 +285,7 @@ export default function Page() {
                 {NO_DATA_MESSAGE}
               </span>
             )}
-            <div className="grid grid-cols-1 justify-evenly gap-10 md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 justify-evenly gap-10 md:grid-cols-2 2xl:grid-cols-3">
               {document &&
                 document.legislative &&
                 document.legislative.map(
@@ -324,7 +324,7 @@ export default function Page() {
                 {NO_DATA_MESSAGE}
               </span>
             )}
-            <div className="grid grid-cols-1 justify-evenly gap-10 *:basis-[20%] md:grid-cols-2 xl:grid-cols-3">
+            <div className="grid grid-cols-1 justify-evenly gap-10 *:basis-[20%] md:grid-cols-2 2xl:grid-cols-3">
               {document &&
                 document.junior_officers.map(
                   (

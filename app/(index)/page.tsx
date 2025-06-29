@@ -123,7 +123,7 @@ export default function Home() {
               <ChevronDownIcon className="animate-infinite animate-duration-[2000ms] animate-delay-1000 animate-ease-in-out absolute bottom-0 left-1/2 size-8 -translate-x-1/2 animate-bounce" />
               <div className="no-scrollbar flex h-36 snap-y snap-mandatory flex-col overflow-y-scroll">
                 {announcements?.map((data, i) => (
-                  <div className="mb-10 h-full snap-center">
+                  <div key={i} className="mb-10 h-full snap-center">
                     <div className="h-6 bg-black/50"></div>
                     <div className="h-30 py-4">
                       {/* Item */}

@@ -32,10 +32,18 @@ export default function AdminStaff() {
       <hr />
 
       {isLoaded ? (
-          <>
-            <div className="flex flex-col justify-around gap-8 *:basis-[40%] lg:mx-0 lg:flex-row">
-              {/* Dean */}
-              <div className="flex flex-col items-center gap-4">
+        <>
+          <div className="flex flex-col justify-around gap-8 *:basis-[40%] lg:mx-0 lg:flex-row">
+            {/* Dean */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <Image
+                  src={"/images/Frame.png"}
+                  alt=""
+                  width={150}
+                  height={150}
+                  className="absolute aspect-square rounded-xl border-2 border-black/60 object-cover shadow-lg shadow-black/30"
+                />
                 <Image
                   src={
                     documents && documents.dean.image !== ""
@@ -45,16 +53,26 @@ export default function AdminStaff() {
                   alt=""
                   width={150}
                   height={150}
-                  className="rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
+                  className="aspect-square rounded-xl object-cover p-2"
                 />
-                <div className="text-center">
-                  <p className="text-xl font-normal">{documents?.dean.name}</p>
-                  <p className="text-lg font-semibold">Dean, CICS</p>
-                </div>
               </div>
 
-              {/* Associate Dean */}
-              <div className="flex flex-col items-center gap-4">
+              <div className="text-center">
+                <p className="text-xl font-normal">{documents?.dean.name}</p>
+                <p className="text-lg font-semibold">Dean, CICS</p>
+              </div>
+            </div>
+
+            {/* Associate Dean */}
+            <div className="flex flex-col items-center gap-4">
+              <div className="relative">
+                <Image
+                  src={"/images/Frame.png"}
+                  alt=""
+                  width={150}
+                  height={150}
+                  className="absolute aspect-square rounded-xl border-2 border-black/60 object-cover shadow-lg shadow-black/30"
+                />
                 <Image
                   src={
                     documents && documents.associate_dean.image !== ""
@@ -64,36 +82,56 @@ export default function AdminStaff() {
                   alt=""
                   width={150}
                   height={150}
-                  className="rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
+                  className="aspect-square rounded-xl object-cover p-2"
                 />
-                <div className="text-center">
-                  <p className="text-xl font-normal">
-                    {documents?.associate_dean.name}
-                  </p>
-                  <p className="text-lg font-semibold">Associate Dean, CICS</p>
-                </div>
+              </div>
+
+              <div className="text-center">
+                <p className="text-xl font-normal">
+                  {documents?.associate_dean.name}
+                </p>
+                <p className="text-lg font-semibold">Associate Dean, CICS</p>
               </div>
             </div>
+          </div>
 
-            {/* Staff */}
-            <div className="m-auto my-16 flex w-full flex-row flex-wrap items-center justify-around gap-x-4 gap-y-10 xl:*:basis-[30%]">
-              {documents?.staff.map((data, i) => (
-                <div key={i} className={`flex flex-col w-full items-center gap-4`}>
+          {/* Staff */}
+          <div className="3xl:grid-cols-3 m-auto my-16 grid w-full grid-cols-1 items-center justify-around gap-x-4 gap-y-10 md:grid-cols-2">
+            {documents?.staff.map((data, i) => (
+              <div
+                key={i}
+                className={`flex w-full flex-col items-center gap-4`}
+              >
+                <div className="relative">
                   <Image
-                    src={data.image !== "" ? data.image : "/images/NoImage.png"}
+                    src={"/images/Frame.png"}
                     alt=""
                     width={150}
                     height={150}
-                    className="grow-0 basis-0 rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
+                    className="absolute aspect-square rounded-xl border-2 border-black/60 object-cover shadow-lg shadow-black/30"
                   />
-                  <div className="grow basis-0">
-                    <p className={`text-xl font-normal text-center`}>{data.name}</p>
-                    <p className={`text-lg font-semibold text-center`}>{data.position}</p>
-                  </div>
+                  <Image
+                    src={
+                      data.image.length > 2 ? data.image : "/images/NoImage.png"
+                    }
+                    alt=""
+                    width={150}
+                    height={150}
+                    className="aspect-square rounded-xl object-cover p-2"
+                  />
                 </div>
-              ))}
-            </div>
-          </>
+                <div className="grow basis-0">
+                  <p className={`text-center text-xl font-normal`}>
+                    {data.name}
+                  </p>
+                  <p className={`text-center text-lg font-semibold`}>
+                    {data.position}
+                  </p>
+                </div>
+              </div>
+            ))}
+          </div>
+        </>
       ) : (
         <div className="flex flex-col justify-around gap-8 *:basis-[40%] lg:mx-0 lg:flex-row">
           <AdminStaffSkeleton amount={2} />

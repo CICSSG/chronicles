@@ -31,7 +31,6 @@ export default function Faculty() {
       setDocumentsIT(documents ?? null);
       setIsLoadedIT(true);
     });
-    
   }, []);
 
   return (
@@ -59,15 +58,24 @@ export default function Faculty() {
                 key={i}
                 className="flex flex-col items-center gap-1.5 text-center"
               >
-                <Image
-                  src={
-                    data.image.length > 2 ? data.image : "/images/NoImage.png"
-                  }
-                  alt=""
-                  width={200}
-                  height={200}
-                  className="rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
-                />
+                <div className="relative">
+                  <Image
+                    src={"/images/Frame.png"}
+                    alt=""
+                    width={200}
+                    height={200}
+                    className="absolute aspect-square rounded-xl border-2 border-black/60 object-cover shadow-lg shadow-black/30"
+                  />
+                  <Image
+                    src={
+                      data.image.length > 2 ? data.image : "/images/NoImage.png"
+                    }
+                    alt=""
+                    width={200}
+                    height={200}
+                    className="aspect-square rounded-xl object-cover p-4"
+                  />
+                </div>
                 <p className="mt-1.5 text-xl font-bold">{data.name}</p>
                 <p className="text-lg font-normal">{data.work_type}</p>
                 <p className="text-base font-semibold">Specializations:</p>
@@ -97,34 +105,45 @@ export default function Faculty() {
 
       <div className="3xl:grid-cols-4 grid grid-cols-1 gap-x-4 gap-y-16 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3">
         {isLoadedIT ? (
-            documentsIT?.map((data, i) => (
-          <div
-            key={i}
-            className="flex flex-col items-center gap-1.5 text-center"
-          >
-            <Image
-              src={data.image.length > 2 ? data.image : "/images/NoImage.png"}
-              alt=""
-              width={200}
-              height={200}
-              className="rounded-xl border-2 border-black/60 shadow-lg shadow-black/30 aspect-square object-cover"
-            />
-            <p className="text-xl font-bold">{data.name}</p>
-            <p className="text-lg font-normal">{data.work_type}</p>
-            <p className="text-base font-semibold">Specializations:</p>
-            <p className="text-base font-normal">
-              {data.specialization.map((specializationData, i) => (
-                <span key={i}>
-                  {specializationData}
-                  {i < data.specialization.length - 1 ? ", " : ""}
-                </span>
-              ))}
-            </p>
-          </div>
-        ))
-          ) : (
-            <FacultySkeleton amount={4} />
-          )}
+          documentsIT?.map((data, i) => (
+            <div
+              key={i}
+              className="flex flex-col items-center gap-1.5 text-center"
+            >
+              <div className="relative">
+                <Image
+                  src={"/images/Frame.png"}
+                  alt=""
+                  width={200}
+                  height={200}
+                  className="absolute aspect-square rounded-xl border-2 border-black/60 object-cover shadow-lg shadow-black/30"
+                />
+                <Image
+                  src={
+                    data.image.length > 2 ? data.image : "/images/NoImage.png"
+                  }
+                  alt=""
+                  width={200}
+                  height={200}
+                  className="aspect-square rounded-xl object-cover p-4"
+                />
+              </div>
+              <p className="text-xl font-bold">{data.name}</p>
+              <p className="text-lg font-normal">{data.work_type}</p>
+              <p className="text-base font-semibold">Specializations:</p>
+              <p className="text-base font-normal">
+                {data.specialization.map((specializationData, i) => (
+                  <span key={i}>
+                    {specializationData}
+                    {i < data.specialization.length - 1 ? ", " : ""}
+                  </span>
+                ))}
+              </p>
+            </div>
+          ))
+        ) : (
+          <FacultySkeleton amount={4} />
+        )}
       </div>
     </div>
   );
