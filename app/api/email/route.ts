@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
   });
 
   const mailOptions: Mail.Options = {
-    from: process.env.MY_EMAIL,
-    to: process.env.MY_EMAIL,
+    from: "cics.chronicles@gmail.com",
+    to: "cics.chronicles@gmail.com",
     cc: email,
-    subject: `[${concern.toUpperCase()} - ${person.toUpperCase()}] Message from ${gender?.toUpperCase()} ${name} (${email} ${phone != "" ? "- " + phone : null})`,
+    subject: `[${concern.toUpperCase()} - ${person.toUpperCase()}] Message from ${gender?.toUpperCase()} ${name} (${email}${phone != "" ? " - " + phone : ""})`,
     text: message,
   };
 
