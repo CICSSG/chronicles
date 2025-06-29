@@ -2,10 +2,15 @@
 @import "tailwindcss-animated";
 @plugin "daisyui";
 @import "tailwindcss/utilities";
+@plugin 'tailwind-scrollbar' {
+  nocompatible: true;
+}
 
 /* Your custom styles below */
-h1, h2, h3 {
-  font-family: 'Space Grotesk', cursive;
+h1,
+h2,
+h3 {
+  font-family: "Space Grotesk", cursive;
 }
 
 @theme {
@@ -13,7 +18,7 @@ h1, h2, h3 {
 }
 
 @theme {
-  --font-secondary: 'Geist', 'sans-serif';
+  --font-secondary: "Geist", "sans-serif";
 }
 
 @plugin "daisyui/theme" {
@@ -51,7 +56,6 @@ h1, h2, h3 {
   --noise: 0;
 }
 
-
 @layer base {
   :root {
     --background: 0 0% 100%;
@@ -83,11 +87,11 @@ h1, h2, h3 {
 }
 
 .main-content {
-  @apply flex
+  @apply flex;
 }
 
 h6 {
-  font-family: 'Roboto', cursive;
+  font-family: "Roboto", cursive;
 }
 
 @utility no-scrollbar {
@@ -97,4 +101,3 @@ h6 {
 @utility min-scrollbar {
   @apply [scrollbar-width:1px] [&::-webkit-scrollbar]:hidden;
 }
-

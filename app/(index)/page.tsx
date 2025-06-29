@@ -149,7 +149,7 @@ export default function Home() {
             className="flex min-h-96 grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-[url(/images/noiselowblack.png)] bg-white/90 bg-linear-to-br from-white via-white to-black/25 p-5 transition-all hover:scale-102 md:min-h-fit "
           >
             <h2 className="lg:text-right">Events</h2>
-            <div className="carousel carousel-center rounded-box m-auto min-h-fit gap-4">
+            <div className="inline-flex overflow-x-scroll scroll-smooth snap-x carousel-center rounded-box m-auto min-h-fit gap-4 scrollbar-none lg:scrollbar scrollbar-h-3 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thumb-black/50 pb-4">
               {/* <div className="absolute top-0 left-0 w-full h-full bg-linear-90 from-blue-200/50 via-blue-200/0 to-blue-200/50"></div> */}
               {events &&
                 events.map((data) => (
