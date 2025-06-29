@@ -10,7 +10,8 @@ const isPublicRoute = createRouteMatcher([
   '/events(.*)',
   '/contact-us(.*)',
   '/sign-in(.*)',
-  '/sign-up(.*)'
+  '/sign-up(.*)',
+  '/api(.*)'
 ])
 
 const isSignupRoute = createRouteMatcher([
