@@ -9,7 +9,7 @@ export default function CICSSG() {
           width={1000}
           height={500}
           alt=""
-          className="h-96 w-full rounded-xl border-2 border-black/40 object-cover shadow-lg"
+          className="h-fit lg:h-96 w-full rounded-xl border-2 border-black/40 object-cover shadow-lg"
         />
         <h1 className="text-3xl">About CICSSG</h1>
         <p className="text-xl font-normal">
