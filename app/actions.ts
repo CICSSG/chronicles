@@ -241,6 +241,7 @@ export async function createEventPOST(formData: FormData) {
   const date = formData.get("date");
   const academicYear = formData.get("academic_year");
   const location = formData.get("location");
+  const albumLink = formData.get("album_link");
   const description = formData.get("description");
   const highlightsRaw = formData.get("highlights");
   const highlights =
@@ -263,6 +264,7 @@ export async function createEventPOST(formData: FormData) {
         academic_year: academicYear,
         location: location,
         project_heads: projectHeads,
+        album_link: albumLink,
         highlights: highlights,
         description: description,
       },
@@ -291,6 +293,7 @@ export async function editEventPOST(formData: FormData) {
   const date = formData.get("date");
   const academicYear = formData.get("academic_year");
   const location = formData.get("location");
+  const albumLink = formData.get("album_link");
   const description = formData.get("description");
   const highlightsRaw = formData.get("highlights");
   const highlights =
@@ -316,6 +319,7 @@ export async function editEventPOST(formData: FormData) {
         academic_year: academicYear,
         location: location,
         project_heads: projectHeads,
+        album_link: albumLink,
         highlights: highlights,
         description: description,
       })
@@ -335,6 +339,7 @@ export async function editEventPOST(formData: FormData) {
         academic_year: academicYear,
         location: location,
         project_heads: projectHeads,
+        album_link: albumLink,
         highlights: highlights,
         description: description,
       })

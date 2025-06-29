@@ -185,6 +185,10 @@ export default function Page() {
               </>
             )}
           </div>
+
+            {document && document.album_link && (
+              <Link href={document.album_link} target="_blank" className="mx-auto px-4 py-2 bg-black/90 text-white/90 rounded-lg hover:bg-black/80">View full album</Link>
+            )}
         </div>
       </div>
     </div>

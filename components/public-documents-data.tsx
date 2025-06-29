@@ -9,13 +9,19 @@ const supabase = createClient(
 const ITEMS_PER_PAGE = 8;
 const ANNOUNCEMENT_ITEMS_PER_PAGE = 7;
 
-export async function PublicDocumentData(document_type: string, page?: number | null) {
+export async function PublicDocumentData(
+  document_type: string,
+  page?: number | null,
+) {
   page == null && (page = 1);
   const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
 
   let { data: documents, count } = await supabase
     .from("documents")
-    .select("id, title, date, document_type, description, author, link, image", { count: "exact", head: false })
+    .select(
+      "id, title, date, document_type, description, author, link, image",
+      { count: "exact", head: false },
+    )
     .eq("document_type", document_type)
     .range(from, to)
     .order("id", { ascending: false });
@@ -25,18 +31,21 @@ export async function PublicDocumentData(document_type: string, page?: number | 
   return { documents, pagination };
 }
 
-
 export async function PublicAnnouncementData(page?: number | null) {
   page == null && (page = 1);
   const { from, to } = getPagination(page - 1, ANNOUNCEMENT_ITEMS_PER_PAGE);
 
   let { data: documents, count } = await supabase
     .from("announcements")
-    .select("id, title, date, link, description, image", { count: "exact", head: false })
+    .select("id, title, date, link, description, image", {
+      count: "exact",
+      head: false,
+    })
     .range(from, to)
     .order("id", { ascending: false });
 
-  let pagination = count != null ? Math.ceil(count / (ANNOUNCEMENT_ITEMS_PER_PAGE + 1)) : 1;
+  let pagination =
+    count != null ? Math.ceil(count / (ANNOUNCEMENT_ITEMS_PER_PAGE + 1)) : 1;
 
   return { documents, pagination };
 }
@@ -47,7 +56,10 @@ export async function PublicEventsData(page?: number | null) {
 
   let { data: documents, count } = await supabase
     .from("events")
-    .select("id, title, image, date, academic_year, location, project_heads, highlights, description, images", { count: "exact", head: false })
+    .select(
+      "id, title, image, date, academic_year, location, project_heads, highlights, description, images, album_link",
+      { count: "exact", head: false },
+    )
     .range(from, to)
     .order("id", { ascending: false });
 
@@ -59,8 +71,10 @@ export async function PublicEventsData(page?: number | null) {
 export async function PublicEventDataByID(id?: string) {
   let { data: documents } = await supabase
     .from("events")
-    .select("id, title, image, date, academic_year, location, project_heads, highlights, description, images")
-    .eq('id', id)
+    .select(
+      "id, title, image, date, academic_year, location, project_heads, highlights, description, images, album_link",
+    )
+    .eq("id", id);
 
   return { documents };
 }
@@ -84,7 +98,7 @@ export async function PublicSlateDataByID(id?: string) {
   let { data: documents } = await supabase
     .from("slate")
     .select("*")
-    .eq('id', id)
+    .eq("id", id);
 
   return { documents };
 }
@@ -103,14 +117,13 @@ export async function PublicFacultyData(department: string) {
     .from("faculty")
     .select("*", { count: "exact", head: false })
     .eq("department", department)
-    .order("work_type", {ascending: true})
-    .order("name", { ascending: true })
-    
+    .order("work_type", { ascending: true })
+    .order("name", { ascending: true });
+
   return { documents };
 }
 
 export async function PublicAnnouncementForHomeData() {
-
   let { data: documents } = await supabase
     .from("announcements")
     .select("date, title")
@@ -120,11 +133,24 @@ export async function PublicAnnouncementForHomeData() {
   type Announcement = { date: string; title: string };
   let formattedDocument: Announcement[] = [];
   documents?.forEach((data) => {
-    const monthNames = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+    const monthNames = [
+      "Jan",
+      "Feb",
+      "Mar",
+      "Apr",
+      "May",
+      "Jun",
+      "Jul",
+      "Aug",
+      "Sep",
+      "Oct",
+      "Nov",
+      "Dec",
+    ];
     const date = new Date(Date.parse(data.date));
     const monthIndex = date.getMonth();
-    const monthAbbreviation = monthNames[monthIndex]
-    const formattedDate = `${monthAbbreviation} ${date.getDate().toString()} ${date.getFullYear().toString()}`
+    const monthAbbreviation = monthNames[monthIndex];
+    const formattedDate = `${monthAbbreviation} ${date.getDate().toString()} ${date.getFullYear().toString()}`;
     formattedDocument.push({ date: formattedDate, title: data.title });
   });
 
@@ -132,7 +158,6 @@ export async function PublicAnnouncementForHomeData() {
 }
 
 export async function PublicEventsForHomeData() {
-
   let { data: documents } = await supabase
     .from("events")
     .select("id, image")
@@ -147,7 +172,7 @@ export async function PublicUrgentAnnounementData() {
     .from("urgent_announcement")
     .select("*", { count: "exact", head: false })
     .order("id", { ascending: false })
-    .limit(1)
+    .limit(1);
 
   return { documents };
 }
