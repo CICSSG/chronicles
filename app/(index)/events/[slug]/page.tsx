@@ -119,28 +119,42 @@ export default function Page() {
         </div>
       </div>
       <div className="3xl:grow-3 flex grow-2 basis-0 flex-col gap-8 rounded-2xl bg-neutral-300 bg-[url(/images/noise.png)] p-6 text-black/80 xl:p-12">
-        <div className="flex flex-col gap-4 2xl:flex-row">
-          {isLoaded ? (
-            <Image
-            src={document && document.image}
-            alt=""
-            width={300}
-            height={300}
-            className="my-auto h-fit w-full rounded-2xl border border-black/60 object-contain"
-          />
-          ) : (
-            <div className="skeleton w-80 aspect-square"></div>
-          )}
-          <div className="my-8 flex flex-col justify-between gap-3">
-            <h1 className="text-center text-3xl xl:text-left">
-              About the event:
-            </h1>
-            <p className="text-justify text-lg font-normal">
+        <div className="flex flex-col gap-4">
+          <h1 className="text-center text-3xl xl:text-left">
+            About the event:
+          </h1>
+          <div className="block">
+            {isLoaded ? (
+              <Image
+                src={document && document.image}
+                alt=""
+                width={300}
+                height={300}
+                className="float-left my-auto mr-0 mb-4 h-fit w-full rounded-2xl border border-black/60 object-contain md:mr-4 md:mb-0 md:w-2/5"
+              />
+            ) : (
+              <div className="flex flex-row gap-2">
+                <div className="skeleton float-left aspect-square w-80 mr-4"></div>
+                <div className="flex flex-col w-full gap-4">
+                  <div className="skeleton h-4 w-full"></div>
+                  <div className="skeleton h-4 w-full"></div>
+                  <div className="skeleton h-4 w-full"></div>
+                  <div className="skeleton h-4 w-full"></div>
+                  <div className="skeleton h-4 w-full"></div>
+                  <div className="skeleton h-4 w-full"></div>
+                </div>
+              </div>
+            )}
+            <p className="text-justify text-lg/10 font-normal">
               {document && document.description}
             </p>
-            <div className="text-xl font-normal">
-              Location: {document && document.location}
-            </div>
+          </div>
+          <div className="flex flex-row items-center gap-2 text-xl font-normal">
+            Location: {isLoaded ? (
+              document && document.location
+            ) : (
+              <div className="skeleton h-4 w-72"></div>
+            )}
           </div>
         </div>
 
@@ -148,7 +162,8 @@ export default function Page() {
         <div className="flex flex-col gap-4">
           <h1 className="text-center text-3xl xl:text-left">Gallery:</h1>
           <div className="3xl:grid-cols-4 mx-auto grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
-            {document && document.images.length != 0 && (
+            {isLoaded ? (
+              document && document.images.length != 0 && (
               <>
                 {document.images.map((data: string) => (
                   <Image
@@ -159,6 +174,14 @@ export default function Page() {
                     className="h-full rounded-xl border border-black/70 object-cover"
                   />
                 ))}
+              </>
+            )
+            ) : (
+              <>
+              <div className="skeleton h-32 w-60"></div>
+              <div className="skeleton h-32 w-full"></div>
+              <div className="skeleton h-32 w-full"></div>
+              <div className="skeleton h-32 w-full"></div>
               </>
             )}
           </div>

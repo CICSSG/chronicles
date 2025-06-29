@@ -553,23 +553,6 @@ export default function Events() {
 
                           <div className="w-full max-w-md">
                             <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Expenses
-                              </Label>
-                              <Input
-                                name="expenses"
-                                placeholder="Optional"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
                               <Label className="text-sm/6 font-medium text-black">
                                 Image
                               </Label>
@@ -790,26 +773,6 @@ export default function Events() {
                                 rows={8}
                                 defaultValue={
                                   editDocument && editDocument[0].description
-                                }
-                              />
-                            </Field>
-                          </div>
-
-                          <div className="w-full max-w-md">
-                            <Field className="flex flex-row items-center gap-4">
-                              <Label className="text-sm/6 font-medium text-nowrap text-black">
-                                Expenses
-                              </Label>
-                              <Input
-                                name="expenses"
-                                placeholder="Optional"
-                                type="text"
-                                className={clsx(
-                                  "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                )}
-                                defaultValue={
-                                  editDocument && editDocument[0].expenses
                                 }
                               />
                             </Field>

@@ -36,6 +36,7 @@ export default function Page() {
         ? params.slug[0]
         : "";
 
+  const [isLoaded, setIsLoaded] = useState(false);
   const [document, setDocument] = useState<any | null>(null);
   const [viewResponsibilities, setViewResponsibilities] = useState(false);
   const [responsibilitiesData, setResponsibilitiesData] = useState<any | null>(
@@ -46,6 +47,7 @@ export default function Page() {
     if (!slug) return;
     PublicSlateDataByID(slug).then(({ documents }) => {
       setDocument(documents && documents[0] ? documents[0] : null);
+      setIsLoaded(true);
     });
   }, [slug]);
 
@@ -132,7 +134,7 @@ export default function Page() {
                 src={
                   document.adviser.image != ""
                     ? document.adviser.image
-                    : "https://i.imgur.com/6pP0o7C.png"
+                    : "/images/NoImage.png"
                 }
                 alt=""
                 className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
@@ -149,60 +151,82 @@ export default function Page() {
             Governor & <br className="xl:hidden" /> Vice Governor
           </h1>
           <div className="flex flex-col justify-evenly gap-8 xl:flex-row">
-            {document && document.governor && (
-              <div className="flex flex-col items-center gap-2">
-                <Image
-                  height={250}
-                  width={250}
-                  src={
-                    document.governor.image != ""
-                      ? document.governor.image
-                      : "https://i.imgur.com/6pP0o7C.png"
-                  }
-                  alt=""
-                  className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
-                />
-                <h1 className="text-xl font-bold">Governor</h1>
-                <p className="text-xl font-medium">{document.governor.name}</p>
-                {document.governor.responsibilities?.length > 0 && (
-                  <Button
-                    onClick={() =>
-                      handleViewResponsibilitiesGovVgov("Governor")
+            {isLoaded ? (
+              document &&
+              document.governor && (
+                <div className="flex flex-col items-center gap-2">
+                  <Image
+                    height={250}
+                    width={250}
+                    src={
+                      document.governor.image != ""
+                        ? document.governor.image
+                        : "/images/NoImage.png"
                     }
-                    className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
-                  >
-                    Responsibilities
-                  </Button>
-                )}
+                    alt=""
+                    className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
+                  />
+                  <h1 className="text-xl font-bold">Governor</h1>
+                  <p className="text-xl font-medium">
+                    {document.governor.name}
+                  </p>
+                  {document.governor.responsibilities?.length > 0 && (
+                    <Button
+                      onClick={() =>
+                        handleViewResponsibilitiesGovVgov("Governor")
+                      }
+                      className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
+                    >
+                      Responsibilities
+                    </Button>
+                  )}
+                </div>
+              )
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                <div className="skeleton h-48 w-48"></div>
+                <div className="skeleton h-6 w-full"></div>
+                <div className="skeleton h-6 w-full"></div>
+                <div className="skeleton h-8 w-8/12"></div>
               </div>
             )}
-            {document && document.vice_governor && (
-              <div className="flex flex-col items-center gap-2">
-                <Image
-                  height={250}
-                  width={250}
-                  src={
-                    document.vice_governor.image != ""
-                      ? document.vice_governor.image
-                      : "https://i.imgur.com/6pP0o7C.png"
-                  }
-                  alt=""
-                  className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
-                />
-                <h1 className="text-xl font-bold">Vice Governor</h1>
-                <p className="text-xl font-medium">
-                  {document.vice_governor.name}
-                </p>
-                {document.vice_governor.responsibilities?.length > 0 && (
-                  <Button
-                    onClick={() =>
-                      handleViewResponsibilitiesGovVgov("Vice Governor")
+            {isLoaded ? (
+              document &&
+              document.vice_governor && (
+                <div className="flex flex-col items-center gap-2">
+                  <Image
+                    height={250}
+                    width={250}
+                    src={
+                      document.vice_governor.image != ""
+                        ? document.vice_governor.image
+                        : "/images/NoImage.png"
                     }
-                    className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
-                  >
-                    Responsibilities
-                  </Button>
-                )}
+                    alt=""
+                    className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
+                  />
+                  <h1 className="text-xl font-bold">Vice Governor</h1>
+                  <p className="text-xl font-medium">
+                    {document.vice_governor.name}
+                  </p>
+                  {document.vice_governor.responsibilities?.length > 0 && (
+                    <Button
+                      onClick={() =>
+                        handleViewResponsibilitiesGovVgov("Vice Governor")
+                      }
+                      className="rounded-xl bg-black/80 px-3 py-1.5 text-white hover:cursor-pointer hover:bg-black/70"
+                    >
+                      Responsibilities
+                    </Button>
+                  )}
+                </div>
+              )
+            ) : (
+              <div className="flex flex-col items-center gap-2">
+                <div className="skeleton h-48 w-48"></div>
+                <div className="skeleton h-6 w-full"></div>
+                <div className="skeleton h-6 w-full"></div>
+                <div className="skeleton h-8 w-8/12"></div>
               </div>
             )}
           </div>
@@ -229,9 +253,7 @@ export default function Page() {
                         height={250}
                         width={250}
                         src={
-                          data.image != ""
-                            ? data.image
-                            : "https://i.imgur.com/6pP0o7C.png"
+                          data.image != "" ? data.image : "/images/NoImage.png"
                         }
                         alt=""
                         className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
@@ -295,9 +317,7 @@ export default function Page() {
                         height={250}
                         width={250}
                         src={
-                          data.image != ""
-                            ? data.image
-                            : "https://i.imgur.com/6pP0o7C.png"
+                          data.image != "" ? data.image : "/images/NoImage.png"
                         }
                         alt=""
                         className="aspect-square w-50 rounded-2xl border-2 border-black/70 shadow-lg"
@@ -334,9 +354,7 @@ export default function Page() {
                     <div key={i} className="flex flex-col items-center gap-2">
                       <Image
                         src={
-                          data.image != ""
-                            ? data.image
-                            : "https://i.imgur.com/6pP0o7C.png"
+                          data.image != "" ? data.image : "/images/NoImage.png"
                         }
                         alt=""
                         height={250}

@@ -52,7 +52,7 @@ export default function Home() {
             {/* The CICS */}
             <Link
               href={"/cics"}
-              className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-black/25 transition-all hover:scale-102"
+              className="relative flex min-h-80 grow basis-0 items-center overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-black/25 transition-all hover:scale-102"
             >
               <h2 className="absolute top-6 left-6 z-2">The CICS</h2>
               <Image
@@ -66,7 +66,7 @@ export default function Home() {
             {/* The CICSSG */}
             <Link
               href={"/cicssg"}
-              className="relative flex min-h-64 grow basis-0 items-center overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-black/25 transition-all hover:scale-102"
+              className="relative flex min-h-80 grow basis-0 items-center overflow-hidden rounded-2xl bg-white bg-linear-to-br from-white via-white to-black/25 transition-all hover:scale-102"
             >
               <h2 className="absolute top-6 left-6 z-2 md:right-6 md:left-auto">
                 The CICS&#123;SG&#125;
@@ -121,7 +121,7 @@ export default function Home() {
             <h2 className="lg:text-right">Announcements</h2>
             <div className="relative m-auto flex h-fit w-11/12 flex-col overflow-hidden rounded-2xl shadow-2xl">
               <ChevronDownIcon className="animate-infinite animate-duration-[2000ms] animate-delay-1000 animate-ease-in-out absolute bottom-0 left-1/2 size-8 -translate-x-1/2 animate-bounce" />
-              <div className="no-scrollbar flex h-36 snap-y snap-mandatory flex-col overflow-y-scroll">
+              <div className="no-scrollbar flex h-40 snap-y snap-mandatory flex-col overflow-y-scroll">
                 {announcements?.map((data, i) => (
                   <div key={i} className="mb-10 h-full snap-center">
                     <div className="h-6 bg-black/50"></div>
@@ -146,7 +146,7 @@ export default function Home() {
           {/* Events */}
           <Link
             href={"/events"}
-            className="flex min-h-96 grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-[url(/images/noiselowblack.png)] bg-white/90 bg-linear-to-br from-white via-white to-black/25 p-5 transition-all hover:scale-102 md:min-h-fit "
+            className="flex min-h-96 grow-3 basis-0 flex-col gap-5 overflow-hidden rounded-2xl bg-[url(/images/noiselowblack.png)] bg-white/90 bg-linear-to-br from-white via-white to-black/25 p-5 transition-all hover:scale-102 md:min-h-fit"
           >
             <h2 className="lg:text-right">Events</h2>
             <div className="inline-flex overflow-x-scroll scroll-smooth snap-x carousel-center rounded-box m-auto min-h-fit gap-4 scrollbar-none lg:scrollbar scrollbar-h-3 scrollbar-thumb-rounded-full scrollbar-track-rounded-full scrollbar-thumb-black/50 pb-4">
@@ -159,7 +159,7 @@ export default function Home() {
                       alt=""
                       width={500}
                       height={500}
-                      className="rounded-box h-72 w-fit border-2 border-black/70 object-contain "
+                      className="rounded-box h-72 w-fit border-1 lg:border-2 border-black/70 object-cover"
                     />
                   </div>
                 ))}
