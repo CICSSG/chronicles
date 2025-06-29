@@ -26,7 +26,7 @@ export async function POST(request: NextRequest) {
     from: process.env.MY_EMAIL,
     to: process.env.MY_EMAIL,
     cc: email,
-    subject: `[${concern.toUpperCase()} - ${person.toUpperCase()}] Message from ${gender.toUpperCase()} ${name} (${email} ${phone != "" ? "- " + phone : null})`,
+    subject: `[${concern.toUpperCase()} - ${person.toUpperCase()}] Message from ${gender?.toUpperCase()} ${name} (${email} ${phone != "" ? "- " + phone : null})`,
     text: message,
   };
 
