@@ -27,8 +27,8 @@ const ContactUs = () => {
     sendEmail(data)
   }
   return (
-    <div className="*w-full flex flex-col gap-4 text-black/80 *:rounded-2xl *:bg-neutral-100">
-      <p className="px-10 py-10 text-4xl bg-neutral-100 rounded-2xl">Contact Us</p>
+    <div className="*w-full flex flex-col gap-4 text-black/80 *:rounded-2xl">
+      <h2 className="px-10 py-8 text-4xl rounded-2xl bg-neutral-100 bg-linear-to-r from-black/2 via-black/2 via-70% to-black/20">Contact Us</h2>
 
       <div className="flex flex-col xl:flex-row gap-30 px-8 xl:px-12 2xl:px-24 py-8 2xl:py-30 bg-neutral-100 rounded-2xl">
         {/* Lets Connect */}
