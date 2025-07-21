@@ -7,7 +7,7 @@ import React, { useState } from "react";
 import { FaFacebook, FaInstagram } from "react-icons/fa";
 import { useForm } from 'react-hook-form';
 
-const CONCERN_CHARACTERS_MAX = 500
+const CONCERN_CHARACTERS_MAX = 1000
 
 export type FormData = {
   name: string,
