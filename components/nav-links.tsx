@@ -30,6 +30,7 @@ import {
 import { ChevronDownIcon } from '@heroicons/react/20/solid'
 import Link from 'next/link'
 import Image from 'next/image'
+import { Map } from 'lucide-react'
 
 const documents = [
   { name: 'Executive Orders', description: 'Executive Orders made by CICSSG', href: '/documents/executive-orders', icon: DocumentTextIcon },
@@ -41,6 +42,7 @@ const documents = [
 
 const cics = [
   { name: 'About', description: 'More information about CICS', href: '/cics', icon: InformationCircleIcon },
+  { name: "Pioneer's Blueprint", description: 'The CICS Guide', href: '/cics/blueprint', icon: Map },
   { name: 'Programs', description: 'View available programs in CICS', href: '/cics/programs', icon: ComputerDesktopIcon },
   { name: 'Departments', description: 'Current departments of CICS', href: '/cics/departments', icon: AcademicCapIcon },
   { name: 'Student Organization', description: 'About the Student Organization', href: '/cics/student-organization', icon: BriefcaseIcon },
