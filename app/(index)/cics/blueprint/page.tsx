@@ -1,7 +1,7 @@
 import CampusDirectory from "@/components/campus-directory";
 import Image from "next/image";
 
-export const eastCampus = [
+const eastCampus = [
   {
     id: 1,
     name: "Rotunda (St. La Salle Marker)",
