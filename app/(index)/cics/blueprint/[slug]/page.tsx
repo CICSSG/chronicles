@@ -429,7 +429,7 @@ export default function Page() {
     <div className="flex w-full flex-col gap-4 *:rounded-2xl lg:flex-row">
       <div className="flex w-full flex-col gap-8 xl:rounded-xl xl:bg-white/80 xl:p-8">
         <div className="flex flex-col gap-4">
-          <div className="flex flex-row items-center justify-between">
+          <div className="flex flex-col lg:flex-row gap-4 lg:gap-0 items-left justify-between">
             <a
               className="flex flex-row items-center text-center text-xl font-semibold text-black/60 hover:text-black/80 xl:text-left"
               href="/cics/blueprint"

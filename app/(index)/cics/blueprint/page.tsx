@@ -406,7 +406,7 @@ export default function Blueprint() {
           width={1000}
           height={500}
           alt=""
-          className="h-96 w-full rounded-xl border-2 border-black/40 object-cover shadow-lg"
+          className="h-fit w-full rounded-xl border-2 border-black/40 object-cover shadow-lg"
         />
 
         <CampusDirectory />

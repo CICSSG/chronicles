@@ -394,7 +394,7 @@ export default function CampusDirectory() {
   const pathname = usePathname();
 
   return (
-    <div className="grid grid-cols-2 gap-4">
+    <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
       <ul className="list bg-base-100 rounded-box shadow-md">
         <li className="p-4 pb-2 text-xs tracking-wide opacity-80">
           East Campus
@@ -402,12 +402,12 @@ export default function CampusDirectory() {
 
         {eastCampus.map((data, i) => (
           <li className="list-row" key={i}>
-            <div className="text-4xl font-light tabular-nums opacity-30">
+            <div className="text-4xl font-light tabular-nums opacity-30 my-auto">
               {String(data.number).padStart(2, "0")}
             </div>
             <div className="my-auto">{data.name}</div>
             <a
-              className="btn btn-square btn-ghost"
+              className="btn btn-square btn-ghost my-auto"
               href={"/cics/blueprint/" + data.id}
             >
               <svg
