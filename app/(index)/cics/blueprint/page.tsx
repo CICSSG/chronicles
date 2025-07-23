@@ -1,396 +1,26 @@
+"use client";
 import CampusDirectory from "@/components/campus-directory";
+import { CampusInfo } from "@/components/public-documents-data";
 import Image from "next/image";
-
-const eastCampus = [
-  {
-    id: 1,
-    name: "Rotunda (St. La Salle Marker)",
-    number: 1,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 2,
-    name: "Magdalo Gate",
-    number: 2,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 3,
-    name: "Magtagumpay Gate",
-    number: 3,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 4,
-    name: "Magpuri Gate",
-    number: 4,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 5,
-    name: "La Porteria De San Benildo",
-    number: 5,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 6,
-    name: "ICTC Building",
-    number: 6,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 7,
-    name: "Mariano Alvarez Hall",
-    number: 7,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 8,
-    name: "CTHM Building",
-    number: 8,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 9,
-    name: "Paulo Campos Hall",
-    number: 9,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 10,
-    name: "Julian Felipe Hall",
-    number: 10,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 11,
-    name: "Study Shed",
-    number: 11,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 12,
-    name: "Transportation Building",
-    number: 12,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 13,
-    name: "COS Building",
-    number: 13,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 14,
-    name: "Ayuntamiento De Gonzales",
-    number: 14,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 15,
-    name: "Residencia La Salle",
-    number: 15,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 16,
-    name: "Aklatang Emilio Aguinaldo (Annex Building)",
-    number: 16,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 17,
-    name: "Aklatang Emilio Agauinaldo (Old Building)",
-    number: 17,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 18,
-    name: "Antonio & Victoria Cojuangco Memorial Chapel of Our Lady of the Holy Rosary",
-    number: 18,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 19,
-    name: "National Bookstore / LCDC Building",
-    number: 19,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 20,
-    name: "Mila's Diner",
-    number: 20,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 21,
-    name: "Residencia Garage",
-    number: 21,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 22,
-    name: "Museo De La Salle",
-    number: 22,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 23,
-    name: "University Food Square",
-    number: 23,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 24,
-    name: "Guest House",
-    number: 24,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 25,
-    name: "Ladies Dormitory Complex",
-    number: 25,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 26,
-    name: "Men's Dormitory Complex",
-    number: 26,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 27,
-    name: "Museo Pavilion",
-    number: 27,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 28,
-    name: "Botanical Garden Park",
-    number: 28,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 29,
-    name: "Hotel Rafael",
-    number: 29,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 30,
-    name: "Centennial Hall",
-    number: 30,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 31,
-    name: "Campus Gourmet",
-    number: 31,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 32,
-    name: "CTHM Food Laboratory Building",
-    number: 32,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 33,
-    name: "Severino De Las Alas Hall (Alumni Building)",
-    number: 33,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 34,
-    name: "Batibot Student Lounge",
-    number: 34,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-  {
-    id: 35,
-    name: "Lumina Bridge",
-    number: 35,
-    location: "Lorem ipsum",
-    services: ["Lorem", "Ipsum", "Dolor"],
-    organization: ["Lorem Ipsum Org", "Another Org", "Third Org"],
-    description:
-      "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed do eiusmod tempor incididunt ut labore et dolore magna aliqua.",
-    image: "/images/DLSUD-rotonda.jpg",
-  },
-];
+import { useEffect, useState } from "react";
 
 export default function Blueprint() {
-  
+  const [isLoaded, setIsLoaded] = useState(false);
+  const [eastDocuments, setEastDocuments] = useState<any[] | undefined>(
+    undefined,
+  );
+  const [westDocuments, setWestDocuments] = useState<any[] | undefined>(
+    undefined,
+  );
+
+  useEffect(() => {
+    CampusInfo().then(({ east_documents, west_documents }) => {
+      setEastDocuments(east_documents ?? undefined);
+      setWestDocuments(west_documents ?? undefined);
+      setIsLoaded(true);
+    });
+  }, []);
+
   return (
     <div className="grid grid-cols-1 gap-4 *:xl:rounded-xl *:xl:bg-white/80 *:xl:p-8">
       <div className="flex flex-col gap-10 text-justify">
@@ -401,7 +31,64 @@ export default function Blueprint() {
           </p>
           <hr />
         </div>
-        <Image
+
+        {/* Timeline */}
+        <div className="flex flex-col gap-4">
+          <h1 className="text-3xl text-center mb-8">Panimola Timeline</h1>
+          <ul className="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
+          <li>
+            <div className="timeline-middle">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="timeline-start mb-10 md:text-end text-black/65">
+              <h1 className="font-mono text-black/80">August 1, 2025</h1>
+              <h1 className="text-lg font-bold text-black/80">Unang mangyayari</h1>
+              Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam animi facere excepturi sed corporis incidunt illum! Quam veritatis quasi laudantium eveniet culpa, error, cum, voluptatem aspernatur dolore repellendus et provident!
+            </div>
+            <hr />
+          </li>
+          <li>
+            <hr />
+            <div className="timeline-middle">
+              <svg
+                xmlns="http://www.w3.org/2000/svg"
+                viewBox="0 0 20 20"
+                fill="currentColor"
+                className="h-5 w-5"
+              >
+                <path
+                  fillRule="evenodd"
+                  d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                  clipRule="evenodd"
+                />
+              </svg>
+            </div>
+            <div className="timeline-end md:mb-10 text-black/65">
+              <h1 className="font-mono text-black/80">August 2, 2025</h1>
+              <h2 className="text-lg font-bold text-black/80">Pangalawang ganap</h2>
+              Lorem ipsum dolor sit amet consectetur, adipisicing elit. Atque explicabo porro molestias maxime hic eveniet illum, incidunt maiores, accusantium quisquam, exercitationem beatae repudiandae totam sed perferendis aliquam facere consectetur labore?
+            </div>
+            <hr />
+          </li>
+        </ul>
+          <hr />
+        </div>
+        
+        {/* Campus Map */}
+        <div className="flex flex-col gap-4">
+          <h1 className="text-3xl text-center">Campus Map</h1>
+          <Image
           src="/images/campus-map.jpg"
           width={1000}
           height={500}
@@ -409,7 +96,13 @@ export default function Blueprint() {
           className="h-fit w-full rounded-xl border-2 border-black/40 object-cover shadow-lg"
         />
 
-        <CampusDirectory />
+        <CampusDirectory
+          isLoaded={isLoaded}
+          east_campus={eastDocuments}
+          west_campus={westDocuments}
+        />
+        </div>
+        
       </div>
     </div>
   );
