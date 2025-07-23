@@ -190,3 +190,12 @@ export async function CampusInfo() {
 
   return { east_documents, west_documents };
 }
+
+export async function PanimolaTimelineData() {
+  let { data: documents } = await supabase
+    .from("panimola_timeline")
+    .select("*")
+    .order("id", { ascending: true });
+
+  return { documents };
+}

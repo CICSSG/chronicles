@@ -1,11 +1,15 @@
 "use client";
 import CampusDirectory from "@/components/campus-directory";
-import { CampusInfo } from "@/components/public-documents-data";
+import { CampusInfo, PanimolaTimelineData } from "@/components/public-documents-data";
 import Image from "next/image";
 import { useEffect, useState } from "react";
 
+
 export default function Blueprint() {
   const [isLoaded, setIsLoaded] = useState(false);
+  const [panimolaTimeline, setPanimolaTimeline] = useState<any[] | undefined>(
+    undefined,
+  );
   const [eastDocuments, setEastDocuments] = useState<any[] | undefined>(
     undefined,
   );
@@ -14,6 +18,10 @@ export default function Blueprint() {
   );
 
   useEffect(() => {
+    PanimolaTimelineData().then(({ documents }) => {
+      setPanimolaTimeline(documents ?? undefined);
+    });
+
     CampusInfo().then(({ east_documents, west_documents }) => {
       setEastDocuments(east_documents ?? undefined);
       setWestDocuments(west_documents ?? undefined);
@@ -35,68 +43,92 @@ export default function Blueprint() {
         {/* Timeline */}
         <div
           tabIndex={0}
-          className="collapse-arrow bg-base-100 border-base-300 collapse border"
+          className="collapse-arrow bg-base-100 collapse border border-black/15 hover:scale-101"
         >
           <input type="checkbox" className="peer" />
-          <div className="collapse-title font-semibold text-2xl"><h1>Panimola Timeline</h1></div>
+          <div className="collapse-title text-2xl font-semibold">
+            <h1>Panimola Timeline</h1>
+          </div>
           <div className="collapse-content text-sm">
             <ul className="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">
-              <li>
-                <div className="timeline-middle">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="h-5 w-5"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="timeline-start mb-10 text-black/65 md:text-end">
-                  <h1 className="font-mono text-black/80">August 1, 2025</h1>
-                  <h1 className="text-lg font-bold text-black/80">
-                    Unang mangyayari
-                  </h1>
-                  Lorem ipsum dolor sit amet consectetur adipisicing elit. Nam
-                  animi facere excepturi sed corporis incidunt illum! Quam
-                  veritatis quasi laudantium eveniet culpa, error, cum,
-                  voluptatem aspernatur dolore repellendus et provident!
-                </div>
-                <hr />
-              </li>
-              <li>
-                <hr />
-                <div className="timeline-middle">
-                  <svg
-                    xmlns="http://www.w3.org/2000/svg"
-                    viewBox="0 0 20 20"
-                    fill="currentColor"
-                    className="h-5 w-5"
-                  >
-                    <path
-                      fillRule="evenodd"
-                      d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
-                      clipRule="evenodd"
-                    />
-                  </svg>
-                </div>
-                <div className="timeline-end text-black/65 md:mb-10">
-                  <h1 className="font-mono text-black/80">August 2, 2025</h1>
-                  <h2 className="text-lg font-bold text-black/80">
-                    Pangalawang ganap
-                  </h2>
-                  Lorem ipsum dolor sit amet consectetur, adipisicing elit.
-                  Atque explicabo porro molestias maxime hic eveniet illum,
-                  incidunt maiores, accusantium quisquam, exercitationem beatae
-                  repudiandae totam sed perferendis aliquam facere consectetur
-                  labore?
-                </div>
-                <hr />
-              </li>
+              {panimolaTimeline?.map((data, i) =>
+                
+                i % 2 === 0 ? (
+                  <li key={i}>
+                    <hr />
+                    <div className="timeline-middle">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="h-5 w-5"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="timeline-start mb-10 font-normal text-black/65 md:text-end">
+                      <h1 className="font-mono text-black/80">
+                        {data.date
+                          ? new Date(data.date).toLocaleString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: true,
+                          })
+                          : ""}
+                      </h1>
+                      <h1 className="text-lg font-bold text-black/80">
+                        {data.title}
+                      </h1>
+                      {data.description}
+                    </div>
+                    <hr />
+                  </li>
+                ) : (
+                  <li key={i}>
+                    <hr />
+                    <div className="timeline-middle">
+                      <svg
+                        xmlns="http://www.w3.org/2000/svg"
+                        viewBox="0 0 20 20"
+                        fill="currentColor"
+                        className="h-5 w-5"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.857-9.809a.75.75 0 00-1.214-.882l-3.483 4.79-1.88-1.88a.75.75 0 10-1.06 1.061l2.5 2.5a.75.75 0 001.137-.089l4-5.5z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                    </div>
+                    <div className="timeline-end font-normal text-black/65 md:mb-10">
+                      <h1 className="font-mono text-black/80">
+                        {data.date
+                          ? new Date(data.date).toLocaleString("en-US", {
+                            month: "long",
+                            day: "numeric",
+                            year: "numeric",
+                            hour: "numeric",
+                            minute: "2-digit",
+                            hour12: true,
+                          })
+                          : ""}
+                      </h1>
+                      <h2 className="text-lg font-bold text-black/80">
+                        {data.title}
+                      </h2>
+                      {data.description}
+                    </div>
+                    <hr />
+                  </li>
+                ),
+              )}
             </ul>
           </div>
         </div>
