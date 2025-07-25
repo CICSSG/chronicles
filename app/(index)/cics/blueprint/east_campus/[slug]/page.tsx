@@ -476,16 +476,9 @@ export default function Page() {
           </div>
 
           {/* Location */}
-          <div className="grid grid-cols-1 gap-4">
-            <div className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-black/2 from-60% to-black/10 transition duration-300 hover:scale-101 hover:from-black/10">
-              <input type="checkbox" name="my-accordion-2" />
-              <div className="collapse-title font-semibold">
-                <h1 className="text-2xl font-bold">Location</h1>
-              </div>
-              <div className="collapse-content text-justify text-lg font-normal">
-                {document && document.location}
-              </div>
-            </div>
+          <div className="flex flex-row items-center gap-4">
+            <h1 className="text-2xl">Location:</h1>
+            <Link href={document && document.location || ""} target="_blank" className="text-md/0 font-semibold px-4 py-1 bg-black/10 rounded-full hover:bg-black/20">Google Maps</Link>
           </div>
 
           {/* Services */}
