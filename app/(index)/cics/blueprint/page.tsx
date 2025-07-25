@@ -35,7 +35,7 @@ export default function Blueprint() {
         <div className="flex flex-col gap-4">
           <h1 className="text-3xl">Pioneer's Blueprint</h1>
           <p className="text-justify text-lg font-normal">
-            Naliligaw ka na ba? kawawa ka naman bui
+            Are you lost bro? Don't worry, we got you covered! The Pioneer's Blueprint is your guide to navigating the DLSUD campus. It provides essential information about the campus layout, facilities, and services available to students. Whether you're looking for classrooms, libraries, or student services, this blueprint will help you find your way around with ease.
           </p>
           <hr />
         </div>
