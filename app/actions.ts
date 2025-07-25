@@ -1492,3 +1492,316 @@ export async function endQuickAnnouncementPOST(formData: FormData) {
     ? { success: false, message: error?.message }
     : { success: true };
 }
+
+// CAMPUS DATA //
+export async function createEastCampusPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const name = formData.get("name");
+  const number = formData.get("number");
+  const location = formData.get("location");
+  const description = formData.get("description");
+  const image = formData.get("image");
+  const servicesRaw = formData.get("services_data");
+  const services = servicesRaw ? JSON.parse(servicesRaw as string) : [];
+  const organizationRaw = formData.get("organizations_data");
+  const organization = organizationRaw
+    ? JSON.parse(organizationRaw as string)
+    : [];
+
+  const { error } = await supabase
+    .from("east_campus")
+    .insert([
+      {
+        name: name,
+        number: number,
+        location: location,
+        services: services,
+        organization: organization,
+        description: description,
+        image: image,
+      },
+    ])
+    .select();
+
+  console.log(error);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+
+  // return {success: true}
+  // console.log(data)
+}
+
+export async function editEastCampusPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+  const name = formData.get("name");
+  const number = formData.get("number");
+  const location = formData.get("location");
+  const description = formData.get("description");
+  const image = formData.get("image");
+  const servicesRaw = formData.get("services_data");
+  const services = servicesRaw ? JSON.parse(servicesRaw as string) : [];
+  const organizationRaw = formData.get("organizations_data");
+  const organization = organizationRaw
+    ? JSON.parse(organizationRaw as string)
+    : [];
+
+  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
+  const { data, error } = await supabase
+    .from("east_campus")
+    .update({
+      name: name,
+      number: number,
+      location: location,
+      services: services,
+      organization: organization,
+      description: description,
+      image: image,
+    })
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
+    .select();
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+  // console.log(data)
+}
+
+export async function deleteEastCampusPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+
+  const { error } = await supabase
+    .from("east_campus")
+    .delete()
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}
+
+export async function createWestCampusPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const name = formData.get("name");
+  const number = formData.get("number");
+  const location = formData.get("location");
+  const description = formData.get("description");
+  const image = formData.get("image");
+  const servicesRaw = formData.get("services_data");
+  const services = servicesRaw ? JSON.parse(servicesRaw as string) : [];
+  const organizationRaw = formData.get("organizations_data");
+  const organization = organizationRaw
+    ? JSON.parse(organizationRaw as string)
+    : [];
+
+  const { error } = await supabase
+    .from("west_campus")
+    .insert([
+      {
+        name: name,
+        number: number,
+        location: location,
+        services: services,
+        organization: organization,
+        description: description,
+        image: image,
+      },
+    ])
+    .select();
+
+  console.log(error);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+
+  // return {success: true}
+  // console.log(data)
+}
+
+export async function editWestCampusPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+  const name = formData.get("name");
+  const number = formData.get("number");
+  const location = formData.get("location");
+  const description = formData.get("description");
+  const image = formData.get("image");
+  const servicesRaw = formData.get("services_data");
+  const services = servicesRaw ? JSON.parse(servicesRaw as string) : [];
+  const organizationRaw = formData.get("organizations_data");
+  const organization = organizationRaw
+    ? JSON.parse(organizationRaw as string)
+    : [];
+
+  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
+  const { data, error } = await supabase
+    .from("west_campus")
+    .update({
+      name: name,
+      number: number,
+      location: location,
+      services: services,
+      organization: organization,
+      description: description,
+      image: image,
+    })
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
+    .select();
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+  // console.log(data)
+}
+
+export async function deleteWestCampusPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+
+  const { error } = await supabase
+    .from("west_campus")
+    .delete()
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}
+
+export async function createPanimolaSchedulePOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const title = formData.get("title");
+  const date = formData.get("date");
+  const description = formData.get("description");
+
+  const { error } = await supabase
+    .from("panimola_timeline")
+    .insert([
+      {
+        title: title,
+        date: date,
+        description: description,
+      },
+    ])
+    .select();
+
+  console.log(error);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+
+  // return {success: true}
+  // console.log(data)
+}
+
+export async function editPanimolaSchedulePOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+  const title = formData.get("title");
+  const date = formData.get("date");
+  const description = formData.get("description");
+
+  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
+  const { data, error } = await supabase
+    .from("panimola_timeline")
+    .update({
+      title: title,
+      date: date,
+      description: description,
+    })
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
+    .select();
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+  // console.log(data)
+}
+
+export async function deletePanimolaSchedulePOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+
+  const { error } = await supabase
+    .from("panimola_timeline")
+    .delete()
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}

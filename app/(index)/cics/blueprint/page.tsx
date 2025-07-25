@@ -47,7 +47,7 @@ export default function Blueprint() {
         >
           <input type="checkbox" className="peer" />
           <div className="collapse-title text-2xl font-semibold">
-            <h1>Panimola Timeline</h1>
+            <h1>Panimola Schedule</h1>
           </div>
           <div className="collapse-content text-sm">
             <ul className="timeline timeline-snap-icon max-md:timeline-compact timeline-vertical">

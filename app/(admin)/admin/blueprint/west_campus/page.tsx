@@ -1,51 +1,46 @@
 "use client";
-import DocumentRadioDropdown from "@/components/admin/documenttypes";
 import {
   Button,
   Dialog,
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
-  Select,
   Textarea,
 } from "@headlessui/react";
 import { DocumentIcon } from "@heroicons/react/20/solid";
-import { ChevronDownIcon } from "lucide-react";
 import Link from "next/link";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
-import DocumentData, {
-  DocumentSearch,
+import { 
+  WestCampusData,
+  WestCampusSearch,
 } from "@/components/admin/documents-data";
 import {
-  createNewDocument,
-  deleteDocumentPOST,
-  editDocumentPOST,
+  createWestCampusPOST,
+  editWestCampusPOST,
+  deleteWestCampusPOST
 } from "@/app/actions";
-import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
+import {
+  ArrowLeftCircleIcon,
+  ExclamationTriangleIcon,
+} from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
 import { CreatePopup } from "@/components/admin/alert-fragment";
+import DynamicInputFieldsServices from "@/components/admin/dynamic-input-field-services";
+import DynamicInputFieldsOrganizations from "@/components/admin/dynamic-input-field-organization";
+import { imgurUpload } from "@/utils/imgur-upload";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 );
 
-const options = [
-  { option: "Executive Order", value: "executive-order" },
-  { option: "Transparency Report", value: "transparency-report" },
-  { option: "Ordinance", value: "ordinance" },
-  { option: "Formal Document", value: "formal-document" },
-  { option: "Resolution", value: "resolution" },
-];
-
 export default function Documents() {
   const [page, setPage] = useQueryState("page", parseAsInteger);
-  const [title, setTitle] = useQueryState("title");
-  const [documentType, setDocumentType] = useQueryState("documentType");
+  const [name, setName] = useQueryState("name");
   const [createForm, setCreateForm] = useState(false);
   const [deleteForm, setDeleteForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
@@ -55,6 +50,32 @@ export default function Documents() {
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
   const [pagination, setPagination] = useState(1);
+  const [base64Image, setBase64Image] = useState<string>("");
+  const [image, setImage] = useState<string>("");
+
+  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setImage("");
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => setBase64Image(reader.result as string);
+    reader.readAsDataURL(file);
+  };
+
+  useEffect(() => {
+    if (base64Image) {
+      CreatePopup("Image uploading");
+      imgurUpload(base64Image)
+        .then((result) => {
+          setImage(`${result.data.link}`);
+          CreatePopup("Image upload successful!", "success");
+        })
+        .catch((err) => {
+          CreatePopup("Image failed to upload. Try Again", "error");
+          // handle error if needed
+        });
+    }
+  }, [base64Image]);
 
   const pages = [
     (page ?? 1) <= 3
@@ -89,7 +110,7 @@ export default function Documents() {
   };
 
   useEffect(() => {
-    DocumentData().then(({ documents, pagination }) => {
+    WestCampusData().then(({ documents, pagination }) => {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
@@ -98,14 +119,13 @@ export default function Documents() {
       .channel("public:data")
       .on(
         "postgres_changes",
-        { event: "*", schema: "public", table: "documents" },
+        { event: "*", schema: "public", table: "west_campus" },
         (payload) => {
-          DocumentData().then(({ documents, pagination }) => {
+          WestCampusData().then(({ documents, pagination }) => {
             setDocuments(documents ?? null);
             setPagination(pagination);
             setPage(1);
-            setTitle(null);
-            setDocumentType(null);
+            setName(null);
             CreatePopup("Data updated");
           });
           // console.log("Change received!", payload);
@@ -124,34 +144,42 @@ export default function Documents() {
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
-    const result = await createNewDocument(formData);
+    formData.set("image", image ?? "");
+    const result = await createWestCampusPOST(formData);
     setCreateForm(false);
     if (result.success) {
-      CreatePopup("Successfully created document", "success");
+      CreatePopup("Successfully created area", "success");
     } else {
-      CreatePopup("Failed to create document", "error");
+      CreatePopup("Failed to create area", "error");
+      console.log(result.message);
     }
+    setBase64Image("");
+    setImage("");
   };
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
-    const result = await editDocumentPOST(formData);
+    formData.set("image", image ?? "");
+    const result = await editWestCampusPOST(formData);
     setEditForm(false);
     handleEditDocument("");
     if (result.success) {
-      CreatePopup("Successfully edited document", "success");
+      CreatePopup("Successfully edited area", "success");
     } else {
-      CreatePopup("Failed to edit document. Try again", "error");
+      CreatePopup("Failed to edit area. Try again", "error");
     }
+    setBase64Image("");
+    setImage("");
   };
+
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
-    const result = await deleteDocumentPOST(formData);
+    const result = await deleteWestCampusPOST(formData);
     setDeleteForm(false);
     if (result.success) {
-      CreatePopup("Successfully deleted document", "success");
+      CreatePopup("Successfully deleted area", "success");
     } else {
-      CreatePopup("Failed to delete document", "error");
+      CreatePopup("Failed to delete area", "error");
     }
   };
 
@@ -160,9 +188,10 @@ export default function Documents() {
       setEditFormId(id);
       setEditForm(false);
     } else {
-      DocumentData(id).then(({ documents, pagination }) => {
+      WestCampusData(id).then(({ documents, pagination }) => {
         setEditDocument(documents);
         setEditFormId(id);
+        setImage((documents && documents[0]?.image) || "");
       });
     }
   };
@@ -175,36 +204,36 @@ export default function Documents() {
 
   const clearFilters = () => {
     setPage(1);
-    setTitle(null);
-    setDocumentType(null);
+    setName(null);
 
-    DocumentData().then(({ documents, pagination }) => {
+    WestCampusData().then(({ documents, pagination }) => {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
   };
 
   useEffect(() => {
-    DocumentSearch(
-      title ?? undefined,
-      documentType ?? undefined,
-      page ?? undefined,
-    ).then(({ documents, pagination }) => {
+    WestCampusSearch(name ?? undefined).then(({ documents, pagination }) => {
       setDocuments(documents);
       setPagination(pagination);
     });
-  }, [page, title, documentType]);
+  }, [page, name]);
 
   useEffect(() => {
     setPage(1);
-  }, [title, documentType]);
+  }, [name]);
 
   return (
     <div className="mx-auto flex w-11/12 flex-col gap-5 text-white/95">
+      <Link
+        href={"/admin/blueprint"}
+        className="flex flex-row items-center gap-2 text-xl"
+      >
+        <ArrowLeftCircleIcon className="size-6" /> Back to Blueprint
+      </Link>
       <div className="flex grow-0 basis-0 flex-row items-center justify-between">
         <div className="">
-          <h1 className="text-4xl font-bold">Documents</h1>
-          <p className="text-lg font-semibold">Edit Documents</p>
+          <h1 className="text-4xl font-bold">West Campus</h1>
         </div>
       </div>
 
@@ -213,64 +242,24 @@ export default function Documents() {
           onClick={() => setCreateForm(true)}
           className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-green-600 px-3 py-1.5 font-semibold text-white hover:bg-green-500"
         >
-          Create Document
+          Create Area
         </Button>
 
         <div className="flex flex-row">
           <div className="w-full max-w-2xs px-4">
             <Field>
-              <Label className="text-sm/6 font-medium text-white">Title</Label>
+              <Label className="text-sm/6 font-medium text-white">Name</Label>
               <Input
-                name="title"
+                name="name"
                 className={clsx(
                   "mt-3 block w-full rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white",
                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25",
                 )}
-                onChange={(e) => setTitle(e.target.value)}
-                value={title ?? ""}
+                onChange={(e) => setName(e.target.value)}
+                value={name ?? ""}
               />
             </Field>
           </div>
-          <div className="max-w-1xs w-full px-4">
-            <Field>
-              <Label className="text-sm/6 font-medium text-nowrap text-white">
-                Document Type
-              </Label>
-              <div className="relative">
-                <Select
-                  name="document_type"
-                  value={documentType ?? ""}
-                  className={clsx(
-                    "mt-3 block w-full appearance-none rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white/45 focus:text-white",
-                    "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25",
-                    // Make the text of each option black on Windows
-                    "*:text-black",
-                  )}
-                  onChange={(e) => setDocumentType(e.target.value)}
-                >
-                  <option value="" disabled>
-                    Document Type
-                  </option>
-                  {options.map((data, i) => (
-                    <option key={i} value={data.value}>
-                      {data.option}
-                    </option>
-                  ))}
-                </Select>
-                <ChevronDownIcon
-                  className="group pointer-events-none absolute top-2.5 right-2.5 size-4 fill-white/60"
-                  aria-hidden="true"
-                />
-              </div>
-            </Field>
-          </div>
-          {/* <button
-            type="button"
-            onClick={handleSearch}
-            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white hover:cursor-pointer hover:bg-white/10"
-          >
-            <Search />
-          </button> */}
           <button
             type="button"
             onClick={clearFilters}
@@ -291,9 +280,12 @@ export default function Documents() {
           {/* head */}
           <thead className="text-white">
             <tr className="border-b border-b-black">
-              <th>Title</th>
-              <th>Date</th>
-              <th>Document Type</th>
+              <th></th>
+              <th>Name</th>
+              <th>Number</th>
+              <th>Location</th>
+              <th>Services</th>
+              <th>Org</th>
               <th>Description</th>
               <th>Actions</th>
             </tr>
@@ -301,9 +293,14 @@ export default function Documents() {
           <tbody className="*:border-b *:border-b-black/30 *:hover:bg-white/10">
             {documents?.map((data, i) => (
               <tr className="w-full" key={i}>
-                <th className="text-nowrap">{data.title}</th>
-                <td className="text-nowrap">{data.date}</td>
-                <td className="text-nowrap">{data.document_type}</td>
+                <td>
+                  <img src={data.image} alt="" className="h-8" />
+                </td>
+                <th className="text-nowrap">{data.name}</th>
+                <td className="text-nowrap">{data.number}</td>
+                <td className="text-nowrap">{data.location}</td>
+                <td className="text-nowrap">{data.services.length}</td>
+                <td className="text-nowrap">{data.organization.length}</td>
                 <td className="max-w-2xl truncate">{data.description}</td>
                 <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                   <Button
@@ -314,7 +311,7 @@ export default function Documents() {
                   </Button>
                   <Button
                     onClick={() =>
-                      handleDeleteDocument(data.id, data.title, true)
+                      handleDeleteDocument(data.id, data.name, true)
                     }
                     className="grow-1 basis-0 bg-red-400 text-black"
                   >
@@ -416,21 +413,21 @@ export default function Documents() {
                         className="size-6 text-green-600"
                       />
                     </div>
-                    <div className="mt-3 w-full overflow-y-scroll text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <div className="mt-3 w-full overflow-y-auto text-center sm:mt-0 sm:ml-4 sm:text-left">
                       <DialogTitle
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        New Document
+                        New Area
                       </DialogTitle>
                       <div className="mt-4 flex w-full flex-col gap-4">
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
                             <Label className="text-sm/6 font-medium text-black">
-                              Title
+                              Name
                             </Label>
                             <Input
-                              name="title"
+                              name="name"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -443,15 +440,13 @@ export default function Documents() {
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
                             <Label className="text-sm/6 font-medium text-black">
-                              Date
+                              Number
                             </Label>
                             <Input
-                              name="date"
-                              type="text"
+                              name="number"
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                                "scheme-light",
                               )}
                             />
                           </Field>
@@ -459,55 +454,86 @@ export default function Documents() {
 
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
-                            <DocumentRadioDropdown left={true} />
+                            <Label className="text-sm/6 font-medium text-black">
+                              Location
+                            </Label>
+                            <Input
+                              name="location"
+                              className={clsx(
+                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                              )}
+                              required
+                            />
                           </Field>
                         </div>
 
                         <div className="w-full max-w-md">
-                          <Field>
+                          <Field className="flex flex-row items-center gap-4">
                             <Label className="text-sm/6 font-medium text-black">
                               Description
                             </Label>
                             <Textarea
                               name="description"
                               className={clsx(
-                                "mt-3 block w-full resize-none rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              rows={8}
+                              rows={4}
+                              required
                             />
                           </Field>
                         </div>
 
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              Author/s
+                            <Label className="text-sm/6 font-medium text-black">
+                              Image
                             </Label>
                             <Input
-                              name="author"
-                              type="text"
+                              type="file"
+                              onChange={handleImageChange}
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
+                              accept=".png,.jpg,.jpeg"
                             />
+                          </Field>
+                          <div className="text-xs font-bold">
+                            {!image && !base64Image ? (
+                              <div className="text-red-400">No image</div>
+                            ) : !image && base64Image ? (
+                              <div className="text-amber-300">
+                                Image uploading
+                              </div>
+                            ) : image && !base64Image ? (
+                              <div className="text-amber-300">
+                                Upload to update image
+                              </div>
+                            ) : (
+                              <div className="text-green-300">
+                                Image uploaded
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-col items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-black">
+                              Services
+                            </Label>
+                            <DynamicInputFieldsServices />
                           </Field>
                         </div>
 
                         <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              File Link
+                          <Field className="flex flex-col items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-black">
+                              Organizations
                             </Label>
-                            <Input
-                              name="file_link"
-                              type="text"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                            />
+                            <DynamicInputFieldsOrganizations />
                           </Field>
                         </div>
                       </div>
@@ -525,7 +551,11 @@ export default function Documents() {
                   <button
                     type="button"
                     data-autofocus
-                    onClick={() => setCreateForm(false)}
+                    onClick={() => {
+                      setCreateForm(false);
+                      setBase64Image("");
+                      setImage("");
+                    }}
                     className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
                   >
                     Cancel
@@ -568,7 +598,7 @@ export default function Documents() {
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        Edit Document
+                        Edit Area
                       </DialogTitle>
 
                       <div className="flex w-full flex-col gap-4">
@@ -590,7 +620,7 @@ export default function Documents() {
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
                             <Label className="text-sm/6 font-medium text-black">
-                              Title
+                              Name
                             </Label>
                             <Input
                               className={clsx(
@@ -598,16 +628,16 @@ export default function Documents() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
                               defaultValue={
-                                editDocument && editDocument[0].title
+                                editDocument && editDocument[0].name
                               }
-                              name="title"
+                              name="name"
                             ></Input>
                           </Field>
                         </div>
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
                             <Label className="text-sm/6 font-medium text-black">
-                              Date
+                              Number
                             </Label>
                             <Input
                               type="text"
@@ -617,20 +647,29 @@ export default function Documents() {
                                 "scheme-light",
                               )}
                               defaultValue={
-                                editDocument && editDocument[0].date
+                                editDocument && editDocument[0].number
                               }
-                              name="date"
+                              name="number"
                             />
                           </Field>
                         </div>
 
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
-                            <DocumentRadioDropdown
-                              left={true}
-                              value={
-                                editDocument && editDocument[0].document_type
+                            <Label className="text-sm/6 font-medium text-black">
+                              Location
+                            </Label>
+                            <Input
+                              type="text"
+                              className={clsx(
+                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                "scheme-light",
+                              )}
+                              defaultValue={
+                                editDocument && editDocument[0].location
                               }
+                              name="location"
                             />
                           </Field>
                         </div>
@@ -656,38 +695,58 @@ export default function Documents() {
 
                         <div className="w-full max-w-md">
                           <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              Author/s
+                            <Label className="text-sm/6 font-medium text-black">
+                              Image
                             </Label>
                             <Input
-                              type="text"
+                              type="file"
+                              onChange={handleImageChange}
                               className={clsx(
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].author
-                              }
-                              name="author"
+                              accept=".png,.jpg,.jpeg"
+                            />
+                          </Field>
+                          <div className="text-xs font-bold">
+                            {!image && !base64Image ? (
+                              <div className="text-red-400">No image</div>
+                            ) : !image && base64Image ? (
+                              <div className="text-amber-300">
+                                Image uploading
+                              </div>
+                            ) : image && !base64Image ? (
+                              <div className="text-amber-300">
+                                Upload to update image
+                              </div>
+                            ) : (
+                              <div className="text-green-300">
+                                Image uploaded
+                              </div>
+                            )}
+                          </div>
+                        </div>
+
+                        <div className="w-full max-w-md">
+                          <Field className="flex flex-col items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-black">
+                              Services
+                            </Label>
+                            <DynamicInputFieldsServices
+                              data={editDocument && editDocument[0].services}
                             />
                           </Field>
                         </div>
 
                         <div className="w-full max-w-md">
-                          <Field className="flex flex-row items-center gap-4">
-                            <Label className="text-sm/6 font-medium text-nowrap text-black">
-                              File Link
+                          <Field className="flex flex-col items-center gap-4">
+                            <Label className="text-sm/6 font-medium text-black">
+                              Organizations
                             </Label>
-                            <Input
-                              type="text"
-                              className={clsx(
-                                "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
-                                "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
-                              )}
-                              defaultValue={
-                                editDocument && editDocument[0].link
+                            <DynamicInputFieldsOrganizations
+                              data={
+                                editDocument && editDocument[0].organization
                               }
-                              name="file_link"
                             />
                           </Field>
                         </div>
@@ -760,7 +819,7 @@ export default function Documents() {
                         as="h3"
                         className="text-base font-semibold text-gray-900"
                       >
-                        Delete document
+                        Delete Area
                       </DialogTitle>
                       <div className="mt-2">
                         <p className="text-sm text-gray-500">
