@@ -1,6 +1,5 @@
 "use client";
 import { PublicEventDataByID } from "@/components/public-documents-data";
-import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";

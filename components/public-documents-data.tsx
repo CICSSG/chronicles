@@ -176,3 +176,26 @@ export async function PublicUrgentAnnounementData() {
 
   return { documents };
 }
+
+export async function CampusInfo() {
+  let { data: east_documents } = await supabase
+    .from("east_campus")
+    .select("*")
+    .order("id", { ascending: true });
+
+  let { data: west_documents } = await supabase
+    .from("west_campus")
+    .select("*")
+    .order("id", { ascending: true });
+
+  return { east_documents, west_documents };
+}
+
+export async function PanimolaTimelineData() {
+  let { data: documents } = await supabase
+    .from("panimola_timeline")
+    .select("*")
+    .order("id", { ascending: true });
+
+  return { documents };
+}

@@ -9,7 +9,7 @@ import { IoDocuments } from "react-icons/io5";
 import { GiPoliceOfficerHead, GiTeacher } from "react-icons/gi";
 import { PiUsersFill } from "react-icons/pi";
 import { CalendarDaysIcon, MegaphoneIcon } from "@heroicons/react/20/solid";
-import { BuildingIcon } from "lucide-react";
+import { BuildingIcon, Map } from "lucide-react";
 
 async function NavLinksAdmin() {
   const user = await currentUser();
@@ -54,6 +54,17 @@ async function NavLinksAdmin() {
                 >
                   <IoDocuments className="text-3xl" />
                   <span className="hidden group-hover:block">Documents</span>
+                </Link>
+              </li>
+              <li>
+                <Link
+                  href="/admin/blueprint"
+                  className="flex w-fit flex-nowrap items-center gap-2"
+                >
+                  <Map className="size-7 text-3xl" />
+                  <span className="hidden group-hover:block text-nowrap">
+                    Pioneer's Blueprint
+                  </span>
                 </Link>
               </li>
               <li>

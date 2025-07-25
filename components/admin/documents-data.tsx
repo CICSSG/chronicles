@@ -435,3 +435,186 @@ export async function UrgentAnnouncementDataSingle() {
 
   return { documents };
 }
+
+export async function EastCampusData(id?: string, page?: number) {
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  if (id == null) {
+    let { data: documents, count } = await supabase
+      .from("east_campus")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .order("id", { ascending: true });
+
+    let pagination =
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+
+    return { documents, pagination };
+  } else {
+    let { data: documents, count } = await supabase
+      .from("east_campus")
+      .select("*")
+      .eq("id", parseInt(id));
+
+    let pagination =
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    return { documents, pagination };
+  }
+}
+
+export async function EastCampusSearch(
+  name?: string,
+  page?: number,
+) {
+  name == "" || name == null
+    ? (name = undefined)
+    : (name = "%" + name + "%");
+
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  if (name != undefined) {
+    let { data: documents, count } = await supabase
+      .from("east_campus")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .ilike("name", name)
+      .order("id", { ascending: true });
+
+    let pagination =
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    return { documents, pagination };
+  }
+
+  let { data: documents, count } = await supabase
+    .from("east_campus")
+    .select("*", { count: "exact", head: false })
+    .range(from, to)
+    .order("id", { ascending: true });
+
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  return { documents, pagination };
+}
+
+export async function WestCampusData(id?: string, page?: number) {
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  if (id == null) {
+    let { data: documents, count } = await supabase
+      .from("west_campus")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .order("id", { ascending: true });
+
+    let pagination =
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+
+    return { documents, pagination };
+  } else {
+    let { data: documents, count } = await supabase
+      .from("west_campus")
+      .select("*")
+      .eq("id", parseInt(id));
+
+    let pagination =
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    return { documents, pagination };
+  }
+}
+
+export async function WestCampusSearch(
+  name?: string,
+  page?: number,
+) {
+  name == "" || name == null
+    ? (name = undefined)
+    : (name = "%" + name + "%");
+
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  if (name != undefined) {
+    let { data: documents, count } = await supabase
+      .from("west_campus")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .ilike("name", name)
+      .order("id", { ascending: true });
+
+    let pagination =
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    return { documents, pagination };
+  }
+
+  let { data: documents, count } = await supabase
+    .from("west_campus")
+    .select("*", { count: "exact", head: false })
+    .range(from, to)
+    .order("id", { ascending: true });
+
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  return { documents, pagination };
+}
+
+export async function PanimolaData(id?: string, page?: number) {
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  if (id == null) {
+    let { data: documents, count } = await supabase
+      .from("panimola_timeline")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .order("id", { ascending: true });
+
+    let pagination =
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+
+    return { documents, pagination };
+  } else {
+    let { data: documents, count } = await supabase
+      .from("panimola_timeline")
+      .select("*")
+      .eq("id", parseInt(id));
+
+    let pagination =
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    return { documents, pagination };
+  }
+}
+
+export async function PanimolaSearch(
+  name?: string,
+  page?: number,
+) {
+  name == "" || name == null
+    ? (name = undefined)
+    : (name = "%" + name + "%");
+
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  if (name != undefined) {
+    let { data: documents, count } = await supabase
+      .from("panimola_timeline")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .ilike("name", name)
+      .order("id", { ascending: true });
+
+    let pagination =
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    return { documents, pagination };
+  }
+
+  let { data: documents, count } = await supabase
+    .from("panimola_timeline")
+    .select("*", { count: "exact", head: false })
+    .range(from, to)
+    .order("id", { ascending: true });
+
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  return { documents, pagination };
+}
