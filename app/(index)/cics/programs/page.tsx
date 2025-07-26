@@ -168,7 +168,7 @@ export default function Programs() {
         <div key={i} className="flex flex-col gap-4">
           <hr />
           <div
-            className="hero min-h-96 h-fit place-items-start overflow-hidden rounded-3xl"
+            className="hero h-fit min-h-96 place-items-start overflow-hidden rounded-3xl"
             style={{
               backgroundImage: `url(${data.imageUrl})`,
             }}
