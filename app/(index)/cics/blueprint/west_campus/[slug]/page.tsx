@@ -39,9 +39,7 @@ export default function Page() {
   useEffect(() => {
     setIsLoaded(true);
   }, [document]);
-
-  console.log(document && document.image);
-  console.log(document && document.image.length > 2);
+  
   return (
     <div className="flex w-full flex-col gap-4 *:rounded-2xl lg:flex-row">
       <div className="flex w-full flex-col gap-8 xl:rounded-xl xl:bg-white/80 xl:p-8">

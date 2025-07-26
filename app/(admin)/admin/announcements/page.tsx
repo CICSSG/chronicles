@@ -236,14 +236,6 @@ export default function Documents() {
               />
             </Field>
           </div>
-
-          {/* <button
-            type="button"
-            onClick={handleSearch}
-            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white hover:cursor-pointer hover:bg-white/10"
-          >
-            <Search />
-          </button> */}
           <button
             type="button"
             onClick={clearFilters}

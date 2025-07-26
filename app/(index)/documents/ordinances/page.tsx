@@ -1,6 +1,5 @@
 "use client";
-import { DocumentCard, ExecutiveCard } from "@/components/documentcard";
-import NavDocuments from "@/components/nav-documents";
+import { ExecutiveCard } from "@/components/documentcard";
 import { PublicDocumentData } from "@/components/public-documents-data";
 import { DocumentSkeleton } from "@/components/skeleton";
 import Link from "next/link";

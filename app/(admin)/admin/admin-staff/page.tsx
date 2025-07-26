@@ -7,16 +7,10 @@ import {
   DialogTitle,
 } from "@headlessui/react";
 import { DocumentIcon } from "@heroicons/react/20/solid";
-import Link from "next/link";
-import { usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
-import {
-  AdminStaffData,
-  AdminStaffSearch,
-} from "@/components/admin/documents-data";
-import { parseAsInteger, useQueryState } from "nuqs";
+import { AdminStaffData } from "@/components/admin/documents-data";
 
 import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
@@ -49,8 +43,6 @@ export interface AdminStaffDocumentData {
 
 export default function AdminStaff() {
   const [id, setId] = useState(0);
-  // const [createForm, setCreateForm] = useState(false);
-  // const [deleteForm, setDeleteForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
   const [documents, setDocuments] = useState<AdminStaffDocumentData | null>(
     null,
@@ -175,38 +167,6 @@ export default function AdminStaff() {
         >
           Edit Admin & Staff
         </Button>
-
-        {/* <div className="flex flex-row">
-          <div className="w-full max-w-2xs px-4">
-            <Field>
-              <Label className="text-sm/6 font-medium text-white">Title</Label>
-              <Input
-                name="title"
-                className={clsx(
-                  "mt-3 block w-full rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white",
-                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25",
-                )}
-                onChange={(e) => setTitle(e.target.value)}
-                value={title ?? ""}
-              />
-            </Field>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleSearch}
-            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white hover:cursor-pointer hover:bg-white/10"
-          >
-            <Search />
-          </button>
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-nowrap text-white hover:cursor-pointer hover:bg-white/10"
-          >
-            Clear Filter
-          </button>
-        </div> */}
       </div>
 
       <div className="relative flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-x-auto overflow-y-auto rounded-2xl border bg-white/10 p-4 shadow-xl">
@@ -231,7 +191,7 @@ export default function AdminStaff() {
                   alt=""
                   width={50}
                   height={50}
-                  className="rounded-xl border-2 border-black/60 aspect-square object-cover"
+                  className="aspect-square rounded-xl border-2 border-black/60 object-cover"
                 />
               </td>
               <td className="text-nowrap">
@@ -251,7 +211,7 @@ export default function AdminStaff() {
                   alt=""
                   width={50}
                   height={50}
-                  className="rounded-xl border-2 border-black/60 aspect-square object-cover"
+                  className="aspect-square rounded-xl border-2 border-black/60 object-cover"
                 />
               </td>
               <td className="text-nowrap">

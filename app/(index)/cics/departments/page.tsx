@@ -6,15 +6,6 @@ export default function Departments() {
       <div className="flex flex-col gap-8 p-6">
         <div className="flex flex-col gap-4">
           <h2 className="text-3xl font-bold">Departments</h2>
-          {/* <p className="text-justify text-lg font-normal">
-            The College of Information and Computer Studies (CICS) is a leader
-            in technological education, committed to academic excellence,
-            innovation, and ethical standards. We foster a dynamic and inclusive
-            environment where students, faculty, and industry partners work
-            together to address and solve intricate technological issues. CICS
-            inspires and prepares future leaders who excel in their professions
-            and make meaningful contributions to the global digital landscape.
-          </p> */}
         </div>
         <hr />
 

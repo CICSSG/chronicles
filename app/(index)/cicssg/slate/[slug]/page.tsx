@@ -2,7 +2,6 @@
 import { PublicSlateDataByID } from "@/components/public-documents-data";
 import {
   ArrowLeftCircleIcon,
-  ExclamationTriangleIcon,
   InformationCircleIcon,
 } from "@heroicons/react/24/outline";
 import Link from "next/link";
@@ -13,7 +12,6 @@ import Image from "next/image";
 import {
   Button,
   Dialog,
-  DialogBackdrop,
   DialogPanel,
   DialogTitle,
 } from "@headlessui/react";

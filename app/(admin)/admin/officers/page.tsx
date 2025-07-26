@@ -5,7 +5,6 @@ import {
   DialogBackdrop,
   DialogPanel,
   DialogTitle,
-  Textarea,
 } from "@headlessui/react";
 import { DocumentIcon } from "@heroicons/react/20/solid";
 import Link from "next/link";
@@ -15,19 +14,14 @@ import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
 import { SlatesData, SlatesSearch } from "@/components/admin/documents-data";
 import {
-  createEventPOST,
   createSlatePOST,
-  deleteEventPOST,
   deleteSlatePOST,
-  editEventPOST,
 } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
-import DynamicInputFieldsProjectHead from "@/components/admin/dynamic-input-field-project-head";
-import DynamicInputFieldsHighlights from "@/components/admin/dynamic-input-field-highlights";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 
 const supabase = createClient(
@@ -170,38 +164,6 @@ export default function Slate() {
         >
           Create Slate
         </Button>
-
-        {/* <div className="flex flex-row">
-          <div className="w-full max-w-2xs px-4">
-            <Field>
-              <Label className="text-sm/6 font-medium text-white">Title</Label>
-              <Input
-                name="title"
-                className={clsx(
-                  "mt-3 block w-full rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white",
-                  "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-white/25",
-                )}
-                onChange={(e) => setTitle(e.target.value)}
-                value={title ?? ""}
-              />
-            </Field>
-          </div>
-
-          <button
-            type="button"
-            onClick={handleSearch}
-            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-white hover:cursor-pointer hover:bg-white/10"
-          >
-            <Search />
-          </button>
-          <button
-            type="button"
-            onClick={clearFilters}
-            className="mx-2 mt-auto rounded-lg border-none bg-white/5 px-3 py-1.5 text-sm/6 text-nowrap text-white hover:cursor-pointer hover:bg-white/10"
-          >
-            Clear Filter
-          </button>
-        </div> */}
       </div>
 
       <div className="relative flex min-h-fit grow-1 basis-0 flex-col justify-between overflow-x-auto overflow-y-auto rounded-2xl border bg-white/10 p-4 shadow-xl">

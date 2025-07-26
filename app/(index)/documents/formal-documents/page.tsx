@@ -1,6 +1,5 @@
 "use client";
-import { DocumentCard, ExecutiveCard } from "@/components/documentcard";
-import NavDocuments from "@/components/nav-documents";
+import { ExecutiveCard } from "@/components/documentcard";
 import React, { Suspense, useEffect, useState } from "react";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { PublicDocumentData } from "@/components/public-documents-data";
