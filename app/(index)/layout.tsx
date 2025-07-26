@@ -20,7 +20,10 @@ export const metadata = {
   metadataBase: new URL(defaultUrl),
   title: "Chronicles",
   description:
-    "The archival website for the College of Information and Computer Studies Student Government (CICSSG)",
+    "CICSSG Chronicles: The archival website for the College of Information and Computer Studies Student Government (CICSSG)",
+  verification: {
+    google: "E2Ef1IDFH3a2Rrv2WiO7hK9IiS4V3bEiwluhPma9D8o",
+  },
 };
 
 const spaceGrotesk = Space_Grotesk({
@@ -63,15 +66,15 @@ export default async function RootLayout({
           </Link>
         </SignedIn>
 
-        <div className="flex w-full flex-col items-center gap-5 ">
+        <div className="flex w-full flex-col items-center gap-5">
           <div className="font-space flex min-h-dvh min-w-dvw flex-col items-center bg-neutral-800 font-semibold">
             <UrgentAnnouncement />
-            <div className="3xl:max-w-[1920px] my-10 flex h-full w-full max-w-11/12 flex-col gap-5 lg:px-10 xl:max-w-10/12 items-center">
-              <div className="flex w-full flex-row justify-between py-2 text-xl text-white 2xl:px-8 2xl:max-w-10/12">
+            <div className="3xl:max-w-[1920px] my-10 flex h-full w-full max-w-11/12 flex-col items-center gap-5 lg:px-10 xl:max-w-10/12">
+              <div className="flex w-full flex-row justify-between py-2 text-xl text-white 2xl:max-w-10/12 2xl:px-8">
                 <NavLinks />
               </div>
 
-              <div className="grow-1 basis-0 w-full 2xl:max-w-10/12">
+              <div className="w-full grow-1 basis-0 2xl:max-w-10/12">
                 <Suspense>
                   <NuqsAdapter>{children}</NuqsAdapter>
                 </Suspense>
