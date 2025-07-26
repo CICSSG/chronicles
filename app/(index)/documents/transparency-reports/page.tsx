@@ -1,7 +1,6 @@
 "use client";
-import NavDocuments from "@/components/nav-documents";
 import React, { Suspense, useEffect, useState } from "react";
-import DocumentCard, { TransparencyCard } from "@/components/documentcard";
+import { TransparencyCard } from "@/components/documentcard";
 import { parseAsInteger, useQueryState } from "nuqs";
 import { PublicDocumentData } from "@/components/public-documents-data";
 import Link from "next/link";

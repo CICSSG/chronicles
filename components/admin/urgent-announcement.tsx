@@ -20,15 +20,12 @@ import {
 } from "@/app/actions";
 import { DocumentIcon } from "@heroicons/react/24/outline";
 import { createClient } from "@supabase/supabase-js";
-import { currentUser } from "@clerk/nextjs/server";
-import { checkRole } from "@/utils/roles";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 );
 
-import { useRouter } from "next/navigation";
 import { useUser } from "@clerk/nextjs";
 
 export default function QuickUrgentAnnouncementAdmin() {

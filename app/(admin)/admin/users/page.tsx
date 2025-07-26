@@ -15,7 +15,7 @@ import {
   Label,
 } from "@headlessui/react";
 import { createUser, deleteUser } from "@/utils/create-user";
-import { DocumentIcon, UserIcon } from "@heroicons/react/20/solid";
+import { UserIcon } from "@heroicons/react/20/solid";
 import clsx from "clsx";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 

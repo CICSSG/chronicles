@@ -22,12 +22,6 @@ export default function AdminStaff() {
     <div className="flex flex-col gap-8 xl:rounded-xl xl:bg-white/80 xl:p-8">
       <div className="flex flex-col gap-6">
         <h1 className="text-3xl">Admin & Staff</h1>
-        {/* <p className="text-lg font-normal">
-            Lorem ipsum dolor sit amet consectetur adipisicing elit. Autem ut
-            distinctio assumenda neque quia, labore optio doloremque recusandae
-            voluptates ipsam commodi delectus fugit porro, omnis iste nesciunt
-            ab. Laudantium, libero.
-          </p> */}
       </div>
       <hr />
 

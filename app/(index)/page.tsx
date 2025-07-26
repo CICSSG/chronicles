@@ -1,10 +1,9 @@
 "use client";
 import {
   PublicAnnouncementForHomeData,
-  PublicDocumentData,
   PublicEventsForHomeData,
 } from "@/components/public-documents-data";
-import { ChevronDownIcon, ChevronRightIcon } from "@heroicons/react/20/solid";
+import { ChevronDownIcon } from "@heroicons/react/20/solid";
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";

@@ -17,9 +17,6 @@ import {
   PanimolaSearch,
 } from "@/components/admin/documents-data";
 import {
-  createWestCampusPOST,
-  editWestCampusPOST,
-  deleteWestCampusPOST,
   createPanimolaSchedulePOST,
   editPanimolaSchedulePOST,
   deletePanimolaSchedulePOST,
@@ -32,9 +29,6 @@ import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
 import { CreatePopup } from "@/components/admin/alert-fragment";
-import DynamicInputFieldsServices from "@/components/admin/dynamic-input-field-services";
-import DynamicInputFieldsOrganizations from "@/components/admin/dynamic-input-field-organization";
-import { imgurUpload } from "@/utils/imgur-upload";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,

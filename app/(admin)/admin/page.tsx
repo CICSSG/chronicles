@@ -1,21 +1,11 @@
 "use client";
 import QuickUrgentAnnouncementAdmin from "@/components/admin/urgent-announcement";
 import { GetTableRows } from "@/utils/get-table-rows";
-import { Button, Field, Input, Label } from "@headlessui/react";
-import { createClient } from "@supabase/supabase-js";
-import clsx from "clsx";
 import { useEffect, useState } from "react";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export default function ProtectedPage() {
   const [tables, setTables] = useState();
   
-
-
   useEffect(() => {
     GetTableRows()
       .then((res) => res.json())

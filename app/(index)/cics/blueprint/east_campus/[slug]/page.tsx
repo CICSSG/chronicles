@@ -33,8 +33,6 @@ export default function Page() {
   }, [slug]);
 
   useEffect(() => {
-    console.log("East Documents:", eastDocuments);
-    console.log("West Documents:", westDocuments);
     setDocument(eastDocuments?.find((doc) => String(doc.id) === slug) || null);
   }, [eastDocuments]);
 
