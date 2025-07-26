@@ -13,6 +13,9 @@ h3 {
   font-family: "Space Grotesk", cursive;
 }
 
+pre {
+  font-family: "Inter", monospace;
+}
 @theme {
   --breakpoint-3xl: 120rem;
 }
