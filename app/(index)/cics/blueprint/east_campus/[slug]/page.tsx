@@ -67,7 +67,7 @@ export default function Page() {
                 <div
                   className="hero h-fit min-h-96 place-items-start overflow-hidden rounded-3xl shadow-lg border-2 border-gray-400"
                   style={{
-                    backgroundImage: `url(${document && document.image.length > 2 ? document.image : "/images/NoImage.png"})`,
+                    backgroundImage: `url(${document && document.image && document.image.length > 2 ? document.image : "/images/NoImage.png"})`,
                   }}
                 >
                   {/* <div className="hero-overlay bg-linear-230 from-white/0 from-30% via-black/1 via-50% to-black/0 to-80%"></div> */}
@@ -129,7 +129,7 @@ export default function Page() {
                 <div className="collapse-arrow collapse border border-black/15 bg-gradient-to-r from-black/2 from-60% to-black/10 transition duration-300 hover:scale-101 hover:from-black/10">
                   <input type="checkbox" name="my-accordion-2" />
                   <div className="collapse-title font-semibold">
-                    <h1 className="text-2xl font-bold">Organizations</h1>
+                    <h1 className="text-2xl font-bold">Offices & Organizations</h1>
                   </div>
                   <div className="collapse-content text-sm">
                     <ul className="list list-inside list-disc gap-4 *:text-lg">
