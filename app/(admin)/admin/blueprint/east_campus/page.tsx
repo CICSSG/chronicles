@@ -213,7 +213,7 @@ export default function Documents() {
   };
 
   useEffect(() => {
-    EastCampusSearch(name ?? undefined).then(({ documents, pagination }) => {
+    EastCampusSearch(name ?? undefined, page ?? undefined).then(({ documents, pagination }) => {
       setDocuments(documents);
       setPagination(pagination);
     });
