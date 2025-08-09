@@ -81,7 +81,7 @@ export default function NavLinks() {
             <Bars3Icon aria-hidden="true" className="size-6" />
           </button>
         </div>
-        <PopoverGroup className="hidden xl:flex lg:gap-x-6 ">
+        <PopoverGroup className="hidden xl:flex lg:gap-x-6 pl-4">
           <Link href={"/"} className="text-sm/6 font-semibold lg:text-md/6 xl:text-xl/6 mr-2">
             Home
           </Link>
