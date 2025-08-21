@@ -94,7 +94,7 @@ export default function AdminStaff() {
             {documents?.staff.map((data, i) => (
               <div
                 key={i}
-                className={`flex w-full flex-col items-center gap-4`}
+                className={`flex w-full h-full flex-col items-center gap-4`}
               >
                 <div className="relative">
                   <Image
