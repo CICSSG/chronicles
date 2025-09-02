@@ -199,3 +199,41 @@ export async function PanimolaTimelineData() {
 
   return { documents };
 }
+
+export async function GetAnonymousSubmissions(ids: String[]) {
+  let { data: documents } = await supabase
+    .from("anonymous")
+    .select("*")
+    .order("updated_at", {ascending: false})
+    .in("id", ids);
+
+  return { documents };
+}
+
+export async function GetAnonymousSubmission(id: String) {
+  let { data: documents } = await supabase
+    .from("anonymous")
+    .select("*")
+    .eq("id", id);
+    
+  return documents && documents.length > 0 ? { success: true, documents } : { success: false, documents: null }
+}
+
+export async function AddAnonymousSubmission(data: any) {
+  let { data: documents } = await supabase
+    .from("anonymous")
+    .insert(data);
+
+  return { success: true, documents };
+}
+
+export async function SendMessage(id: string, messages: any[]) {
+  console.log(id, messages)
+  let { data: documents } = await supabase
+    .from("anonymous")
+    .update({ messages: messages, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select();
+
+  return documents && documents.length > 0 ? { success: true, documents } : { success: false, documents: null }
+}

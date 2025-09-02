@@ -618,3 +618,55 @@ export async function PanimolaSearch(
   let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
+
+export async function SulongData(id?: string, page?: number) {
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, 12);
+
+  if (id == null) {
+    let { data: documents, count } = await supabase
+      .from("anonymous")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .order("updated_at", { ascending: false });
+
+    let pagination =
+      count != null ? Math.ceil(count / (12 + 1)) : 1;
+
+    return { documents, pagination };
+  } else {
+    let { data: documents, count } = await supabase
+      .from("anonymous")
+      .select("*")
+      .eq("id", id);
+
+    let pagination =
+      count != null ? Math.ceil(count / (12 + 1)) : 1;
+    return { documents, pagination };
+  }
+}
+
+export async function SulongSearch(page?: number) {
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, 12);
+
+  let { data: documents, count } = await supabase
+    .from("anonymous")
+    .select("*", { count: "exact", head: false })
+    .range(from, to)
+    .order("updated_at", { ascending: false });
+
+  let pagination =
+    count != null ? Math.ceil(count / (12 + 1)) : 1;
+  return { documents, pagination };
+}
+
+export async function SendReply(id: string, messages: any[]) {
+  const { data: documents } = await supabase
+    .from("anonymous")
+    .update({ messages: messages, updated_at: new Date().toISOString() })
+    .eq("id", id)
+    .select();
+
+  return documents && documents.length > 0 ? { success: true, documents } : { success: false, documents: null }
+}
