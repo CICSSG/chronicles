@@ -15,6 +15,7 @@ import {
 } from "@heroicons/react/24/outline";
 import { AnonymousData } from "@/app/(index)/contact-us/page";
 import Link from "next/link";
+import { sendAnonymousEmail } from "@/utils/send-email";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -92,6 +93,14 @@ export default function Page() {
     return () => observer.disconnect();
   }, []);
 
+  function handleSubmitAnonymous(data: {
+    email: string;
+    id: string;
+    type: string;
+  }) {
+    sendAnonymousEmail(data);
+  }
+
   function sendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -107,10 +116,16 @@ export default function Page() {
         sent_at: new Date().toISOString().toString(),
       },
     ];
-    console.log(messages);
 
     SendReply(slug, messages).then((data) => {
       if (data.success) {
+        if (submission?.email && submission.email != "") {
+          handleSubmitAnonymous({
+            email: submission?.email ?? "",
+            id: submission?.id ?? "",
+            type: "Reply",
+          });
+        }
         (
           document.getElementById("message-form") as HTMLFormElement | null
         )?.reset();

@@ -1,5 +1,5 @@
 "use client";
-import { sendEmail } from "@/utils/send-email";
+import { sendAnonymousEmail, sendEmail } from "@/utils/send-email";
 import { EnvelopeIcon, MapPinIcon } from "@heroicons/react/20/solid";
 import { CheckBadgeIcon, ChevronDownIcon } from "@heroicons/react/24/outline";
 import Image from "next/image";
@@ -86,6 +86,14 @@ const ContactUs = () => {
     sendEmail(data);
   }
 
+  function handleSubmitAnonymous(data: {
+    email: string;
+    id: string;
+    type: string;
+  }) {
+    sendAnonymousEmail(data);
+  }
+
   async function handleAnonymousSubmit(
     event: React.FormEvent<HTMLFormElement>,
   ) {
@@ -93,6 +101,7 @@ const ContactUs = () => {
     const uid = new ShortUniqueId({ length: 10 });
     const uuid = uid.stamp(10);
     const formData = new FormData(event.currentTarget);
+    const email = formData.get("email") as string;
 
     const formatJSON = {
       id: uuid,
@@ -113,6 +122,13 @@ const ContactUs = () => {
     const res = await AddAnonymousSubmission(formatJSON);
 
     if (res.success) {
+      if (email && email != "") {
+        handleSubmitAnonymous({
+          email: email,
+          id: uuid,
+          type: "Received",
+        });
+      }
       const formattedIds = submissionIds.map((id: string) =>
         id.replace("Pioneer-", ""),
       );
@@ -121,8 +137,12 @@ const ContactUs = () => {
         setSubmissionData(data && data.documents ? data.documents : []);
       });
     }
-    
-    (document.getElementById("anonymous-message-form") as HTMLFormElement | null)?.reset();
+
+    (
+      document.getElementById(
+        "anonymous-message-form",
+      ) as HTMLFormElement | null
+    )?.reset();
   }
 
   async function handleViewSubmission(event: React.FormEvent<HTMLFormElement>) {
@@ -132,7 +152,11 @@ const ContactUs = () => {
 
     const res = await GetAnonymousSubmission(uuid.replace("Pioneer-", ""));
     if (res.success) {
-      (document.getElementById("view-submission-form") as HTMLFormElement | null)?.reset();
+      (
+        document.getElementById(
+          "view-submission-form",
+        ) as HTMLFormElement | null
+      )?.reset();
       addSubmissionId(uuid);
       setSubmissionId(uuid);
 
@@ -145,7 +169,7 @@ const ContactUs = () => {
       }, 2000);
     }
   }
-  
+
   const copylink = () => {
     navigator.clipboard.writeText(submissionId);
     setCopyText("Copied to clipboard!");
@@ -157,7 +181,6 @@ const ContactUs = () => {
 
   return (
     <div className="*w-full flex flex-col gap-4 text-black/80 *:rounded-2xl">
-      
       <h2 className="rounded-2xl bg-neutral-100 bg-linear-to-r from-black/2 via-black/2 via-70% to-black/20 px-10 py-8 text-4xl">
         Contact Us - Sulong Pioneers Platform
       </h2>
@@ -227,7 +250,7 @@ const ContactUs = () => {
           </p>
           <p className="text-lg font-medium text-black/70">
             Want to send an anonymous message?{" "}
-            <Link href="#anonymous" className="text-black/95 underline" >
+            <Link href="#anonymous" className="text-black/95 underline">
               Click here
             </Link>
           </p>
@@ -553,7 +576,7 @@ const ContactUs = () => {
             id="view-submission-form"
             className="flex flex-col items-stretch gap-4 text-xl sm:text-lg/5 lg:text-xl/6"
           >
-             {error && <p style={{ color: 'red' }}>{error}</p>}
+            {error && <p style={{ color: "red" }}>{error}</p>}
             <div>
               <div className="flex flex-row">
                 <label
@@ -615,7 +638,10 @@ const ContactUs = () => {
                     }
                   </div>
                 </div>
-                <Link href={`/contact-us/${submission.id}`} className="btn btn-square btn-ghost">
+                <Link
+                  href={`/contact-us/${submission.id}`}
+                  className="btn btn-square btn-ghost"
+                >
                   <svg
                     className="size-[1.2em]"
                     xmlns="http://www.w3.org/2000/svg"
