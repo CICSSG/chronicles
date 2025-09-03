@@ -29,14 +29,27 @@ export async function POST(request: NextRequest) {
       from: "cics.chronicles@gmail.com",
       to: "cics.chronicles@gmail.com",
       cc: email,
-      subject: `[ANONYMOUS MESSAGE] Pioneer-${id} Submission Received!`,
+      subject: `[ANONYMOUS MESSAGE] Pioneer-${id} New Submission`,
       html: `<p>Your message has been received! We will notify you when we have an update.<br>Here is your submission ID for future reference: <strong>Pioneer-${id}</strong></p>`,
+    };
+  } else if (type == "UserReply") {
+    mailOptions = {
+      from: "cics.chronicles@gmail.com",
+      to: "cics.chronicles@gmail.com",
+      subject: `[ANONYMOUS MESSAGE] Pioneer-${id} Submission Reply`,
+      html: `<p>User has replied to your message.</p>`,
+    };
+  } else if (type == "UserSend") {
+    mailOptions = {
+      from: "cics.chronicles@gmail.com",
+      to: "cics.chronicles@gmail.com",
+      subject: `[ANONYMOUS MESSAGE] Pioneer-${id} New Submission`,
+      html: `<p>A new submission has been sent</p>`,
     };
   } else {
     mailOptions = {
       from: "cics.chronicles@gmail.com",
-      to: "cics.chronicles@gmail.com",
-      cc: email,
+      to: email,
       subject: `[ANONYMOUS MESSAGE] Pioneer-${id} Submission Update`,
       html: `<p>Your message has received a reply! Here is your submission ID for future reference: <strong>Pioneer-${id}</strong></p>`,
     };

@@ -9,6 +9,7 @@ import {
 import Link from "next/link";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
 import { createClient } from "@supabase/supabase-js";
+import { sendAnonymousEmail } from "@/utils/send-email";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -83,6 +84,10 @@ export default function Page() {
     return () => observer.disconnect();
   }, []);
 
+  function handleSubmitAnonymous(data: { id: string; type: string }) {
+    sendAnonymousEmail(data);
+  }
+
   function sendMessage(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     const formData = new FormData(event.currentTarget);
@@ -113,6 +118,10 @@ export default function Page() {
             prev.map((doc) => (doc.id === slug ? data.documents[0] : doc)),
           );
         }
+        handleSubmitAnonymous({
+          id: currentSubmission?.id ?? "",
+          type: "UserReply",
+        });
       } else {
         // Handle error
         console.error("Error sending message:");
@@ -125,7 +134,7 @@ export default function Page() {
       <div className="flex flex-row justify-between rounded-2xl bg-neutral-100 bg-linear-to-r from-black/2 via-black/2 via-70% to-black/20 px-10 py-8">
         <Link
           href={"/contact-us"}
-          className="flex flex-row gap-3 align-middle text-xl xl:text-3xl font-bold hover:text-black"
+          className="flex flex-row gap-3 align-middle text-xl font-bold hover:text-black xl:text-3xl"
         >
           <ArrowLeftCircleIcon className="size-6 xl:size-8" /> Go back
         </Link>

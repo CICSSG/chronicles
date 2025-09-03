@@ -17,7 +17,7 @@ export function sendEmail(data: FormData) {
     });
 }
 
-export function sendAnonymousEmail(data: { email: string; id: string; type: string }) {
+export function sendAnonymousEmail(data: { email?: string; id: string; type: string }) {
   const apiEndpoint = '/api/anonymous';
 
   fetch(apiEndpoint, {

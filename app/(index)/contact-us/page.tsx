@@ -87,7 +87,7 @@ const ContactUs = () => {
   }
 
   function handleSubmitAnonymous(data: {
-    email: string;
+    email?: string;
     id: string;
     type: string;
   }) {
@@ -127,6 +127,11 @@ const ContactUs = () => {
           email: email,
           id: uuid,
           type: "Received",
+        });
+      } else {
+        handleSubmitAnonymous({
+          id: uuid,
+          type: "UserSend",
         });
       }
       const formattedIds = submissionIds.map((id: string) =>
