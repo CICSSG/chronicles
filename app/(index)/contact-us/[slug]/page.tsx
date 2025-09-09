@@ -16,6 +16,41 @@ const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
 );
 
+const easterEggMessage = {
+  updated_at: new Date().toISOString(),
+  messages: [
+    {
+      from: "You",
+      content:
+        "Huy Rumi! It looks like someone else is reading our convo oh?",
+      sent_at: new Date().toISOString(),
+    },
+    {
+      from: "CICSSG",
+      content:
+        "Frfr Jinu, who is this third party looking at our convo?",
+      sent_at: new Date().toISOString(),
+    },
+    {
+      from: "You",
+      content:
+        "Have to keep things lowkey for a while muna Rumi.",
+      sent_at: new Date().toISOString(),
+    },
+    {
+      from: "CICSSG",
+      content:
+        "Kaya nga Jinu, basta ha our plans later?",
+      sent_at: new Date().toISOString(),
+    },
+    {
+      from: "You",
+      content: "Sige sige Rumi, I'll just finish my pancit canton!",
+      sent_at: new Date().toISOString(),
+    },
+  ],
+};
+
 export default function Page() {
   const params = useParams();
   const slug =
@@ -104,6 +139,9 @@ export default function Page() {
       },
     ];
     SendMessage(slug, messages).then((data) => {
+      if (slug == "768bbab0a1") {
+        return;
+      }
       if (data.success) {
         (
           document.getElementById("message-form") as HTMLFormElement | null
@@ -149,7 +187,8 @@ export default function Page() {
         <div className="flex flex-col gap-4 xl:col-span-2">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-bold md:text-3xl lg:text-4xl">
-              Pioneer-{currentSubmission?.id}
+              Pioneer-
+              {slug == "768bbab0a1" ? "768bbab0a1" : currentSubmission?.id}
             </h1>
             <p className="text-lg font-medium text-black/80">
               Last Updated:{" "}
@@ -165,7 +204,17 @@ export default function Page() {
                       hour12: true,
                     },
                   )
-                : "N/A"}
+                : new Date(easterEggMessage.updated_at).toLocaleString(
+                    "en-US",
+                    {
+                      month: "long",
+                      day: "numeric",
+                      year: "numeric",
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    },
+                  )}
             </p>
           </div>
 
@@ -173,7 +222,7 @@ export default function Page() {
             ref={parentRef}
             className="flex h-96 grow flex-col gap-2 overflow-y-auto rounded-2xl border-1 border-black/30 bg-white p-4"
           >
-            {currentSubmission && currentSubmission.messages.length > 0 ? (
+            {currentSubmission && currentSubmission.messages.length > 0 && slug != "768bbab0a1" ? (
               currentSubmission.messages.map((message, i) => (
                 <div className="flex h-fit w-full flex-row gap-2" key={i}>
                   <div className="avatar rounded-full bg-white">
@@ -202,9 +251,37 @@ export default function Page() {
                   </div>
                 </div>
               ))
-            ) : (
+            ) : slug != "768bbab0a1" ? (
               <div>No messages found.</div>
-            )}
+            ) : (
+              easterEggMessage.messages.map((message, i) => (
+                <div className="flex h-fit w-full flex-row gap-2" key={i}>
+                  <div className="avatar rounded-full bg-white">
+                    <div className="h-8 w-8 rounded-full">
+                      <img
+                        src={
+                          message.from == "CICSSG"
+                            ? "/images/Rumi.png"
+                            : "/images/Jinu.png"
+                        }
+                      />
+                    </div>
+                  </div>
+
+                  <div className="py-auto h-full text-sm/8 font-normal">
+                    {message.content}
+                  </div>
+
+                  <div className="py-auto h-full text-sm/8 font-normal text-nowrap text-black/50">
+                    -{" "}
+                    {new Date(message.sent_at).toLocaleTimeString("en-US", {
+                      hour: "numeric",
+                      minute: "2-digit",
+                      hour12: true,
+                    })}
+                  </div>
+                </div>
+              )))}
           </div>
 
           <form
@@ -232,14 +309,23 @@ export default function Page() {
                 </svg>
                 <input
                   type="text"
-                  placeholder="Enter a message"
+                  placeholder={
+                    slug == "768bbab0a1"
+                      ? "Chat is disabled."
+                      : "Enter a message"
+                  }
                   name="message"
                   autoComplete="off"
                   required
+                  disabled={slug == "768bbab0a1"}
                 />
               </label>
             </div>
-            <button className="btn btn-neutral join-item" type="submit">
+            <button
+              disabled={slug == "768bbab0a1"}
+              className="btn btn-neutral join-item"
+              type="submit"
+            >
               Send
             </button>
           </form>
