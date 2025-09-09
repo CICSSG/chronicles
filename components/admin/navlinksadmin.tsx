@@ -6,7 +6,7 @@ import React from "react";
 import { RiContactsBook2Line, RiDashboardLine } from "react-icons/ri";
 import { FiLogOut, FiUser } from "react-icons/fi";
 import { IoDocuments } from "react-icons/io5";
-import { GiPoliceOfficerHead, GiTeacher } from "react-icons/gi";
+import { GiLifeSupport, GiPoliceOfficerHead, GiTeacher } from "react-icons/gi";
 import { PiUsersFill } from "react-icons/pi";
 import { CalendarDaysIcon, MegaphoneIcon } from "@heroicons/react/20/solid";
 import { BuildingIcon, Map } from "lucide-react";
@@ -38,11 +38,11 @@ async function NavLinksAdmin() {
           </li>
           <li>
             <Link
-              href="/admin/contacts"
+              href="/admin/sulong"
               className="flex w-fit flex-nowrap items-center gap-2"
             >
-              <RiContactsBook2Line className="w-fit text-3xl" />
-              <span className="hidden group-hover:block">Contact</span>
+              <GiLifeSupport className="w-fit text-3xl" />
+              <span className="hidden group-hover:block text-nowrap">Sulong Pioneers</span>
             </Link>
           </li>
           {(user?.publicMetadata.role == "data" || user?.publicMetadata.role == "admin") && (
