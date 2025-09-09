@@ -21,26 +21,22 @@ const easterEggMessage = {
   messages: [
     {
       from: "You",
-      content:
-        "Huy Rumi! It looks like someone else is reading our convo oh?",
+      content: "Huy Rumi! It looks like someone else is reading our convo oh?",
       sent_at: new Date().toISOString(),
     },
     {
       from: "CICSSG",
-      content:
-        "Frfr Jinu, who is this third party looking at our convo?",
+      content: "Frfr Jinu, who is this third party looking at our convo?",
       sent_at: new Date().toISOString(),
     },
     {
       from: "You",
-      content:
-        "Have to keep things lowkey for a while muna Rumi.",
+      content: "Have to keep things lowkey for a while muna Rumi.",
       sent_at: new Date().toISOString(),
     },
     {
       from: "CICSSG",
-      content:
-        "Kaya nga Jinu, basta ha our plans later?",
+      content: "Kaya nga Jinu, basta ha our plans later?",
       sent_at: new Date().toISOString(),
     },
     {
@@ -60,6 +56,7 @@ export default function Page() {
         ? params.slug[0]
         : "";
 
+  const [isLoading, setIsLoading] = useState(true);
   const parentRef = useRef<HTMLDivElement>(null);
   const [submissionIds, setSubmissionIds] = useState(() => {
     if (typeof window !== "undefined") {
@@ -97,6 +94,7 @@ export default function Page() {
 
   useEffect(() => {
     setCurrentSubmission(submissionData.find((sub) => sub.id === slug) || null);
+    setIsLoading(false);
   }, [slug, submissionData]);
 
   useEffect(() => {
@@ -187,8 +185,13 @@ export default function Page() {
         <div className="flex flex-col gap-4 xl:col-span-2">
           <div className="flex flex-col gap-1">
             <h1 className="text-2xl font-bold md:text-3xl lg:text-4xl">
-              Pioneer-
-              {slug == "768bbab0a1" ? "768bbab0a1" : currentSubmission?.id}
+              {slug == "768bbab0a1"
+                ? "Pioneer-768bbab0a1"
+                : isLoading
+                  ? "Loading..."
+                  : currentSubmission
+                    ? `Pioneer-${currentSubmission?.id}`
+                    : "Invalid ID"}
             </h1>
             <p className="text-lg font-medium text-black/80">
               Last Updated:{" "}
@@ -222,7 +225,9 @@ export default function Page() {
             ref={parentRef}
             className="flex h-96 grow flex-col gap-2 overflow-y-auto rounded-2xl border-1 border-black/30 bg-white p-4"
           >
-            {currentSubmission && currentSubmission.messages.length > 0 && slug != "768bbab0a1" ? (
+            {currentSubmission &&
+            currentSubmission.messages.length > 0 &&
+            slug != "768bbab0a1" ? (
               currentSubmission.messages.map((message, i) => (
                 <div className="flex h-fit w-full flex-row gap-2" key={i}>
                   <div className="avatar rounded-full bg-white">
@@ -281,7 +286,8 @@ export default function Page() {
                     })}
                   </div>
                 </div>
-              )))}
+              ))
+            )}
           </div>
 
           <form
