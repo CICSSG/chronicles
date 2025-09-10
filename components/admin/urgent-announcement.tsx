@@ -27,7 +27,6 @@ const supabase = createClient(
 );
 
 import { useUser } from "@clerk/nextjs";
-import { isAdmin } from "@/app/(admin)/isAdmin";
 
 export default function QuickUrgentAnnouncementAdmin() {
   const { user } = useUser();
@@ -178,10 +177,6 @@ export default function QuickUrgentAnnouncementAdmin() {
   };
 
   const handleEndSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (!isAdmin()) {
-      CreatePopup("You are not authorized to end announcements", "error");
-      return;
-    }
     const formData = new FormData(e.currentTarget);
     const result = await endQuickAnnouncementPOST(formData);
     if (result.success) {
