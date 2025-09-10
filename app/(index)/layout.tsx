@@ -54,6 +54,7 @@ export default async function RootLayout({
       lang="en"
       data-theme="cicssg"
       className={`${spaceGrotesk.className} ${inter.className}`}
+      style={{scrollBehavior:'smooth'}}
       suppressHydrationWarning
     >
       <body className="bg-background text-foreground flex min-h-screen flex-col justify-between overflow-x-hidden">
