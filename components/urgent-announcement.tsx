@@ -14,6 +14,7 @@ export type UrgentAnnouncementDocumentData = {
   button_text: string;
   button_link: string;
   button_visibility: boolean;
+  button_new_tab: boolean;
 };
 
 export default function UrgentAnnouncement() {
@@ -76,7 +77,7 @@ export default function UrgentAnnouncement() {
         </div>
         <Link
           href={documents ? documents[0].button_link : ""}
-          target="_blank"
+          target={documents && documents[0].button_new_tab ? "_blank" : "_self"}
           className={`flex flex-row items-center rounded-lg bg-black/90 px-3 py-2 text-white hover:bg-black/80 ${!buttonVisibility && "hidden"}`}
         >
           <span className="text-sm font-semibold">

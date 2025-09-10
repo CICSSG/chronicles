@@ -35,8 +35,10 @@ export default function QuickUrgentAnnouncementAdmin() {
   >(null);
   const [hasActiveAnnouncement, setHasActiveAnnouncement] = useState(false);
   const [editButton, setEditButton] = useState(false);
+  const [newTabButton, setNewTabButton] = useState(false);
   const [editTimer, setEditTimer] = useState(false);
   const [createButton, setCreateButton] = useState(false);
+  const [createTabButton, setCreateTabButton] = useState(false);
   const [createTimer, setCreateTimer] = useState(false);
   const [createForm, setCreateForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
@@ -81,6 +83,7 @@ export default function QuickUrgentAnnouncementAdmin() {
       setHasActiveAnnouncement(true);
       setEditTimer(activeDocument.time_visibility);
       setEditButton(activeDocument.button_visibility);
+      setNewTabButton(activeDocument.button_new_tab);
     } else {
       setHasActiveAnnouncement(false);
       setEditTimer(false);
@@ -99,6 +102,7 @@ export default function QuickUrgentAnnouncementAdmin() {
       button_text: "",
       button_link: "",
       date: "",
+      button_new_tab: false,
     };
 
     console.log(formData.get("button_visible"));
@@ -106,6 +110,7 @@ export default function QuickUrgentAnnouncementAdmin() {
     temp.announcement = (formData.get("announcement") ?? "") as string;
     temp.time_visibility = createTimer;
     temp.button_visibility = createButton;
+    temp.button_new_tab = createTabButton;
     temp.button_text = (formData.get("button_text") ?? "") as string;
     temp.button_link = (formData.get("button_link") ?? "") as string;
     temp.date = (formData.get("date") ?? "") as string;
@@ -125,9 +130,9 @@ export default function QuickUrgentAnnouncementAdmin() {
       button_text: "",
       button_link: "",
       date: "",
+      button_new_tab: false,
     };
 
-    console.log(formData.get("button_visible"));
     temp.id = (formData.get("id") ?? 0) as number;
     temp.announcement = (formData.get("announcement") ?? "") as string;
     temp.time_visibility = editTimer;
@@ -135,8 +140,10 @@ export default function QuickUrgentAnnouncementAdmin() {
     temp.button_text = (formData.get("button_text") ?? "") as string;
     temp.button_link = (formData.get("button_link") ?? "") as string;
     temp.date = (formData.get("date") ?? "") as string;
+    temp.button_new_tab = newTabButton;
 
     setEditFormData(temp);
+    console.log(temp);
     isEdit ? setEditForm(true) : setEndForm(true);
   };
 
@@ -158,6 +165,8 @@ export default function QuickUrgentAnnouncementAdmin() {
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+
+    console.log(formData.entries().toArray());
     const result = await editQuickAnnouncementPOST(formData);
     if (result.success) {
       CreatePopup("Successfully edited urgent announcement", "success");
@@ -325,6 +334,25 @@ export default function QuickUrgentAnnouncementAdmin() {
                         checked={editButton}
                       />
                     </Field>
+
+                    {editButton && (
+                      <Field className="flex flex-row items-center gap-4">
+                        <Label className="text-sm/6 font-medium text-nowrap text-black">
+                          Open on new tab
+                        </Label>
+                        <Input
+                          name="button_new_tab"
+                          type="checkbox"
+                          className={clsx(
+                            "block w-full rounded-lg border-none bg-black/20 px-3 py-1.5 text-sm/6 text-black",
+                            "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                            "scheme-light",
+                          )}
+                          onChange={(e) => setNewTabButton(e.target.checked)}
+                          checked={newTabButton}
+                        />
+                      </Field>
+                    )}
                     <div className="ml-auto flex flex-row gap-4">
                       <Button
                         type="submit"
@@ -454,6 +482,23 @@ export default function QuickUrgentAnnouncementAdmin() {
                     onChange={(e) => setCreateButton(e.target.checked)}
                   />
                 </Field>
+                {createButton && (
+                  <Field className="flex flex-row items-center gap-4">
+                    <Label className="text-sm/6 font-medium text-nowrap text-black">
+                      Open on new tab
+                    </Label>
+                    <Input
+                      name="button_new_tab"
+                      type="checkbox"
+                      className={clsx(
+                        "block w-full rounded-lg border-none bg-black/20 px-3 py-1.5 text-sm/6 text-black",
+                        "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                        "scheme-light",
+                      )}
+                      onChange={(e) => setCreateTabButton(e.target.checked)}
+                    />
+                  </Field>
+                )}
                 <Button
                   className="ml-auto rounded-2xl bg-green-400 px-5 py-2 font-bold text-black/80 hover:cursor-pointer hover:bg-green-300"
                   type="submit"
@@ -508,7 +553,7 @@ export default function QuickUrgentAnnouncementAdmin() {
                             </p>
                           </div>
 
-                          <div className="">
+                          <div className="hidden">
                             <div className="w-full max-w-md">
                               <Field className="flex flex-row items-center gap-4">
                                 <Input
@@ -634,6 +679,26 @@ export default function QuickUrgentAnnouncementAdmin() {
                                     createFormData.button_visibility
                                   }
                                   name="button_visible"
+                                />
+                              </Field>
+                            </div>
+
+                            <div className="w-full max-w-md">
+                              <Field className="flex flex-row items-center gap-4">
+                                <Label className="text-sm/6 font-medium text-nowrap text-black">
+                                  Open Button on new tab
+                                </Label>
+                                <Input
+                                  type="checkbox"
+                                  className={clsx(
+                                    "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                    "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                  )}
+                                  defaultChecked={
+                                    createFormData &&
+                                    createFormData.button_new_tab
+                                  }
+                                  name="button_new_tab"
                                 />
                               </Field>
                             </div>
@@ -829,6 +894,25 @@ export default function QuickUrgentAnnouncementAdmin() {
                                     editFormData.button_visibility
                                   }
                                   name="button_visible"
+                                />
+                              </Field>
+                            </div>
+
+                            <div className="w-full max-w-md">
+                              <Field className="flex flex-row items-center gap-4">
+                                <Label className="text-sm/6 font-medium text-nowrap text-black">
+                                  New Tab Button
+                                </Label>
+                                <Input
+                                  type="checkbox"
+                                  className={clsx(
+                                    "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
+                                    "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
+                                  )}
+                                  defaultChecked={
+                                    editFormData && editFormData.button_new_tab
+                                  }
+                                  name="button_new_tab"
                                 />
                               </Field>
                             </div>

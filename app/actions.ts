@@ -1365,9 +1365,8 @@ export async function createQuickAnnouncementPOST(formData: FormData) {
   const timer_visibility = formData.get("timer_visible") == "on" ? true : false;
   const button_visibility =
     formData.get("button_visible") == "on" ? true : false;
+  const button_new_tab = formData.get("button_new_tab") == "on" ? true : false;
 
-  console.log(timer_visibility);
-  console.log(button_visibility);
   if (hasActiveAnnouncement == "false") {
     const { data, error } = await supabase
       .from("urgent_announcement")
@@ -1378,10 +1377,10 @@ export async function createQuickAnnouncementPOST(formData: FormData) {
         button_link: button_link,
         time_visibility: timer_visibility,
         button_visibility: button_visibility,
+        button_new_tab: button_new_tab,
       })
       .select();
 
-    console.log(error);
     return error
       ? { success: false, message: error?.message }
       : { success: true };
@@ -1420,6 +1419,7 @@ export async function createQuickAnnouncementPOST(formData: FormData) {
         button_link: button_link,
         time_visibility: timer_visibility,
         button_visibility: button_visibility,
+        button_new_tab: button_new_tab,
       })
       .select();
 
@@ -1448,6 +1448,7 @@ export async function editQuickAnnouncementPOST(formData: FormData) {
   const timer_visibility = formData.get("timer_visible") == "on" ? true : false;
   const button_visibility =
     formData.get("button_visible") == "on" ? true : false;
+  const button_new_tab = formData.get("button_new_tab") == "on" ? true : false;
 
   const { data, error } = await supabase
     .from("urgent_announcement")
@@ -1458,6 +1459,7 @@ export async function editQuickAnnouncementPOST(formData: FormData) {
       button_link: button_link,
       time_visibility: timer_visibility,
       button_visibility: button_visibility,
+      button_new_tab: button_new_tab,
     })
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
     .select();
