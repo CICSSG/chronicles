@@ -243,7 +243,7 @@ export default function Page() {
               {document &&
                 document.directorate.map(
                   (
-                    data: { image: string; position: string; name: string },
+                    data: { image: string; position: string; name: string; responsibilities: string[] },
                     i: number,
                   ) => (
                     <div key={i} className="flex flex-col items-center gap-2">
@@ -262,7 +262,8 @@ export default function Page() {
                       <p className="text-center text-xl font-medium">
                         {data.name}
                       </p>
-                      <Button
+                      {data.responsibilities?.length > 0 && (
+                        <Button
                         onClick={() =>
                           handleViewResponsibilitiesDirectorate(data.position)
                         }
@@ -270,6 +271,7 @@ export default function Page() {
                       >
                         Responsibilities
                       </Button>
+                      )}
                     </div>
                   ),
                 )}

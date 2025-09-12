@@ -11,7 +11,7 @@ const isPublicRoute = createRouteMatcher([
   '/contact-us(.*)',
   '/sign-in(.*)',
   '/sign-up(.*)',
-  '/api(.*)'
+  '/api(.*)',
 ])
 
 const isSignupRoute = createRouteMatcher([
