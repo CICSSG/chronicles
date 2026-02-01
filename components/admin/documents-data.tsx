@@ -670,3 +670,61 @@ export async function SendReply(id: string, messages: any[]) {
 
   return documents && documents.length > 0 ? { success: true, documents } : { success: false, documents: null }
 }
+
+export async function FetchDeskData(id?: string, page?: number) {
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, 12);
+
+  if (id == null) {
+    let { data: documents, count } = await supabase
+      .from("fetchdesk")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .order("date", { ascending: false });
+
+    let pagination =
+      count != null ? Math.ceil(count / (12 + 1)) : 1;
+
+    return { documents, pagination };
+  } else {
+    let { data: documents, count } = await supabase
+      .from("fetchdesk")
+      .select("*")
+      .eq("id", id);
+
+    let pagination =
+      count != null ? Math.ceil(count / (12 + 1)) : 1;
+    return { documents, pagination };
+  }
+}
+
+export async function FetchDeskSearch(title?: string, page?: number) {
+  title == "" || title == null
+    ? (title = undefined)
+    : (title = "%" + title + "%");
+
+  if (page == null) page = 1;
+  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+
+  if (title != undefined) {
+    let { data: documents, count } = await supabase
+      .from("fetchdesk")
+      .select("*", { count: "exact", head: false })
+      .range(from, to)
+      .ilike("student_number", title)
+      .order("id", { ascending: false });
+
+    let pagination =
+      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    return { documents, pagination };
+  }
+
+  let { data: documents, count } = await supabase
+    .from("fetchdesk")
+    .select("*", { count: "exact", head: false })
+    .range(from, to)
+    .order("id", { ascending: false });
+
+  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  return { documents, pagination };
+}

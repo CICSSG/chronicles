@@ -1,6 +1,7 @@
 "use server";
 import { createClient } from "@supabase/supabase-js";
 import { auth } from "@clerk/nextjs/server";
+import { put } from "@vercel/blob";
 
 export async function createNewDocument(formData: FormData) {
   const { getToken } = await auth();
@@ -1803,6 +1804,595 @@ export async function deletePanimolaSchedulePOST(formData: FormData) {
     .delete()
     .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
 
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}
+
+export async function checkFreeBwPages(studentNumber: string) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const getWeekRange = (dateString: string) => {
+    const baseDate = new Date(`${dateString}T00:00:00`);
+    const day = baseDate.getDay();
+    const mondayOffset = day === 0 ? -6 : 1 - day;
+    const weekStart = new Date(baseDate);
+    weekStart.setDate(baseDate.getDate() + mondayOffset);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    return {
+      start: weekStart.toISOString().split("T")[0],
+      end: weekEnd.toISOString().split("T")[0],
+    };
+  };
+
+  // Get current date in GMT+8 (UTC+8)
+  const now = new Date();
+  const gmt8Date = new Date(
+    now.getTime() + 8 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000,
+  );
+  const today = gmt8Date.toISOString().split("T")[0];
+  const { start, end } = getWeekRange(today);
+
+  const { data: weeklyRows, error: weeklyError } = await supabase
+    .from("fetchdesk")
+    .select("bw_page_count, print_type, page_count")
+    .eq("transaction_type", "printing")
+    .eq("student_number", studentNumber)
+    .gte("date", start)
+    .lte("date", end);
+
+  console.log("Weekly Rows:", weeklyRows, studentNumber, start, end);
+  if (weeklyError) {
+    return { success: false, message: weeklyError?.message };
+  }
+
+  const usedBwPages = (weeklyRows || []).reduce((total: number, row: any) => {
+    const bwPages = Number(row?.bw_page_count ?? 0);
+    if (bwPages) return total + bwPages;
+    if (row?.print_type === "blackAndWhite") {
+      return total + Number(row?.page_count ?? 0);
+    }
+    return total;
+  }, 0);
+
+  const freePagesPerWeek = 5;
+  const remainingFree = Math.max(0, freePagesPerWeek - usedBwPages);
+
+  return {
+    success: true,
+    usedBwPages,
+    remainingFree,
+    weekStart: start,
+    weekEnd: end,
+  };
+}
+
+export async function createFetchDeskPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const extractDataUrl = (value: FormDataEntryValue | null) => {
+    if (typeof value !== "string") return null;
+    if (!value.startsWith("data:image")) return null;
+    return value;
+  };
+
+  const getFileExtension = (mimeType: string) => {
+    if (mimeType === "image/jpeg") return "jpg";
+    if (mimeType === "image/png") return "png";
+    if (mimeType === "image/webp") return "webp";
+    return "png";
+  };
+
+  const uploadSignatureIfNeeded = async (
+    value: FormDataEntryValue | null,
+    filePrefix: string,
+  ) => {
+    const dataUrl = extractDataUrl(value);
+    if (!dataUrl) return value;
+
+    const [header, base64Data] = dataUrl.split(",");
+    if (!header || !base64Data) return value;
+
+    const mimeMatch = header.match(/data:(image\/[a-zA-Z0-9.+-]+);base64/);
+    const mimeType = mimeMatch?.[1] ?? "image/png";
+    const extension = getFileExtension(mimeType);
+    const buffer = Buffer.from(base64Data, "base64");
+    const filename = `fetchdesk/signatures/${filePrefix}-${Date.now()}.${extension}`;
+    const blob = await put(filename, buffer, {
+      access: "public",
+      contentType: mimeType,
+    });
+    return blob.url;
+  };
+
+  const transactionType = formData.get("transaction_type");
+  const studentNumber = formData.get("student_number");
+  const dateRaw = formData.get("date");
+
+  // Get current date in GMT+8 (UTC+8) as default
+  const now = new Date();
+  const gmt8Date = new Date(
+    now.getTime() + 8 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000,
+  );
+  const defaultDateGmt8 = gmt8Date.toISOString().split("T")[0];
+
+  const dateValue =
+    typeof dateRaw === "string" && dateRaw ? dateRaw : defaultDateGmt8;
+
+  const parseNumber = (value: FormDataEntryValue | null, fallback = 0) => {
+    if (value === null) return fallback;
+    const parsed = Number(value);
+    return Number.isFinite(parsed) ? parsed : fallback;
+  };
+  const parseJsonArray = (value: FormDataEntryValue | null) => {
+    if (!value) return null;
+    if (Array.isArray(value)) return value;
+    if (typeof value !== "string") return null;
+    try {
+      const parsed = JSON.parse(value);
+      return Array.isArray(parsed) ? parsed : null;
+    } catch {
+      return value
+        .split(",")
+        .map((item) => item.trim())
+        .filter(Boolean);
+    }
+  };
+
+  const getWeekRange = (dateString: string) => {
+    const baseDate = new Date(`${dateString}T00:00:00`);
+    const day = baseDate.getDay();
+    const mondayOffset = day === 0 ? -6 : 1 - day;
+    const weekStart = new Date(baseDate);
+    weekStart.setDate(baseDate.getDate() + mondayOffset);
+    const weekEnd = new Date(weekStart);
+    weekEnd.setDate(weekStart.getDate() + 6);
+    return {
+      start: weekStart.toISOString().split("T")[0],
+      end: weekEnd.toISOString().split("T")[0],
+    };
+  };
+
+  let calculatedPrice = parseNumber(formData.get("calculated_price"));
+  let freePagesAvailed = formData.get("free_pages_availed") === "true";
+
+  let bwPageCount = parseNumber(formData.get("bw_page_count"));
+  let coloredPageCount = parseNumber(formData.get("colored_page_count"));
+  const pageCount = parseNumber(formData.get("page_count"));
+  const printType = formData.get("print_type");
+  if (transactionType === "printing") {
+    if (!bwPageCount && !coloredPageCount && pageCount) {
+      if (printType === "colored") {
+        coloredPageCount = pageCount;
+      } else {
+        bwPageCount = pageCount;
+      }
+    }
+
+    const { start, end } = getWeekRange(dateValue);
+    const { data: weeklyRows, error: weeklyError } = await supabase
+      .from("fetchdesk")
+      .select("bw_page_count, print_type, page_count")
+      .eq("transaction_type", "printing")
+      .eq("student_number", studentNumber)
+      .gte("date", start)
+      .lte("date", end);
+
+    if (weeklyError) {
+      return { success: false, message: weeklyError?.message };
+    }
+    const usedBwPages = (weeklyRows || []).reduce((total, row: any) => {
+      const bwPages = Number(row?.bw_page_count ?? 0);
+      if (bwPages) return total + bwPages;
+      if (row?.print_type === "blackAndWhite") {
+        return total + Number(row?.page_count ?? 0);
+      }
+      return total;
+    }, 0);
+
+    const freePagesPerWeek = 5;
+    const remainingFree = Math.max(0, freePagesPerWeek - usedBwPages);
+    const freeApplied = Math.min(remainingFree, bwPageCount);
+    const chargeableBw = Math.max(0, bwPageCount - freeApplied);
+
+    calculatedPrice = chargeableBw * 2 + Math.max(0, coloredPageCount) * 5;
+    freePagesAvailed = usedBwPages >= freePagesPerWeek;
+  }
+  const rentalItems = parseJsonArray(formData.get("rental_items"));
+  const officerSignature = await uploadSignatureIfNeeded(
+    formData.get("officer_signature"),
+    `officer-${studentNumber ?? "unknown"}`,
+  );
+  const studentSignature = await uploadSignatureIfNeeded(
+    formData.get("student_signature"),
+    `student-${studentNumber ?? "unknown"}`,
+  );
+
+  const payload = {
+    student_name: formData.get("student_name"),
+    student_number: studentNumber,
+    cys: formData.get("cys"),
+    contact_details: formData.get("contact_details"),
+    transaction_type: transactionType,
+    print_type: formData.get("print_type"),
+    page_count: pageCount || bwPageCount + coloredPageCount,
+    bw_page_count: bwPageCount,
+    colored_page_count: coloredPageCount,
+    free_pages_availed: freePagesAvailed,
+    rental_item: formData.get("rental_item"),
+    rental_items: rentalItems ?? formData.get("rental_items"),
+    rental_time: formData.get("rental_time"),
+    return_time: formData.get("return_time"),
+    status: formData.get("status"),
+    calculated_price: calculatedPrice,
+    officer_signature: officerSignature,
+    student_signature: studentSignature,
+    date: dateValue,
+  };
+
+  const { error } = await supabase.from("fetchdesk").insert([payload]).select();
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}
+
+export async function editFetchDeskPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+
+  const uploadSignatureIfNeeded = async (
+    value: FormDataEntryValue | null,
+    filePrefix: string,
+  ) => {
+    if (typeof value !== "string") return value;
+    if (!value.startsWith("data:image")) return value;
+
+    const [header, base64Data] = value.split(",");
+    if (!header || !base64Data) return value;
+
+    const mimeMatch = header.match(/data:(image\/[a-zA-Z0-9.+-]+);base64/);
+    const mimeType = mimeMatch?.[1] ?? "image/png";
+    const extension = mimeType === "image/jpeg" ? "jpg" : "png";
+    const buffer = Buffer.from(base64Data, "base64");
+
+    const filename = `fetchdesk/signatures/${filePrefix}-${Date.now()}.${extension}`;
+    const blob = await put(filename, buffer, {
+      access: "public",
+      contentType: mimeType,
+    });
+
+    return blob.url;
+  };
+
+  const studentNumber = formData.get("student_number");
+  const officerSignature = await uploadSignatureIfNeeded(
+    formData.get("officer_signature"),
+    `officer-${studentNumber ?? "unknown"}`,
+  );
+  const studentSignature = await uploadSignatureIfNeeded(
+    formData.get("student_signature"),
+    `student-${studentNumber ?? "unknown"}`,
+  );
+  const returnOfficerSignature = await uploadSignatureIfNeeded(
+    formData.get("return_officer_signature"),
+    `return-officer-${studentNumber ?? "unknown"}`,
+  );
+  const returnStudentSignature = await uploadSignatureIfNeeded(
+    formData.get("return_student_signature"),
+    `return-student-${studentNumber ?? "unknown"}`,
+  );
+
+  const updateData: Record<string, FormDataEntryValue | null> = {};
+
+  const setIfPresent = (key: string) => {
+    if (formData.has(key)) {
+      updateData[key] = formData.get(key);
+    }
+  };
+
+  setIfPresent("student_name");
+  setIfPresent("student_number");
+  setIfPresent("cys");
+  setIfPresent("contact_details");
+  setIfPresent("transaction_type");
+  setIfPresent("print_type");
+  setIfPresent("page_count");
+  setIfPresent("bw_page_count");
+  setIfPresent("colored_page_count");
+  setIfPresent("free_pages_availed");
+  setIfPresent("rental_item");
+  setIfPresent("rental_items");
+  setIfPresent("rental_time");
+  setIfPresent("return_time");
+  setIfPresent("penalty_amount");
+  setIfPresent("status");
+  setIfPresent("calculated_price");
+  setIfPresent("notes");
+  setIfPresent("date");
+
+  if (officerSignature) updateData.officer_signature = officerSignature;
+  if (studentSignature) updateData.student_signature = studentSignature;
+  if (returnOfficerSignature)
+    updateData.return_officer_signature = returnOfficerSignature;
+  if (returnStudentSignature)
+    updateData.return_student_signature = returnStudentSignature;
+
+  const { data, error } = await supabase
+    .from("fetchdesk")
+    .update(updateData)
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
+    .select();
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+  // console.log(data)
+}
+
+export async function deleteFetchDeskPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+
+  const { error } = await supabase
+    .from("fetchdesk")
+    .delete()
+    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}
+
+export async function getAttendance(studentNumber: string, date?: string) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const baseDate = new Date();
+  const day = baseDate.getDate();
+
+  let { data: documents } = await supabase
+    .from("attendance_users")
+    .select("*", { count: "exact", head: false })
+    .eq("student_id", studentNumber);
+
+  if (!documents || documents.length === 0) {
+    // console.log("No user found with student number:", studentNumber);
+    return { success: true, data: documents, count: 0, type: "userAccount" };
+  }
+
+  let { data: attendance, count } = await supabase
+    .from("attendance")
+    .select("*", { count: "exact", head: false })
+    .or('student_id.eq.' + studentNumber + ',student_name.eq.' + studentNumber)
+    .eq('date', date ? date : baseDate.toISOString().split("T")[0]);
+
+  // console.log("Attendance Records:", attendance);
+
+  return { success: true, data: attendance, userData: documents[0], count: count || 0, type: "attendanceRecords" };
+}
+
+export async function createAttendanceUserPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const student_name = formData.get("student_name");
+  const student_number = formData.get("student_number");
+  const role = formData.get("role");
+
+  // console.log(student_name, student_number, role);
+  const { data, error } = await supabase
+    .from("attendance_users")
+    .insert([
+      {
+        student_name: student_name,
+        student_id: student_number,
+        role: role,
+      },
+    ])
+    .select();
+
+  // console.log(data, error);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}
+
+export async function createAttendancePOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const extractDataUrl = (value: FormDataEntryValue | null) => {
+    if (typeof value !== "string") return null;
+    if (!value.startsWith("data:image")) return null;
+    return value;
+  };
+
+  const getFileExtension = (mimeType: string) => {
+    if (mimeType === "image/jpeg") return "jpg";
+    if (mimeType === "image/png") return "png";
+    if (mimeType === "image/webp") return "webp";
+    return "png";
+  };
+
+  const uploadSignatureIfNeeded = async (
+    value: FormDataEntryValue | null,
+    filePrefix: string,
+  ) => {
+    const dataUrl = extractDataUrl(value);
+    if (!dataUrl) return value;
+
+    const [header, base64Data] = dataUrl.split(",");
+    if (!header || !base64Data) return value;
+
+    const mimeMatch = header.match(/data:(image\/[a-zA-Z0-9.+-]+);base64/);
+    const mimeType = mimeMatch?.[1] ?? "image/png";
+    const extension = getFileExtension(mimeType);
+    const buffer = Buffer.from(base64Data, "base64");
+    const filename = `attendance/signatures/${filePrefix}-${Date.now()}.${extension}`;
+    const blob = await put(filename, buffer, {
+      access: "public",
+      contentType: mimeType,
+    });
+    return blob.url;
+  };
+
+
+  const student_name = formData.get("student_name");
+  const student_id = formData.get("student_id");
+  const time_in = formData.get("time_in");
+  const additional = formData.get("additional");
+  const signature = formData.get("signature");
+  const role = formData.get("role");
+
+
+  const signatureUrl = await uploadSignatureIfNeeded(
+    signature,
+    `attendance-${student_id ?? "unknown"}`,
+  );
+
+  const { data, error } = await supabase
+    .from("attendance")
+    .insert([
+      {
+        student_name: student_name,
+        student_id: student_id,
+        date: new Date().toISOString().split("T")[0],
+        time_in: time_in,
+        additional: additional,
+        type: role,
+        time_in_signature: signatureUrl,
+      },
+    ])
+    .select();
+
+  // console.log(data, error);
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}
+
+export async function updateAttendancePOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const extractDataUrl = (value: FormDataEntryValue | null) => {
+    if (typeof value !== "string") return null;
+    if (!value.startsWith("data:image")) return null;
+    return value;
+  };
+
+  const getFileExtension = (mimeType: string) => {
+    if (mimeType === "image/jpeg") return "jpg";
+    if (mimeType === "image/png") return "png";
+    if (mimeType === "image/webp") return "webp";
+    return "png";
+  };
+
+  const uploadSignatureIfNeeded = async (
+    value: FormDataEntryValue | null,
+    filePrefix: string,
+  ) => {
+    const dataUrl = extractDataUrl(value);
+    if (!dataUrl) return value;
+
+    const [header, base64Data] = dataUrl.split(",");
+    if (!header || !base64Data) return value;
+
+    const mimeMatch = header.match(/data:(image\/[a-zA-Z0-9.+-]+);base64/);
+    const mimeType = mimeMatch?.[1] ?? "image/png";
+    const extension = getFileExtension(mimeType);
+    const buffer = Buffer.from(base64Data, "base64");
+    const filename = `attendance/signatures/${filePrefix}-${Date.now()}.${extension}`;
+    const blob = await put(filename, buffer, {
+      access: "public",
+      contentType: mimeType,
+    });
+    return blob.url;
+  };
+
+  const document_id = formData.get("document_id");
+  const student_name = formData.get("student_name");
+  const student_id = formData.get("student_id");
+  const time_out = formData.get("time_out");
+  const signature = formData.get("signature");
+
+
+  const signatureUrl = await uploadSignatureIfNeeded(
+    signature,
+    `attendance-${student_id ?? "unknown"}`,
+  );
+
+  const { data, error } = await supabase
+    .from("attendance")
+    .update([
+      {
+        student_name: student_name,
+        student_id: student_id,
+        time_out: time_out,
+        time_out_signature: signatureUrl,
+        updated_at: new Date().toISOString(),
+      },
+    ])
+    .eq("id", document_id !== null ? parseInt(document_id as string, 10) : undefined)
+    .select();
+
+  // console.log(data, error);
   return error
     ? { success: false, message: error?.message }
     : { success: true };

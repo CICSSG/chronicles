@@ -6,11 +6,11 @@ import Image from 'next/image'
 
 export default function SignInPage() {
   return (
-    <div className="grid w-full flex-grow items-center bg-radial from-neutral-600 to-neutral-850 px-4 sm:justify-center bg-[url(/images/noiselow.png)]">
+    <div className="grid w-full flex-grow items-center bg-radial from-neutral-600 to-neutral-850 bg-gray-900 px-4 sm:justify-center bg-[url(/images/noiselow.png)]">
       <SignIn.Root>
         <SignIn.Step
           name="start"
-          className="w-full space-y-6 rounded-2xl bg-linear-to-br from-neutral-600 to-neutral-800 px-4 py-10 shadow-md shadow-white/20 ring-1 ring-black/5 sm:w-96 sm:px-8 "
+          className="w-full space-y-6 rounded-2xl bg-linear-to-br from-neutral-600 to-neutral-800 bg-neutral-700 px-4 py-10 shadow-md shadow-white/20 ring-1 ring-black/5 sm:w-96 sm:px-8 "
         >
           <header className="text-center">
             <Image

@@ -1,6 +1,7 @@
 import { SpeedInsights } from "@vercel/speed-insights/next"
 import { Space_Grotesk } from "next/font/google";
-import "/app/globals.css";
+// @ts-ignore
+import "../globals.css";
 import { ClerkProvider } from "@clerk/nextjs";
 import { Analytics } from "@vercel/analytics/next";
 
