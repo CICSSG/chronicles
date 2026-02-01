@@ -3,7 +3,8 @@ import { Analytics } from "@vercel/analytics/next";
 
 import { Space_Grotesk, Inter, Roboto } from "next/font/google";
 import Link from "next/link";
-import "/app/globals.css";
+// @ts-ignore
+import "../globals.css";
 import Footer from "@/components/footer";
 import NavLinks from "@/components/nav-links";
 import { Edit } from "lucide-react";
