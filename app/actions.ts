@@ -1849,7 +1849,7 @@ export async function checkFreeBwPages(studentNumber: string) {
     .gte("date", start)
     .lte("date", end);
 
-  console.log("Weekly Rows:", weeklyRows, studentNumber, start, end);
+  // console.log("Weekly Rows:", weeklyRows, studentNumber, start, end);
   if (weeklyError) {
     return { success: false, message: weeklyError?.message };
   }
@@ -2173,6 +2173,32 @@ export async function deleteFetchDeskPOST(formData: FormData) {
   return error
     ? { success: false, message: error?.message }
     : { success: true };
+}
+
+export async function getUser(studentNumber: string, date?: string) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const baseDate = new Date();
+  const day = baseDate.getDate();
+
+  let { data: documents } = await supabase
+    .from("fetchdesk")
+    .select("*", { count: "exact", head: false })
+    .eq("student_number", studentNumber);
+
+  if (!documents || documents.length === 0) {
+    // console.log("No user found with student number:", studentNumber);
+    return { success: true, data: documents, count: 0, type: "userAccount" };
+  }
+
+  return { success: true, data: documents, count: documents.length, type: "userAccount" };
 }
 
 export async function getAttendance(studentNumber: string, date?: string) {

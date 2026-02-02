@@ -28,6 +28,7 @@ import {
   deleteFetchDeskPOST,
   editFetchDeskPOST,
   checkFreeBwPages,
+  getUser,
 } from "@/app/actions";
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
@@ -36,6 +37,7 @@ import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 import { off } from "process";
+import { set } from "react-hook-form";
 
 const supabase = createClient(
   process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -78,6 +80,9 @@ const FetchDesk = () => {
   const [pagination, setPagination] = useState(1);
 
   // Form state
+  const [studentName, setStudentName] = useState("");
+  const [studentCYS, setStudentCYS] = useState("");
+  const [studentContact, setStudentContact] = useState("");
   const [selectedTransactionType, setSelectedTransactionType] = useState<
     "printing" | "rental"
   >("printing");
@@ -209,11 +214,11 @@ const FetchDesk = () => {
   const formatPrintSummary = (data: any) => {
     const bw = Number(
       data?.bw_page_count ??
-        (data?.print_type === "blackAndWhite" ? data?.page_count : 0),
+      (data?.print_type === "blackAndWhite" ? data?.page_count : 0),
     );
     const colored = Number(
       data?.colored_page_count ??
-        (data?.print_type === "colored" ? data?.page_count : 0),
+      (data?.print_type === "colored" ? data?.page_count : 0),
     );
     if (!bw && !colored) return "0 pages";
     const parts: string[] = [];
@@ -308,8 +313,11 @@ const FetchDesk = () => {
       formData.set("rental_item", selectedRentalItems[0] ?? "");
     }
 
-    const result = await createFetchDeskPOST(formData);
+    setStudentName("");
+    setStudentCYS("");
+    setStudentContact("");
     setCreateForm(false);
+    const result = await createFetchDeskPOST(formData);
 
     // Clear signature canvases
     if (officerSigRef.current) {
@@ -340,9 +348,9 @@ const FetchDesk = () => {
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
-    const result = await editFetchDeskPOST(formData);
     setEditForm(false);
     handleEditDocument("");
+    const result = await editFetchDeskPOST(formData);
 
     if (result.success) {
       CreatePopup("Successfully edited transaction", "success");
@@ -495,7 +503,7 @@ const FetchDesk = () => {
               />
             </Field>
           </div>
-          <div className="w-full max-w-2xs px-4">
+          {/* <div className="w-full max-w-2xs px-4">
             <Field>
               <Label className="text-sm/6 font-medium text-white">
                 Transaction Type
@@ -514,7 +522,7 @@ const FetchDesk = () => {
                 <option value="rental">Rental</option>
               </Select>
             </Field>
-          </div>
+          </div> */}
           <button
             type="button"
             onClick={clearFilters}
@@ -562,10 +570,10 @@ const FetchDesk = () => {
                     </span>
                   )}
                 </td>
-                <th className="text-nowrap">{data.student_name}</th>
+                <th className="text-nowrap text-xs whitespace-nowrap">{data.student_name}</th>
                 <td className="text-nowrap">{data.student_number}</td>
                 <td className="text-nowrap">{data.cys}</td>
-                <td className="w-[150px]">{data.date}</td>
+                <td className="w-[150px] whitespace-nowrap">{data.date}</td>
                 <td className="max-w-xs truncate">
                   {data.transaction_type === "printing"
                     ? formatPrintSummary(data)
@@ -733,7 +741,7 @@ const FetchDesk = () => {
           className="fixed inset-0 z-auto bg-neutral-600 opacity-40 transition-opacity data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in"
         />
         <div className="fixed inset-0 z-40 w-screen overflow-y-auto">
-          <div className="flex min-h-[50vh] items-end justify-center text-center sm:items-center sm:p-0">
+          <div className="flex min-h-[50vh] max-h-[95vh] items-end justify-center text-center sm:items-center sm:p-0">
             <DialogPanel
               transition
               className="relative transform overflow-hidden rounded-lg bg-white text-left shadow-xl transition-all data-closed:translate-y-4 data-closed:opacity-0 data-enter:duration-300 data-enter:ease-out data-leave:duration-200 data-leave:ease-in sm:my-8 sm:w-full sm:max-w-2xl data-closed:sm:translate-y-0 data-closed:sm:scale-95"
@@ -806,6 +814,8 @@ const FetchDesk = () => {
                             </Label>
                             <Input
                               name="student_name"
+                              value={studentName}
+                              onChange={(e) => setStudentName(e.target.value)}
                               className={clsx(
                                 "mt-2 block w-full rounded-lg border-none bg-neutral-200 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -824,8 +834,18 @@ const FetchDesk = () => {
                                 const studentNum = e.target.value;
                                 if (studentNum.trim()) {
                                   (async () => {
-                                    const result =
-                                      await checkFreeBwPages(studentNum);
+                                      const [result, userResult] = await Promise.all([
+                                        checkFreeBwPages(studentNum),
+                                        getUser(studentNum),
+                                      ]);
+
+                                    if (userResult.success && userResult.count > 0) {
+                                      const userInfo = userResult.data?.[userResult.data?.length - 1]
+                                      setStudentName(userInfo?.student_name || "");
+                                      setStudentCYS(userInfo?.cys || "");
+                                      setStudentContact(userInfo?.contact_details || "");
+                                    }
+
                                     if (
                                       result.success &&
                                       result.usedBwPages !== undefined &&
@@ -837,7 +857,7 @@ const FetchDesk = () => {
                                       });
                                       setHasAvailedFreePages(
                                         result.usedBwPages >=
-                                          PRICING.printing.freePagesPerWeek,
+                                        PRICING.printing.freePagesPerWeek,
                                       );
                                     }
                                   })();
@@ -863,6 +883,8 @@ const FetchDesk = () => {
                             <Input
                               name="cys"
                               placeholder="e.g., BIT11"
+                              value={studentCYS}
+                              onChange={(e) => setStudentCYS(e.target.value)}
                               className={clsx(
                                 "mt-2 block w-full rounded-lg border-none bg-neutral-200 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -879,6 +901,8 @@ const FetchDesk = () => {
                               name="contact_details"
                               type="tel"
                               placeholder="Phone number"
+                              value={studentContact}
+                              onChange={(e) => setStudentContact(e.target.value)}
                               className={clsx(
                                 "mt-2 block w-full rounded-lg border-none bg-neutral-200 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
@@ -1243,18 +1267,23 @@ const FetchDesk = () => {
                     </div>
                   </div>
                 </div>
-                <div className="bg-gray-50 px-4 py-3 sm:flex sm:flex-row-reverse sm:px-6">
+                <div className="bg-gray-50 px-4 py-2 sm:flex sm:flex-row-reverse sm:px-6">
                   <button
                     type="submit"
-                    className="inline-flex w-full justify-center rounded-md bg-green-600 px-3 py-2 text-sm font-semibold text-white shadow-xs hover:bg-green-500 sm:ml-3 sm:w-auto"
+                    className="inline-flex w-full justify-center rounded-md bg-green-600 px-4 py-4 text-md font-semibold text-white shadow-xs hover:bg-green-500 sm:ml-3 sm:w-auto"
                   >
                     Create Transaction
                   </button>
                   <button
                     type="button"
                     data-autofocus
-                    onClick={() => setCreateForm(false)}
-                    className="mt-3 inline-flex w-full justify-center rounded-md bg-white px-3 py-2 text-sm font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
+                    onClick={() => {
+                      setStudentName("");
+                      setStudentCYS("");
+                      setStudentContact("");
+                      setCreateForm(false)
+                    }}
+                    className="mt-3 inline-flex w-full justify-center rounded-md bg-neutral-200 px-4 py-4 text-md font-semibold text-gray-900 shadow-xs ring-1 ring-gray-300 ring-inset hover:bg-gray-50 sm:mt-0 sm:w-auto"
                   >
                     Cancel
                   </button>
@@ -1351,7 +1380,7 @@ const FetchDesk = () => {
                                 </span>{" "}
                                 {viewDocument[0].bw_page_count ??
                                   (viewDocument[0].print_type ===
-                                  "blackAndWhite"
+                                    "blackAndWhite"
                                     ? viewDocument[0].page_count
                                     : 0)}
                               </div>
