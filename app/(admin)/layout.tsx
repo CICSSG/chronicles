@@ -55,7 +55,7 @@ export default async function RootLayout({
           <meta name="apple-mobile-web-app-capable" content="yes"></meta>
         </head>
         <body className={`${spaceGrotesk.className} ${inter.className}`}>
-          <div className="fixed right-4 bottom-4 z-20 flex w-90 flex-col items-end gap-2">
+          <div className="fixed right-4 bottom-4 z-5 flex w-90 flex-col items-end gap-2">
             {/* ALERTS */}
             <AlertFragment />
 
@@ -72,7 +72,7 @@ export default async function RootLayout({
             {/* Container */}
             <div className="flex min-h-screen w-full flex-row bg-black/30">
               {/* Navbar */}
-              <div className="peer fixed z-9999">
+              <div className="peer fixed z-5">
                 <NavLinksAdmin/>
               </div>
 
