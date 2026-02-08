@@ -728,3 +728,12 @@ export async function FetchDeskSearch(title?: string, page?: number) {
   let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
+
+export async function GetAttendanceList() {
+  let { data: documents } = await supabase
+    .from("attendance")
+    .select("*")
+    .order("date", { ascending: false });
+
+  return { documents };
+}
