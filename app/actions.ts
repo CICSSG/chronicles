@@ -2423,3 +2423,104 @@ export async function updateAttendancePOST(formData: FormData) {
     ? { success: false, message: error?.message }
     : { success: true };
 }
+
+export async function updateAttendanceAdminPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const id = formData.get("id");
+  const date = formData.get("date");
+  const timeIn = formData.get("time_in");
+  const timeOut = formData.get("time_out");
+
+  const parsedId = id !== null ? parseInt(id as string, 10) : NaN;
+  if (!Number.isFinite(parsedId)) {
+    return { success: false, message: "Invalid attendance record id." };
+  }
+
+  const updatePayload = {
+    date: date,
+    time_in: timeIn,
+    time_out: typeof timeOut === "string" && timeOut.length === 0 ? null : timeOut,
+    updated_at: new Date().toISOString(),
+  };
+
+  const { error } = await supabase
+    .from("attendance")
+    .update(updatePayload)
+    .eq("id", parsedId)
+    .select();
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true };
+}
+
+export async function createAttendanceAdminPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const studentId = formData.get("student_id");
+  const studentName = formData.get("student_name");
+  const date = formData.get("date");
+  const timeIn = formData.get("time_in");
+  const timeOut = formData.get("time_out");
+
+  const insertPayload = {
+    student_id: studentId,
+    student_name: studentName,
+    date: date,
+    time_in: timeIn,
+    time_out: typeof timeOut === "string" && timeOut.length === 0 ? null : timeOut,
+    type: "admin",
+    additional: "Manual entry",
+    updated_at: new Date().toISOString(),
+  };
+
+  const { data, error } = await supabase
+    .from("attendance")
+    .insert([insertPayload])
+    .select();
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true, data };
+}
+
+export async function lookupAttendanceUserPOST(formData: FormData) {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  const studentId = formData.get("student_id");
+  if (!studentId) {
+    return { success: false, message: "Student ID is required." };
+  }
+
+  const { data, error } = await supabase
+    .from("attendance_users")
+    .select("student_name, student_id")
+    .eq("student_id", studentId)
+    .limit(1);
+
+  return error
+    ? { success: false, message: error?.message }
+    : { success: true, data };
+}

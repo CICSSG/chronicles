@@ -1,6 +1,7 @@
 "use client";
 import QuickUrgentAnnouncementAdmin from "@/components/admin/urgent-announcement";
 import { GetTableRows } from "@/utils/get-table-rows";
+import { useUser } from "@clerk/nextjs";
 import { useEffect, useState } from "react";
 
 export default function ProtectedPage() {
