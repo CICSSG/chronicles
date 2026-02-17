@@ -142,40 +142,41 @@ const Attendance = () => {
 
   const handleTimeOut = () => {
     setTimeOutModal(false);
-    setSignatureModal(true);
+    // setSignatureModal(true);
+    handleSignatureSubmitTimeOut();
   };
 
   const handleSignatureSubmitTimeOut = async () => {
-    if (signatureRef.current && !signatureRef.current.isEmpty()) {
-      const signatureData = signatureRef.current.toDataURL();
-      setSignature(signatureData);
-      setSignatureModal(false);
+    const formData = new FormData();
+    formData.append("student_id", studentId);
+    formData.append("student_name", studentName);
+    formData.append("role", userType ?? "");
+    formData.append("signature", "signed");
+    formData.append("time_out", new Date().toISOString());
+    formData.append("document_id", documentId);
 
-      const formData = new FormData();
-      formData.append("student_id", studentId);
-      formData.append("student_name", studentName);
-      formData.append("role", userType ?? "");
-      formData.append("signature", signatureData);
-      formData.append("time_out", new Date().toISOString());
-      formData.append("document_id", documentId);
+    resetForm();
+    updateAttendancePOST(formData)
+      .then(() => {
+        //   console.log("Time-out recorded successfully.");
+        CreatePopup(
+          `Time-out recorded successfully at ${new Date().toLocaleTimeString()}!`,
+          "success",
+        );
+      })
+      .catch((error) => {
+        //   console.error("Error recording time-out:", error);
+        CreatePopup("Failed to record time-out. Please try again.", "error");
+      });
 
-      resetForm();
-      updateAttendancePOST(formData)
-        .then(() => {
-          //   console.log("Time-in recorded successfully.");
-          CreatePopup(
-            `Time-in recorded successfully at ${new Date().toLocaleTimeString()}!`,
-            "success",
-          );
-        })
-        .catch((error) => {
-          //   console.error("Error recording time-in:", error);
-          CreatePopup("Failed to record time-in. Please try again.", "error");
-        });
+    // Reset after successful submission
+    resetForm();
 
-      // Reset after successful submission
-      resetForm();
-    }
+    // if (signatureRef.current && !signatureRef.current.isEmpty()) {
+    //   const signatureData = signatureRef.current.toDataURL();
+    //   setSignature(signatureData);
+    //   setSignatureModal(false);
+    // }
   };
 
   const resetForm = () => {
