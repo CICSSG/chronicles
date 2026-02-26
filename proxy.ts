@@ -19,17 +19,36 @@ const isSignupRoute = createRouteMatcher([
   '/sign-up(.*)'
 ])
 
-export default clerkMiddleware(async (auth, req) => {
-  if (req.nextUrl.pathname.startsWith('/sign-in*')) {
-  return NextResponse.next();
+function checkIfUserIsTreasury(sessionClaims: Record<string, any> | null): boolean {
+  if (sessionClaims && sessionClaims.username === 'treasury') {
+    return true
+  }
+  return false
 }
 
+function checkIfUserIsCOS(sessionClaims: Record<string, any> | null): boolean {
+  if (sessionClaims && sessionClaims.username === 'chiefofstaff') {
+    return true
+  }
+  return false
+}
+
+export default clerkMiddleware(async (auth, req) => {
   const { sessionClaims, userId } = await auth()
 
-  // console.log(sessionClaims)
-  if (isSignupRoute(req) && userId != null) { 
+  if (isSignupRoute(req) && userId) { 
     return NextResponse.redirect(new URL('/admin', req.url))
   }
+
+  if(sessionClaims) {
+      // console.log("Session claims: ", sessionClaims)
+      if(checkIfUserIsTreasury(sessionClaims)) {
+        // Only redirect if accessing the base /admin page
+        if (req.nextUrl.pathname === '/admin') {
+          return NextResponse.redirect(new URL('/admin/treasury/fetchdesk-report', req.url))
+        }
+      }
+    }
 
   if (!isPublicRoute(req)) {
     await auth.protect()

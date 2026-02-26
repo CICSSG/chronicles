@@ -2524,3 +2524,30 @@ export async function lookupAttendanceUserPOST(formData: FormData) {
     ? { success: false, message: error?.message }
     : { success: true, data };
 }
+
+// FETCHDESK REPORT //
+export async function getFetchDeskOrders() {
+  const { getToken } = await auth();
+  const accessToken = await getToken({ template: "supabase" });
+
+  const supabase = createClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  );
+
+  try {
+    const { data, error } = await supabase
+      .from("fetchdesk")
+      .select("*")
+      .order("date", { ascending: false });
+
+    if (error) {
+      return { success: false, message: error.message, data: [] };
+    }
+
+    return { success: true, message: "Orders fetched successfully", data: data || [] };
+  } catch (err) {
+    return { success: false, message: "Unexpected error fetching orders", data: [] };
+  }
+}
