@@ -21,7 +21,7 @@ import {
   GetAnonymousSubmissions,
 } from "@/components/public-documents-data";
 import { redirect } from "next/navigation";
-import { AngryIcon } from "lucide-react";
+import { AngryIcon, Target } from "lucide-react";
 
 const CONCERN_CHARACTERS_MAX = 1000;
 
@@ -159,6 +159,14 @@ const ContactUs = () => {
     if (uuid == "Pioneer-768bbab0a1") {
       setEasterEgg(true);
       return;
+    }
+
+    if (uuid.toLocaleLowerCase() == "pioneer-casinoplus") {
+      window.open("https://www.casinoplus.com.ph", "_blank")
+    }
+
+    if (uuid.toLocaleLowerCase() == "pioneer-bingoplus") {
+      window.open("https://bingoplus.com", "_blank")
     }
 
     const res = await GetAnonymousSubmission(uuid.replace("Pioneer-", ""));
@@ -605,7 +613,7 @@ const ContactUs = () => {
                     type="text"
                     placeholder="Pioneer-xxxxxxxxxx"
                     className="text-md/4 block min-w-0 grow py-3 pr-3 pl-1 text-base text-gray-900 placeholder:text-gray-400 focus:outline-none sm:text-lg/5 lg:text-xl/6"
-                    pattern="^Pioneer-[0-9a-zA-Z]{10}$"
+                    pattern="^Pioneer-[0-9a-zA-Z]{9,10}$"
                   />
                 </div>
               </div>
