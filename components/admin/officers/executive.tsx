@@ -9,7 +9,7 @@ import {
   Input,
   Label,
 } from "@headlessui/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ArrowLeftCircleIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import { imgurUpload } from "@/utils/imgur-upload";
@@ -41,42 +41,41 @@ export default function ExecutiveOverview({ document }: { document: any }) {
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
 
-  const [base64Image, setBase64Image] = useState<string>("");
+  const [isImageUploading, setIsImageUploading] = useState(false);
   const [image, setImage] = useState<string>("");
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setImage("");
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setBase64Image(reader.result as string);
-    reader.readAsDataURL(file);
+    setIsImageUploading(true);
+    CreatePopup("Image uploading");
+    try {
+      const result = await imgurUpload(file);
+      if (result.success) {
+        setImage(`${result.data.link}`);
+        CreatePopup("Image upload successful!", "success");
+      } else {
+        setImage("");
+        CreatePopup("Image failed to upload. Try Again", "error");
+      }
+    } catch (err) {
+      setImage("");
+      CreatePopup("Image failed to upload. Try Again", "error");
+    } finally {
+      setIsImageUploading(false);
+    }
   };
 
-  useEffect(() => {
-    if (base64Image) {
-      CreatePopup("Image uploading");
-      imgurUpload(base64Image)
-        .then((result) => {
-          setImage(`${result.data.link}`);
-          CreatePopup("Image upload successful!", "success");
-        })
-        .catch((err) => {
-          CreatePopup("Image failed to upload. Try Again", "error");
-          // handle error if needed
-        });
-    }
-  }, [base64Image]);
-
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
+    if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await createOfficerPOST(formData);
-      setBase64Image("");
       setImage("");
+      setIsImageUploading(false);
       setCreateOfficerForm(false);
       if (result.success) {
         CreatePopup("Successfully created officer", "success");
@@ -87,7 +86,7 @@ export default function ExecutiveOverview({ document }: { document: any }) {
   };
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
+    if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
@@ -95,8 +94,8 @@ export default function ExecutiveOverview({ document }: { document: any }) {
       formData.set("id_name", editOfficerName ?? null);
       const result = await editOfficerPOST(formData);
       setEditOfficerForm(false);
-      setBase64Image("");
       setImage("");
+      setIsImageUploading(false);
       if (result.success) {
         CreatePopup("Successfully edited officer", "success");
       } else {
@@ -106,14 +105,14 @@ export default function ExecutiveOverview({ document }: { document: any }) {
   };
 
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
+    if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await deleteOfficerPOST(formData);
-      setBase64Image("");
       setImage("");
+      setIsImageUploading(false);
       setDeleteForm(false);
       if (result.success) {
         CreatePopup("Successfully deleted officer", "success");
@@ -131,7 +130,7 @@ export default function ExecutiveOverview({ document }: { document: any }) {
     );
 
     setEditOfficerForm(true);
-    setBase64Image("");
+    setIsImageUploading(false);
     setEditOfficerName(filtered[0]?.name || "");
     setEditOfficerPosition(filtered[0]?.position || "");
     setEditOfficerResponsibilities(filtered[0]?.responsibilities || []);
@@ -166,7 +165,7 @@ export default function ExecutiveOverview({ document }: { document: any }) {
         <Button
           onClick={() => {
             setImage("");
-            setBase64Image("");
+            setIsImageUploading(false);
             setCreateOfficerForm(true);
           }}
           className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-green-600 px-3 py-1.5 font-semibold text-white hover:bg-green-500"
@@ -326,13 +325,13 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                             />
                           </Field>
                           <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
+                            {!image && !isImageUploading ? (
                               <div className="text-red-400">No image</div>
-                            ) : !image && base64Image ? (
+                            ) : !image && isImageUploading ? (
                               <div className="text-amber-300">
                                 Image uploading
                               </div>
-                            ) : image && !base64Image ? (
+                            ) : image && !isImageUploading ? (
                               <div className="text-amber-300">
                                 Upload to update image
                               </div>
@@ -487,13 +486,13 @@ export default function ExecutiveOverview({ document }: { document: any }) {
                             />
                           </Field>
                           <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
+                            {!image && !isImageUploading ? (
                               <div className="text-red-400">No image</div>
-                            ) : !image && base64Image ? (
+                            ) : !image && isImageUploading ? (
                               <div className="text-amber-300">
                                 Image uploading
                               </div>
-                            ) : image && !base64Image ? (
+                            ) : image && !isImageUploading ? (
                               <div className="text-amber-300">
                                 Upload to update image
                               </div>

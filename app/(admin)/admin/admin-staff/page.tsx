@@ -48,59 +48,55 @@ export default function AdminStaff() {
     null,
   );
 
-  const [deanBase64Image, setDeanBase64Image] = useState<string>("");
   const [deanImage, setDeanImage] = useState<string>("");
-  const [associateDeanBase64Image, setAssociateDeanBase64Image] =
-    useState<string>("");
   const [associateDeanImage, setAssociateDeanImage] = useState<string>("");
+  const [isDeanImageUploading, setIsDeanImageUploading] = useState(false);
+  const [isAssociateDeanImageUploading, setIsAssociateDeanImageUploading] =
+    useState(false);
 
-  const handleDeanImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setDeanBase64Image(reader.result as string);
-    reader.readAsDataURL(file);
-  };
-
-  useEffect(() => {
-    if (deanBase64Image) {
-      CreatePopup("Image uploading");
-      imgurUpload(deanBase64Image)
-        .then((result) => {
-          setDeanImage(`${result.data.link}`);
-          CreatePopup("Image upload successful!", "success");
-        })
-        .catch((err) => {
-          CreatePopup("Image failed to upload. Try Again", "error");
-          // handle error if needed
-        });
-    }
-  }, [deanBase64Image]);
-
-  const handleAssocDeanImageChange = (
+  const handleDeanImageChange = async (
     e: React.ChangeEvent<HTMLInputElement>,
   ) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setAssociateDeanBase64Image(reader.result as string);
-    reader.readAsDataURL(file);
+    setIsDeanImageUploading(true);
+    CreatePopup("Image uploading");
+    try {
+      const result = await imgurUpload(file);
+      if (result.success) {
+        setDeanImage(`${result.data.link}`);
+        CreatePopup("Image upload successful!", "success");
+      } else {
+        CreatePopup("Image failed to upload. Try Again", "error");
+      }
+    } catch (err) {
+      CreatePopup("Image failed to upload. Try Again", "error");
+    } finally {
+      setIsDeanImageUploading(false);
+    }
   };
 
-  useEffect(() => {
-    if (associateDeanBase64Image) {
-      CreatePopup("Image uploading");
-      imgurUpload(associateDeanBase64Image)
-        .then((result) => {
-          setAssociateDeanImage(`${result.data.link}`);
-          CreatePopup("Image upload successful!", "success");
-        })
-        .catch((err) => {
-          CreatePopup("Image failed to upload. Try Again", "error");
-          // handle error if needed
-        });
+  const handleAssocDeanImageChange = async (
+    e: React.ChangeEvent<HTMLInputElement>,
+  ) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setIsAssociateDeanImageUploading(true);
+    CreatePopup("Image uploading");
+    try {
+      const result = await imgurUpload(file);
+      if (result.success) {
+        setAssociateDeanImage(`${result.data.link}`);
+        CreatePopup("Image upload successful!", "success");
+      } else {
+        CreatePopup("Image failed to upload. Try Again", "error");
+      }
+    } catch (err) {
+      CreatePopup("Image failed to upload. Try Again", "error");
+    } finally {
+      setIsAssociateDeanImageUploading(false);
     }
-  }, [associateDeanBase64Image]);
+  };
 
   useEffect(() => {
     AdminStaffData().then(({ documents, pagination }) => {
@@ -136,6 +132,11 @@ export default function AdminStaff() {
   }, []);
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+    if (isDeanImageUploading || isAssociateDeanImageUploading) {
+      CreatePopup("Image was not uploaded yet. Please wait", "error");
+      return;
+    }
+
     const formData = new FormData(e.currentTarget);
     formData.set("id", id?.toString() ?? "");
     formData.set("dean_image", deanImage);
@@ -191,6 +192,7 @@ export default function AdminStaff() {
                   alt=""
                   width={50}
                   height={50}
+                  unoptimized
                   className="aspect-square rounded-xl border-2 border-black/60 object-cover"
                 />
               </td>
@@ -211,6 +213,7 @@ export default function AdminStaff() {
                   alt=""
                   width={50}
                   height={50}
+                  unoptimized
                   className="aspect-square rounded-xl border-2 border-black/60 object-cover"
                 />
               </td>
@@ -228,6 +231,7 @@ export default function AdminStaff() {
                     alt=""
                     width={50}
                     height={50}
+                    unoptimized
                     className="rounded-xl border-2 border-black/60"
                   />
                 </td>
@@ -323,9 +327,9 @@ export default function AdminStaff() {
                               />
                             </Field>
                             <div className="text-xs font-bold">
-                              {!deanImage && !deanBase64Image ? (
+                              {!deanImage && !isDeanImageUploading ? (
                                 <div className="text-red-400">No image</div>
-                              ) : !deanImage && deanBase64Image ? (
+                              ) : !deanImage && isDeanImageUploading ? (
                                 <div className="text-amber-300">
                                   Image uploading
                                 </div>
@@ -372,10 +376,10 @@ export default function AdminStaff() {
                             </Field>
                             <div className="text-xs font-bold">
                               {!associateDeanImage &&
-                              !associateDeanBase64Image ? (
+                              !isAssociateDeanImageUploading ? (
                                 <div className="text-red-400">No image</div>
                               ) : !associateDeanImage &&
-                                associateDeanBase64Image ? (
+                                isAssociateDeanImageUploading ? (
                                 <div className="text-amber-300">
                                   Image uploading
                                 </div>

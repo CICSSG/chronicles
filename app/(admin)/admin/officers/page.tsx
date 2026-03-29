@@ -21,7 +21,6 @@ import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
 import { createClient } from "@supabase/supabase-js";
-import { imgurUpload } from "@/utils/imgur-upload";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 
 const supabase = createClient(
@@ -39,21 +38,7 @@ export default function Slate() {
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
   const [pagination, setPagination] = useState(1);
-  const [base64Image, setBase64Image] = useState<string>("");
   const [image, setImage] = useState<string>("");
-
-  useEffect(() => {
-    if (base64Image) {
-      imgurUpload(base64Image)
-        .then((result) => {
-          console.log(result);
-          setImage(`${result.data.link}`);
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [base64Image]);
 
   const setCurrentPageHandler = (value: number) => {
     setPage(value);
@@ -115,27 +100,21 @@ export default function Slate() {
   }, [page, title]);
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
-      CreatePopup("Image was not uploaded yet. Please wait", "error");
+    const formData = new FormData(e.currentTarget);
+    formData.set("image", image ?? "");
+    const result = await createSlatePOST(formData);
+    setImage("");
+    setCreateForm(false);
+    if (result.success) {
+      CreatePopup("Successfully created slate", "success");
     } else {
-      const formData = new FormData(e.currentTarget);
-      formData.set("image", image ?? "");
-      const result = await createSlatePOST(formData);
-      setBase64Image("");
-      setImage("");
-      setCreateForm(false);
-      if (result.success) {
-        CreatePopup("Successfully created slate", "success");
-      } else {
-        CreatePopup("Failed to create slate", "error");
-      }
+      CreatePopup("Failed to create slate", "error");
     }
   };
 
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
     const result = await deleteSlatePOST(formData);
-    setBase64Image("");
     setImage("");
     setDeleteForm(false);
     if (result.success) {
@@ -157,7 +136,6 @@ export default function Slate() {
         <Button
           onClick={() => {
             setImage("");
-            setBase64Image("");
             setCreateForm(true);
           }}
           className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-green-600 px-3 py-1.5 font-semibold text-white hover:cursor-pointer hover:bg-green-500"

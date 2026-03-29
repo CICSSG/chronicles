@@ -1,14 +1,17 @@
 export function imgurUpload(data: unknown): Promise<any> {
     const apiEndpoint = '/api/upload';
-
-    let base64Img = data;
-    if (typeof base64Img == 'string') {
-        base64Img = base64Img.replace(/^data:.+base64,/, '');
+    const formData = new FormData();
+    if (data instanceof File) {
+        formData.append('file', data);
+    } else if (typeof data === 'string') {
+        formData.append('imageBase64', data);
+    } else {
+        throw new Error('Unsupported upload payload');
     }
 
     return fetch(apiEndpoint, {
         method: 'POST',
-        body: JSON.stringify({ image: base64Img }),
+        body: formData,
     })
         .then((res) => res.json())
         .then((response) => {

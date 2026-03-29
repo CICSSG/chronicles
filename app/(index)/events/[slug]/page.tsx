@@ -125,10 +125,11 @@ export default function Page() {
           <div className="block">
             {isLoaded ? (
               <Image
-                src={document && document.image}
+                src={document?.image || "/images/NoImage.png"}
                 alt=""
                 width={300}
                 height={300}
+                unoptimized
                 className="float-left my-auto mr-0 mb-4 h-fit w-full rounded-2xl border border-black/60 object-contain md:mr-4 md:mb-0 md:w-2/5"
               />
             ) : (
@@ -166,10 +167,12 @@ export default function Page() {
               <>
                 {document.images.map((data: string) => (
                   <Image
+                    key={data}
                     src={data}
                     alt=""
                     width={300}
                     height={300}
+                    unoptimized
                     className="h-full rounded-xl border border-black/70 object-cover"
                   />
                 ))}

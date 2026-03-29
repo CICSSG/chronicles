@@ -46,31 +46,30 @@ export default function Faculty() {
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
   const [pagination, setPagination] = useState(1);
-  const [base64Image, setBase64Image] = useState<string>("");
   const [image, setImage] = useState<string>("");
+  const [isImageUploading, setIsImageUploading] = useState(false);
 
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setBase64Image(reader.result as string);
-    reader.readAsDataURL(file);
-  };
-
-  useEffect(() => {
-    if (base64Image) {
-      CreatePopup("Image uploading");
-      imgurUpload(base64Image)
-        .then((result) => {
-          setImage(`${result.data.link}`);
-          CreatePopup("Image upload successful!", "success");
-        })
-        .catch((err) => {
-          CreatePopup("Image failed to upload. Try Again", "error");
-          // handle error if needed
-        });
+    setIsImageUploading(true);
+    CreatePopup("Image uploading");
+    try {
+      const result = await imgurUpload(file);
+      if (result.success) {
+        setImage(`${result.data.link}`);
+        CreatePopup("Image upload successful!", "success");
+      } else {
+        setImage("");
+        CreatePopup("Image failed to upload. Try Again", "error");
+      }
+    } catch (err) {
+      setImage("");
+      CreatePopup("Image failed to upload. Try Again", "error");
+    } finally {
+      setIsImageUploading(false);
     }
-  }, [base64Image]);
+  };
 
   const setCurrentPageHandler = (value: number) => {
     setPage(value);
@@ -108,14 +107,14 @@ export default function Faculty() {
   }, [editDocument]);
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
+    if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await createFacultyPOST(formData);
-      setBase64Image("");
       setImage("");
+      setIsImageUploading(false);
       setCreateForm(false);
       if (result.success) {
         CreatePopup("Successfully created faculty member", "success");
@@ -126,15 +125,15 @@ export default function Faculty() {
   };
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
+    if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await editFacultyPOST(formData);
       setEditForm(false);
-      setBase64Image("");
       setImage("");
+      setIsImageUploading(false);
       handleEditDocument("");
       if (result.success) {
         CreatePopup("Successfully edited faculty member", "success");
@@ -144,14 +143,14 @@ export default function Faculty() {
     }
   };
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
+    if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await deleteFacultyPOST(formData);
-      setBase64Image("");
       setImage("");
+      setIsImageUploading(false);
       setDeleteForm(false);
       if (result.success) {
         CreatePopup("Successfully deleted faculty member", "success");
@@ -164,6 +163,7 @@ export default function Faculty() {
   const handleEditDocument = (id: string) => {
     if (id == "") {
       setImage("");
+      setIsImageUploading(false);
       setEditFormId(id);
       setEditForm(false);
     } else {
@@ -212,7 +212,7 @@ export default function Faculty() {
         <Button
           onClick={() => {
             setImage("");
-            setBase64Image("");
+            setIsImageUploading(false);
             setCreateForm(true);
           }}
           className="mx-2 mt-auto flex h-fit flex-row items-center justify-self-start rounded-lg bg-green-600 px-3 py-1.5 font-semibold text-white hover:bg-green-500"
@@ -275,6 +275,7 @@ export default function Faculty() {
                     alt=""
                     width={50}
                     height={50}
+                    unoptimized
                     className="aspect-square grow-0 basis-0 rounded-xl border-1 border-black/60 object-cover"
                   />
                 </td>
@@ -512,9 +513,9 @@ export default function Faculty() {
                             />
                           </Field>
                           <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
+                            {!image && !isImageUploading ? (
                               <div className="text-red-400">No image</div>
-                            ) : !image && base64Image ? (
+                            ) : !image && isImageUploading ? (
                               <div className="text-amber-300">
                                 Image uploading
                               </div>
@@ -702,11 +703,11 @@ export default function Faculty() {
                             />
                           </Field>
                           <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
+                            {!image && !isImageUploading ? (
                               <div className="text-red-400">
                                 Upload to change image
                               </div>
-                            ) : !image && base64Image ? (
+                            ) : !image && isImageUploading ? (
                               <div className="text-amber-300">
                                 Image uploading
                               </div>

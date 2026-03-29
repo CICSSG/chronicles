@@ -1,6 +1,6 @@
 import { Input } from "@headlessui/react";
 import clsx from "clsx";
-import { Delete, Trash } from "lucide-react";
+import { Trash } from "lucide-react";
 import { useState } from "react";
 import { IoAdd } from "react-icons/io5";
 
@@ -8,13 +8,11 @@ type InputField = { name: string; position: string; image: string };
 
 import { useEffect } from "react";
 import { imgurUpload } from "@/utils/imgur-upload";
-import Image from "next/image";
 import { CreatePopup } from "./alert-fragment";
 
 export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
   const [inputs, setInputs] = useState<InputField[]>([]);
-  const [base64Image, setBase64Image] = useState<string>("");
-  const [index, setIndex] = useState<number>();
+  const [uploadingIndex, setUploadingIndex] = useState<number | null>(null);
 
   useEffect(() => {
     if (data) {
@@ -28,28 +26,6 @@ export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
       }
     }
   }, [data]);
-
-  useEffect(() => {
-    if (base64Image != "") {
-      let onChangeValue = [...inputs];
-      CreatePopup("Image uploading, please wait");
-      imgurUpload(base64Image)
-        .then((result) => {
-          if (result.success) {
-            if (typeof index === "number") {
-              onChangeValue[index]["image"] = result.data.link;
-              setInputs(onChangeValue);
-              CreatePopup("Image upload successful.", "success");
-            }
-          } else {
-            CreatePopup("Image did not upload. Please try again", "error");
-          }
-        })
-        .catch((err) => {
-          console.log(err);
-        });
-    }
-  }, [base64Image]);
 
   const handleAddInput = () => {
     setInputs([...inputs, { name: "", position: "", image: "" }]);
@@ -65,16 +41,32 @@ export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
     setInputs(onChangeValue);
   };
 
-  const handleImageChange = (
+  const handleImageChange = async (
     event: React.ChangeEvent<HTMLInputElement>,
     index: number,
   ) => {
     const file = event.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    setIndex(index);
-    reader.onload = () => setBase64Image(reader.result as string);
-    reader.readAsDataURL(file);
+    setUploadingIndex(index);
+    CreatePopup("Image uploading, please wait");
+    try {
+      const result = await imgurUpload(file);
+      if (result.success) {
+        setInputs((prev) => {
+          const onChangeValue = [...prev];
+          onChangeValue[index]["image"] = result.data.link;
+          return onChangeValue;
+        });
+        CreatePopup("Image upload successful.", "success");
+      } else {
+        CreatePopup("Image did not upload. Please try again", "error");
+      }
+    } catch (err) {
+      console.log(err);
+      CreatePopup("Image did not upload. Please try again", "error");
+    } finally {
+      setUploadingIndex(null);
+    }
   };
 
   const handleDeleteInput = (index: number) => {
@@ -131,6 +123,7 @@ export default function DynamicInputFieldsStaff({ data }: { data?: any }) {
             )}
             onChange={(event) => handleImageChange(event, index)}
             accept=".png,.jpg,.jpeg"
+            disabled={uploadingIndex === index}
           />
           {index === inputs.length - 1 && (
             <button

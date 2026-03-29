@@ -23,8 +23,7 @@ const Footer = () => {
           <div className="text-center md:text-left">
             <h6 className="text-xl">Address</h6>
             <h6 className="text-lg font-normal">
-              PCH 102, Paolo Campus Hall, DBB-B, 4115 West Ave, Dasmariñas,
-              Cavite
+              CIH310, Purificacion Borromeo Hall, De La Salle University-Dasmariñas
             </h6>
           </div>
           <div className="text-center md:text-left">
@@ -46,7 +45,7 @@ const Footer = () => {
 
         <div className="flex flex-col justify-between gap-4 text-sm font-normal md:flex-row">
           <h6 className="text-center md:text-left">
-            @2025 CICSSG. All rights reserved.
+            @{new Date().getFullYear()} CICSSG. All rights reserved.
           </h6>
           <div className="flex flex-col md:flex-row items-center gap-4 *:underline">
             <h6>

@@ -9,7 +9,7 @@ import {
   Input,
   Label,
 } from "@headlessui/react";
-import React, { useEffect, useState } from "react";
+import React, { useState } from "react";
 import { ArrowLeftCircleIcon, DocumentIcon } from "@heroicons/react/24/outline";
 import Link from "next/link";
 import clsx from "clsx";
@@ -30,31 +30,30 @@ export default function OfficersOverview({ document }: { document: any }) {
   const [editGovernorForm, setGovernorForm] = useState(false);
   const [editViceGovernorForm, setViceGovernorForm] = useState(false);
 
-  const [base64Image, setBase64Image] = useState<string>("");
+  const [isImageUploading, setIsImageUploading] = useState(false);
   const [image, setImage] = useState<string>("");
 
-  useEffect(() => {
-    if (base64Image) {
-      CreatePopup("Image uploading");
-      imgurUpload(base64Image)
-        .then((result) => {
-          setImage(`${result.data.link}`);
-          CreatePopup("Image upload successful!", "success");
-        })
-        .catch((err) => {
-          CreatePopup("Image failed to upload. Try Again", "error");
-          // handle error if needed
-        });
-    }
-  }, [base64Image]);
-
-  const handleImageChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     setImage("");
     const file = e.target.files?.[0];
     if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => setBase64Image(reader.result as string);
-    reader.readAsDataURL(file);
+    setIsImageUploading(true);
+    CreatePopup("Image uploading");
+    try {
+      const result = await imgurUpload(file);
+      if (result.success) {
+        setImage(`${result.data.link}`);
+        CreatePopup("Image upload successful!", "success");
+      } else {
+        setImage("");
+        CreatePopup("Image failed to upload. Try Again", "error");
+      }
+    } catch (err) {
+      setImage("");
+      CreatePopup("Image failed to upload. Try Again", "error");
+    } finally {
+      setIsImageUploading(false);
+    }
   };
 
   const handleEditImage = () => {
@@ -63,15 +62,15 @@ export default function OfficersOverview({ document }: { document: any }) {
   };
 
   const handleEditImageSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
-    if (image == "" && base64Image != "") {
+    if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await editImagePOST(formData);
       setImageForm(false);
-      setBase64Image("");
       setImage("");
+      setIsImageUploading(false);
       if (result.success) {
         CreatePopup("Successfully edited slate image", "success");
       } else {
@@ -88,15 +87,15 @@ export default function OfficersOverview({ document }: { document: any }) {
   const handleEditAdviserSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
-    if (image == "" && base64Image != "") {
+    if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await editAdviserPOST(formData);
       setAdviserForm(false);
-      setBase64Image("");
       setImage("");
+      setIsImageUploading(false);
       if (result.success) {
         CreatePopup("Successfully edited adviser", "success");
       } else {
@@ -113,15 +112,15 @@ export default function OfficersOverview({ document }: { document: any }) {
   const handleEditGovernorSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
-    if (image == "" && base64Image != "") {
+    if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await editGovernorPOST(formData);
       setGovernorForm(false);
-      setBase64Image("");
       setImage("");
+      setIsImageUploading(false);
       if (result.success) {
         CreatePopup("Successfully edited governor", "success");
       } else {
@@ -138,15 +137,15 @@ export default function OfficersOverview({ document }: { document: any }) {
   const handleEditViceGovernorSubmit = async (
     e: React.FormEvent<HTMLFormElement>,
   ) => {
-    if (image == "" && base64Image != "") {
+    if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
       formData.set("image", image ?? "");
       const result = await editViceGovernorPOST(formData);
       setViceGovernorForm(false);
-      setBase64Image("");
       setImage("");
+      setIsImageUploading(false);
       if (result.success) {
         CreatePopup("Successfully edited vice governor", "success");
       } else {
@@ -390,13 +389,13 @@ export default function OfficersOverview({ document }: { document: any }) {
                             />
                           </Field>
                           <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
+                            {!image && !isImageUploading ? (
                               <div className="text-red-400">No image</div>
-                            ) : !image && base64Image ? (
+                            ) : !image && isImageUploading ? (
                               <div className="text-amber-300">
                                 Image uploading
                               </div>
-                            ) : image && !base64Image ? (
+                            ) : image && !isImageUploading ? (
                               <div className="text-amber-300">
                                 Upload to update image
                               </div>
@@ -516,13 +515,13 @@ export default function OfficersOverview({ document }: { document: any }) {
                             />
                           </Field>
                           <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
+                            {!image && !isImageUploading ? (
                               <div className="text-red-400">No image</div>
-                            ) : !image && base64Image ? (
+                            ) : !image && isImageUploading ? (
                               <div className="text-amber-300">
                                 Image uploading
                               </div>
-                            ) : image && !base64Image ? (
+                            ) : image && !isImageUploading ? (
                               <div className="text-amber-300">
                                 Upload to update image
                               </div>
@@ -642,13 +641,13 @@ export default function OfficersOverview({ document }: { document: any }) {
                             />
                           </Field>
                           <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
+                            {!image && !isImageUploading ? (
                               <div className="text-red-400">No image</div>
-                            ) : !image && base64Image ? (
+                            ) : !image && isImageUploading ? (
                               <div className="text-amber-300">
                                 Image uploading
                               </div>
-                            ) : image && !base64Image ? (
+                            ) : image && !isImageUploading ? (
                               <div className="text-amber-300">
                                 Upload to update image
                               </div>
@@ -791,13 +790,13 @@ export default function OfficersOverview({ document }: { document: any }) {
                             />
                           </Field>
                           <div className="text-xs font-bold">
-                            {!image && !base64Image ? (
+                            {!image && !isImageUploading ? (
                               <div className="text-red-400">No image</div>
-                            ) : !image && base64Image ? (
+                            ) : !image && isImageUploading ? (
                               <div className="text-amber-300">
                                 Image uploading
                               </div>
-                            ) : image && !base64Image ? (
+                            ) : image && !isImageUploading ? (
                               <div className="text-amber-300">
                                 Upload to update image
                               </div>
