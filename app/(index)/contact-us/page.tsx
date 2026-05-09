@@ -198,6 +198,8 @@ const ContactUs = () => {
     }, 1000);
   };
 
+  return <div className="bg-white p-10 flex flex-col items-center rounded-xl h-full">This page is under maintenance.</div>
+
   return (
     <div className="*w-full flex flex-col gap-4 text-black/80 *:rounded-2xl">
       <h2 className="rounded-2xl bg-neutral-100 bg-linear-to-r from-black/2 via-black/2 via-70% to-black/20 px-10 py-8 text-4xl">
