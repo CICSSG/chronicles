@@ -220,20 +220,31 @@ export async function GetAnonymousSubmission(id: String) {
 }
 
 export async function AddAnonymousSubmission(data: any) {
-  let { data: documents } = await supabase
-    .from("anonymous")
-    .insert(data);
+  const response = await fetch("/api/anonymous", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ action: "add", data }),
+  });
 
-  return { success: true, documents };
+  const result = await response.json().catch(() => null);
+  return response.ok && result
+    ? result
+    : { success: false, documents: null, error: result?.error ?? "Request failed" };
 }
 
 export async function SendMessage(id: string, messages: any[]) {
-  console.log(id, messages)
-  let { data: documents } = await supabase
-    .from("anonymous")
-    .update({ messages: messages, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select();
+  const response = await fetch("/api/anonymous", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ action: "message", id, messages }),
+  });
 
-  return documents && documents.length > 0 ? { success: true, documents } : { success: false, documents: null }
+  const result = await response.json().catch(() => null);
+  return response.ok && result
+    ? result
+    : { success: false, documents: null, error: result?.error ?? "Request failed" };
 }
