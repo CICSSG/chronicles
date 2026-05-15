@@ -5,6 +5,12 @@ export const updateSession = async (request: NextRequest) => {
   // This `try/catch` block is only here for the interactive tutorial.
   // Feel free to remove once you have Supabase connected.
   try {
+    type CookieToSet = {
+      name: string;
+      value: string;
+      options?: any;
+    };
+
     // Create an unmodified response
     let response = NextResponse.next({
       request: {
@@ -20,7 +26,7 @@ export const updateSession = async (request: NextRequest) => {
           getAll() {
             return request.cookies.getAll();
           },
-          setAll(cookiesToSet) {
+          setAll(cookiesToSet: CookieToSet[]) {
             cookiesToSet.forEach(({ name, value }) =>
               request.cookies.set(name, value),
             );

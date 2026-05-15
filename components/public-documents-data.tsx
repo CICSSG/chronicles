@@ -1,10 +1,31 @@
-import { createClient } from "@supabase/supabase-js";
 import { getPagination } from "./pagination";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+type PublicDataResponse<T> = {
+  documents: T[] | null;
+  pagination?: number;
+  count?: number;
+  success?: boolean;
+  error?: string;
+};
+
+const fetchPublicData = async <T,>(searchParams: Record<string, string | number | undefined>) => {
+  const params = new URLSearchParams();
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (value != null && value !== "") {
+      params.set(key, String(value));
+    }
+  });
+
+  const response = await fetch(`/api/public-data?${params.toString()}`);
+  const result = (await response.json().catch(() => null)) as PublicDataResponse<T> | null;
+
+  if (!response.ok || !result) {
+    return { documents: null, error: result?.error ?? "Request failed" } as PublicDataResponse<T>;
+  }
+
+  return result;
+};
 
 const ITEMS_PER_PAGE = 8;
 const ANNOUNCEMENT_ITEMS_PER_PAGE = 7;
@@ -13,122 +34,98 @@ export async function PublicDocumentData(
   document_type: string,
   page?: number | null,
 ) {
-  page == null && (page = 1);
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
-  let { data: documents, count } = await supabase
-    .from("documents")
-    .select(
-      "id, title, date, document_type, description, author, link, image",
-      { count: "exact", head: false },
-    )
-    .eq("document_type", document_type)
-    .range(from, to)
-    .order("id", { ascending: false });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const currentPage = page ?? 1;
+  const { documents, pagination: responsePagination } = await fetchPublicData<any>({
+    collection: "documents",
+    document_type,
+    page: currentPage,
+    limit: ITEMS_PER_PAGE,
+    count: 1,
+  });
+  const pagination = responsePagination ?? 1;
 
   return { documents, pagination };
 }
 
 export async function PublicAnnouncementData(page?: number | null) {
-  page == null && (page = 1);
-  const { from, to } = getPagination(page - 1, ANNOUNCEMENT_ITEMS_PER_PAGE);
-
-  let { data: documents, count } = await supabase
-    .from("announcements")
-    .select("id, title, date, link, description, image", {
-      count: "exact",
-      head: false,
-    })
-    .range(from, to)
-    .order("id", { ascending: false });
-
-  let pagination =
-    count != null ? Math.ceil(count / (ANNOUNCEMENT_ITEMS_PER_PAGE + 1)) : 1;
+  const currentPage = page ?? 1;
+  const { documents, pagination: responsePagination } = await fetchPublicData<any>({
+    collection: "announcements",
+    page: currentPage,
+    limit: ANNOUNCEMENT_ITEMS_PER_PAGE,
+    count: 1,
+  });
+  const pagination = responsePagination ?? 1;
 
   return { documents, pagination };
 }
 
 export async function PublicEventsData(page?: number | null) {
-  page == null && (page = 1);
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
-  let { data: documents, count } = await supabase
-    .from("events")
-    .select(
-      "id, title, image, date, academic_year, location, project_heads, highlights, description, images, album_link",
-      { count: "exact", head: false },
-    )
-    .range(from, to)
-    .order("id", { ascending: false });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const currentPage = page ?? 1;
+  const { documents, pagination: responsePagination } = await fetchPublicData<any>({
+    collection: "events",
+    page: currentPage,
+    limit: ITEMS_PER_PAGE,
+    count: 1,
+  });
+  const pagination = responsePagination ?? 1;
 
   return { documents, pagination };
 }
 
 export async function PublicEventDataByID(id?: string) {
-  let { data: documents } = await supabase
-    .from("events")
-    .select(
-      "id, title, image, date, academic_year, location, project_heads, highlights, description, images, album_link",
-    )
-    .eq("id", id);
+  const { documents } = await fetchPublicData<any>({
+    collection: "events",
+    id,
+  });
 
   return { documents };
 }
 
 export async function PublicSlateData(page?: number | null) {
-  page == null && (page = 1);
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
-  let { data: documents, count } = await supabase
-    .from("slate")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("id", { ascending: false });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const currentPage = page ?? 1;
+  const { documents, pagination: responsePagination } = await fetchPublicData<any>({
+    collection: "slate",
+    page: currentPage,
+    limit: ITEMS_PER_PAGE,
+    count: 1,
+  });
+  const pagination = responsePagination ?? 1;
 
   return { documents, pagination };
 }
 
 export async function PublicSlateDataByID(id?: string) {
-  let { data: documents } = await supabase
-    .from("slate")
-    .select("*")
-    .eq("id", id);
+  const { documents } = await fetchPublicData<any>({
+    collection: "slate",
+    id,
+  });
 
   return { documents };
 }
 
 export async function PublicAdminStaffData() {
-  let { data: documents } = await supabase
-    .from("admin_staff")
-    .select("*", { count: "exact", head: false })
-    .order("id", { ascending: false });
+  const { documents } = await fetchPublicData<any>({
+    collection: "admin_staff",
+  });
 
   return { documents };
 }
 
 export async function PublicFacultyData(department: string) {
-  let { data: documents } = await supabase
-    .from("faculty")
-    .select("*", { count: "exact", head: false })
-    .eq("department", department)
-    .order("work_type", { ascending: true })
-    .order("name", { ascending: true });
+  const { documents } = await fetchPublicData<any>({
+    collection: "faculty",
+    department,
+  });
 
   return { documents };
 }
 
 export async function PublicAnnouncementForHomeData() {
-  let { data: documents } = await supabase
-    .from("announcements")
-    .select("date, title")
-    .order("id", { ascending: false })
-    .limit(5);
+  const { documents } = await fetchPublicData<any>({
+    collection: "announcements",
+    limit: 5,
+  });
 
   type Announcement = { date: string; title: string };
   let formattedDocument: Announcement[] = [];
@@ -158,65 +155,61 @@ export async function PublicAnnouncementForHomeData() {
 }
 
 export async function PublicEventsForHomeData() {
-  let { data: documents } = await supabase
-    .from("events")
-    .select("id, image")
-    .order("id", { ascending: false })
-    .limit(8);
+  const { documents } = await fetchPublicData<any>({
+    collection: "events",
+    limit: 8,
+  });
 
   return { documents };
 }
 
 export async function PublicUrgentAnnounementData() {
-  let { data: documents } = await supabase
-    .from("urgent_announcement")
-    .select("*", { count: "exact", head: false })
-    .order("id", { ascending: false })
-    .limit(1);
+  const { documents } = await fetchPublicData<any>({
+    collection: "urgent_announcement",
+    limit: 1,
+  });
 
   return { documents };
 }
 
 export async function CampusInfo() {
-  let { data: east_documents } = await supabase
-    .from("east_campus")
-    .select("*")
-    .order("id", { ascending: true });
+  const { documents: east_documents } = await fetchPublicData<any>({
+    collection: "east_campus",
+  });
 
-  let { data: west_documents } = await supabase
-    .from("west_campus")
-    .select("*")
-    .order("id", { ascending: true });
+  const { documents: west_documents } = await fetchPublicData<any>({
+    collection: "west_campus",
+  });
 
   return { east_documents, west_documents };
 }
 
 export async function PanimolaTimelineData() {
-  let { data: documents } = await supabase
-    .from("panimola_timeline")
-    .select("*")
-    .order("id", { ascending: true });
+  const { documents } = await fetchPublicData<any>({
+    collection: "panimola_timeline",
+  });
 
   return { documents };
 }
 
-export async function GetAnonymousSubmissions(ids: String[]) {
-  let { data: documents } = await supabase
-    .from("anonymous")
-    .select("*")
-    .order("updated_at", {ascending: false})
-    .in("id", ids);
+export async function GetAnonymousSubmissions(ids: string[]) {
+  const { documents } = await fetchPublicData<any>({
+    collection: "anonymous",
+    ids: ids.join(","),
+  });
 
   return { documents };
 }
 
-export async function GetAnonymousSubmission(id: String) {
-  let { data: documents } = await supabase
-    .from("anonymous")
-    .select("*")
-    .eq("id", id);
-    
-  return documents && documents.length > 0 ? { success: true, documents } : { success: false, documents: null }
+export async function GetAnonymousSubmission(id: string) {
+  const { documents } = await fetchPublicData<any>({
+    collection: "anonymous",
+    id,
+  });
+
+  return documents && documents.length > 0
+    ? { success: true, documents }
+    : { success: false, documents: null };
 }
 
 export async function AddAnonymousSubmission(data: any) {
