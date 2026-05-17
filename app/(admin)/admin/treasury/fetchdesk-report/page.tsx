@@ -30,12 +30,17 @@ export default function FetchdeskReportPage() {
       setLoading(true);
       try {
         const result = await getFetchDeskOrders();
-        
-        if (result.success) {
-          setOrders(result.data || []);
-        } else {
-          setOrders([]);
-        }
+        const docs = result.documents || [];
+        const mapped = docs.map((doc: any) => ({
+          id: String(doc.id ?? doc._id ?? ""),
+          date: doc.date ?? doc.created_at ?? "",
+          student_name: doc.student_name ?? doc.name ?? "",
+          calculated_price: Number(doc.calculated_price ?? doc.price ?? 0),
+          transaction_type: doc.transaction_type ?? doc.print_type ?? "",
+          ...doc,
+        }));
+
+        setOrders(mapped as FetchdeskOrder[]);
       } catch (err) {
         setOrders([]);
       } finally {

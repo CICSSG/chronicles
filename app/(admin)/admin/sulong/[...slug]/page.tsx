@@ -6,7 +6,6 @@ import {
   SlatesData,
   SulongData,
 } from "@/components/admin/documents-data";
-import { createClient } from "@supabase/supabase-js";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import {
@@ -16,11 +15,6 @@ import {
 import { AnonymousData } from "@/app/(index)/contact-us/page";
 import Link from "next/link";
 import { sendAnonymousEmail } from "@/utils/send-email";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export default function Page() {
   const params = useParams();
@@ -45,33 +39,29 @@ export default function Page() {
     SulongData(slug).then(({ documents }) => {
       setSubmission(documents && documents[0] ? documents[0] : null);
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "anonymous" },
-        (payload) => {
-          SulongData(slug).then(({ documents }) => {
-            setSubmission(documents && documents[0] ? documents[0] : null);
-          });
-
-          SulongData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
-          });
-
-          CreatePopup("Data updated");
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, [slug]);
 
   const parentRef = useRef<HTMLDivElement>(null);
+  const pollRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    SulongData().then(({ documents, pagination }) => {
+      setDocuments(documents ?? null);
+    });
+
+    pollRef.current = window.setInterval(() => {
+      SulongData().then(({ documents }) => {
+        setDocuments(documents ?? null);
+      });
+    }, 3000);
+
+    return () => {
+      if (pollRef.current) {
+        clearInterval(pollRef.current);
+        pollRef.current = null;
+      }
+    };
+  }, []);
 
   useEffect(() => {
     if (!parentRef.current) return;
@@ -130,6 +120,9 @@ export default function Page() {
           document.getElementById("message-form") as HTMLFormElement | null
         )?.reset();
         setSubmission(data.documents && data.documents[0]);
+        SulongData().then(({ documents }) => {
+          setDocuments(documents ?? null);
+        });
       } else {
         // Handle error
         console.error("Error sending message:");

@@ -62,9 +62,9 @@ const Slate = () => {
             {isLoaded ? (
               documents?.map((data) => (
                 <SlateCard
-                  key={data.id}
+                  key={data._id}
                   AcademicYear={data.academic_year}
-                  URL={"/cicssg/slate/" + data.id}
+                  URL={"/cicssg/slate/" + data._id}
                   ImageLink={
                     data.image ? data.image : "https://i.imgur.com/6pP0o7C.png"
                   }

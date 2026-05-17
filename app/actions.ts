@@ -1,2553 +1,728 @@
 "use server";
-import { createClient } from "@supabase/supabase-js";
-import { auth } from "@clerk/nextjs/server";
+
 import { put } from "@vercel/blob";
+import clientPromise from "@/lib/mongodb";
+import { ObjectId } from "mongodb";
 
+type AnyRecord = Record<string, any>;
+
+const databaseName = process.env.MONGODB_DATABASE;
+
+if (!databaseName) {
+  throw new Error('Invalid/Missing environment variable: "MONGODB_DATABASE"');
+}
+
+async function getCollection(name: string) {
+  const client = await clientPromise;
+  return client.db(databaseName).collection(name);
+}
+
+function parseFormValue(value: FormDataEntryValue) {
+  if (typeof value !== "string") return value;
+
+  const trimmed = value.trim();
+  if (!trimmed) return "";
+
+  if (
+    (trimmed.startsWith("[") && trimmed.endsWith("]")) ||
+    (trimmed.startsWith("{") && trimmed.endsWith("}"))
+  ) {
+    try {
+      return JSON.parse(trimmed);
+    } catch {
+      return value;
+    }
+  }
+
+  return value;
+}
+
+function formDataToObject(formData: FormData) {
+  const data: AnyRecord = {};
+
+  for (const [key, value] of formData.entries()) {
+    if (value instanceof File) continue;
+    data[key] = parseFormValue(value);
+  }
+
+  if (data._id && !data.id) {
+    data.id = String(data._id);
+  }
+
+  return data;
+}
+
+function toMongoId(id: string) {
+  return /^[0-9a-fA-F]{24}$/.test(id) ? new ObjectId(id) : null;
+}
+
+function idFilter(data: AnyRecord) {
+  const rawId = String(data._id ?? data.id ?? "").trim();
+  if (!rawId) return null;
+
+  const mongoId = toMongoId(rawId);
+  return mongoId ? { _id: mongoId } : { id: rawId };
+}
+
+async function insertDocument(collectionName: string, data: AnyRecord) {
+  const collection = await getCollection(collectionName);
+  const record = { ...data };
+
+  delete record._id;
+
+  if (!record.id) {
+    record.id = new ObjectId().toHexString();
+  }
+
+  const mongoId = toMongoId(String(record.id));
+  record._id = mongoId ?? new ObjectId();
+
+  if (!mongoId) {
+    record.id = record._id.toHexString();
+  }
+
+  await collection.insertOne(record);
+  return { success: true, message: "", data: [record] };
+}
+
+async function updateDocument(collectionName: string, data: AnyRecord) {
+  const collection = await getCollection(collectionName);
+  const filter = idFilter(data);
+
+  if (!filter) {
+    return { success: false, message: "Missing id" };
+  }
+
+  const updateData = { ...data };
+  delete updateData._id;
+  delete updateData.id;
+
+  await collection.updateOne(filter, { $set: updateData });
+  return { success: true };
+}
+
+async function deleteDocument(collectionName: string, data: AnyRecord) {
+  const collection = await getCollection(collectionName);
+  const filter = idFilter(data);
+
+  if (!filter) {
+    return { success: false, message: "Missing id" };
+  }
+
+  await collection.deleteOne(filter);
+  return { success: true };
+}
+
+async function findAll(collectionName: string, filter: AnyRecord = {}, sort: AnyRecord = {}): Promise<AnyRecord[]> {
+  const collection = await getCollection(collectionName);
+  return collection.find(filter).sort(sort).toArray();
+}
+
+async function findById(collectionName: string, id?: string): Promise<AnyRecord | null> {
+  if (!id) return null;
+
+  const collection = await getCollection(collectionName);
+  const mongoId = toMongoId(id);
+  return mongoId ? collection.findOne({ _id: mongoId }) : collection.findOne({ id });
+}
+
+function serializeRecord(record: AnyRecord | null) {
+  if (!record) return null;
+
+  const plain = { ...record };
+
+  if (plain._id instanceof ObjectId) {
+    plain._id = plain._id.toHexString();
+  } else if (plain._id && typeof plain._id === "object" && typeof plain._id.toString === "function") {
+    plain._id = plain._id.toString();
+  }
+
+  // Normalize date fields for JSON serialization and consistent client shape
+  if (plain.date instanceof Date) {
+    plain.date = plain.date.toISOString();
+  } else if (plain.date && typeof plain.date === "object" && typeof plain.date.$date === "string") {
+    try {
+      plain.date = new Date(plain.date.$date).toISOString();
+    } catch {}
+  }
+
+  // Normalize created_at/updated_at to ISO strings when possible
+  if (plain.created_at instanceof Date) {
+    plain.created_at = plain.created_at.toISOString();
+  } else if (plain.created_at && typeof plain.created_at === "object" && typeof plain.created_at.$date === "string") {
+    try {
+      plain.created_at = new Date(plain.created_at.$date).toISOString();
+    } catch {}
+  }
+
+  if (plain.updated_at instanceof Date) {
+    plain.updated_at = plain.updated_at.toISOString();
+  } else if (plain.updated_at && typeof plain.updated_at === "object" && typeof plain.updated_at.$date === "string") {
+    try {
+      plain.updated_at = new Date(plain.updated_at.$date).toISOString();
+    } catch {}
+  }
+
+  return plain;
+}
+
+function coerceNumericStudentId(data: AnyRecord) {
+  const next = { ...data };
+  const rawStudentId = next.student_id ?? next.student_number;
+
+  if (rawStudentId !== undefined) {
+    const numericStudentId = Number(rawStudentId);
+    if (Number.isFinite(numericStudentId)) {
+      next.student_id = numericStudentId;
+    }
+  }
+
+  if (next.student_number !== undefined) {
+    const numericStudentNumber = Number(next.student_number);
+    if (Number.isFinite(numericStudentNumber)) {
+      next.student_number = numericStudentNumber;
+    }
+  }
+
+  return next;
+}
+
+async function uploadSignatureIfNeeded(data: AnyRecord) {
+  const signature = data.signature;
+
+  if (typeof signature !== "string" || !signature.startsWith("data:")) {
+    return data;
+  }
+
+  const mimeMatch = signature.match(/^data:([^;]+);base64,/);
+  const mimeType = mimeMatch?.[1] ?? "image/png";
+  const base64Data = signature.replace(/^data:.+base64,/, "");
+  const buffer = Buffer.from(base64Data, "base64");
+  const extension = mimeType.split("/")[1] ?? "png";
+  const file = new File([buffer], `attendance/signature.${extension}`, {
+    type: mimeType,
+  });
+  const blob = await put(file.name, file, {
+    access: "public",
+    addRandomSuffix: true,
+  });
+
+  return {
+    ...data,
+    signature: blob.url,
+  };
+}
+
+function officerPayload(data: AnyRecord) {
+  return {
+    name: data.name ?? data.id_name ?? "",
+    image: data.image ?? "",
+    position: data.position ?? "",
+    responsibilities: data.responsibilities_data ?? data.responsibilities ?? [],
+    contact_info: data.contact_data ?? data.contact_info ?? [],
+  };
+}
+
+async function updateSlateSection(id: string, section: string, payload: AnyRecord, mode: "create" | "edit" | "delete") {
+  const collection = await getCollection("slate");
+  const filter = idFilter({ id });
+
+  if (!filter) {
+    return { success: false, message: "Missing id" };
+  }
+
+  const slate = await collection.findOne(filter);
+  if (!slate) {
+    return { success: false, message: "Slate not found" };
+  }
+
+  const current = Array.isArray((slate as AnyRecord)[section]) ? [...(slate as AnyRecord)[section]] : [];
+  const targetName = String(payload.name ?? payload.id_name ?? "");
+
+  if (mode === "create") {
+    current.push(payload);
+  } else if (mode === "edit") {
+    const index = current.findIndex((item: AnyRecord) => item.name === targetName);
+    if (index >= 0) current[index] = { ...current[index], ...payload };
+  } else {
+    const index = current.findIndex((item: AnyRecord) => item.name === targetName);
+    if (index >= 0) current.splice(index, 1);
+  }
+
+  await collection.updateOne(filter, { $set: { [section]: current } });
+  return { success: true };
+}
+
+function slateSeed(formData: FormData) {
+  const data = formDataToObject(formData);
+
+  return {
+    academic_year: data.academic_year ?? data.year ?? data.title ?? "",
+    adviser: data.adviser ?? { name: data.adviser_name ?? "", image: data.adviser_image ?? "" },
+    governor: data.governor ?? {
+      name: data.governor_name ?? "",
+      image: data.governor_image ?? "",
+      position: "Governor",
+      responsibilities: data.governor_responsibilities ?? [],
+    },
+    vice_governor: data.vice_governor ?? {
+      name: data.vice_governor_name ?? "",
+      image: data.vice_governor_image ?? "",
+      position: "Vice Governor",
+      responsibilities: data.vice_governor_responsibilities ?? [],
+    },
+    directorate: data.directorate ?? [],
+    legislative: data.legislative ?? [],
+    junior_officers: data.junior_officers ?? [],
+    committees: data.committees ?? [],
+  };
+}
+
+// Documents
 export async function createNewDocument(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const title = formData.get("title");
-  const date = formData.get("date");
-  const documentType = formData.get("document_type");
-  const description = formData.get("description");
-  const author = formData.get("author");
-  const fileLink = formData.get("file_link");
-  const image = formData.get("image");
-  // const externalLinksRaw = formData.get("external_links");
-  // const externalLinks = externalLinksRaw ? JSON.parse(externalLinksRaw as string) : [];
-
-  const { data, error } = await supabase
-    .from("documents")
-    .insert([
-      {
-        title: title,
-        date: date,
-        document_type: documentType,
-        description: description,
-        author: author,
-        link: fileLink,
-        // image: image,
-        // external_links: externalLinks
-      },
-    ])
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  return insertDocument("documents", formDataToObject(formData));
 }
 
 export async function editDocumentPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const title = formData.get("title");
-  const date = formData.get("date");
-  const documentType = formData.get("document_type");
-  const description = formData.get("description");
-  const author = formData.get("author");
-  const fileLink = formData.get("file_link");
-  // const image = formData.get("image")
-  // const externalLinksRaw = formData.get("external_links");
-  // const externalLinks = externalLinksRaw ? JSON.parse(externalLinksRaw as string) : [];
-
-  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
-  const { data, error } = await supabase
-    .from("documents")
-    .update({
-      title: title,
-      date: date,
-      document_type: documentType,
-      description: description,
-      author: author,
-      link: fileLink,
-      // image: image,
-      // external_links: externalLinks
-    })
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  return updateDocument("documents", formDataToObject(formData));
 }
 
 export async function deleteDocumentPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-
-  const { error } = await supabase
-    .from("documents")
-    .delete()
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return deleteDocument("documents", formDataToObject(formData));
 }
 
-// ANNOUNCEMENTS //
-
+// Announcements
 export async function createAnnouncementPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const title = formData.get("title");
-  const date = formData.get("date");
-  const description = formData.get("description");
-  const postLink = formData.get("post_link");
-  const image = formData.get("image");
-
-  const { error } = await supabase
-    .from("announcements")
-    .insert([
-      {
-        title: title,
-        date: date,
-        description: description,
-        link: postLink,
-        image: image,
-      },
-    ])
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  return insertDocument("announcements", formDataToObject(formData));
 }
 
 export async function editAnnouncementPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const title = formData.get("title");
-  const date = formData.get("date");
-  const description = formData.get("description");
-  const postLink = formData.get("post_link");
-  const image = formData.get("image");
-  // const externalLinksRaw = formData.get("external_links");
-  // const externalLinks = externalLinksRaw ? JSON.parse(externalLinksRaw as string) : [];
-
-  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
-
-  if (!image) {
-    const { data, error } = await supabase
-      .from("announcements")
-      .update({
-        title: title,
-        date: date,
-        description: description,
-        link: postLink,
-        // external_links: externalLinks
-      })
-      .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-      .select();
-
-    return error
-      ? { success: false, message: error?.message }
-      : { success: true };
-  } else {
-    const { data, error } = await supabase
-      .from("announcements")
-      .update({
-        title: title,
-        date: date,
-        description: description,
-        link: postLink,
-        image: image,
-        // external_links: externalLinks
-      })
-      .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-      .select();
-
-    return error
-      ? { success: false, message: error?.message }
-      : { success: true };
-  }
+  return updateDocument("announcements", formDataToObject(formData));
 }
 
 export async function deleteAnnouncementPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-
-  const { error } = await supabase
-    .from("announcements")
-    .delete()
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return deleteDocument("announcements", formDataToObject(formData));
 }
 
-// EVENTS //
+// Events
 export async function createEventPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const title = formData.get("title");
-  const image = formData.get("image");
-  const date = formData.get("date");
-  const academicYear = formData.get("academic_year");
-  const location = formData.get("location");
-  const albumLink = formData.get("album_link");
-  const description = formData.get("description");
-  const highlightsRaw = formData.get("highlights");
-  const highlights =
-    typeof highlightsRaw === "string"
-      ? JSON.parse(highlightsRaw)
-      : highlightsRaw;
-  const projectHeadsRaw = formData.get("project_heads");
-  const projectHeads =
-    typeof projectHeadsRaw === "string"
-      ? JSON.parse(projectHeadsRaw)
-      : projectHeadsRaw;
-
-  const { error } = await supabase
-    .from("events")
-    .insert([
-      {
-        title: title,
-        image: image,
-        date: date,
-        academic_year: academicYear,
-        location: location,
-        project_heads: projectHeads,
-        album_link: albumLink,
-        highlights: highlights,
-        description: description,
-      },
-    ])
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  return insertDocument("events", formDataToObject(formData));
 }
 
 export async function editEventPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const title = formData.get("title");
-  const image = formData.get("image");
-  const date = formData.get("date");
-  const academicYear = formData.get("academic_year");
-  const location = formData.get("location");
-  const albumLink = formData.get("album_link");
-  const description = formData.get("description");
-  const highlightsRaw = formData.get("highlights");
-  const highlights =
-    typeof highlightsRaw === "string"
-      ? JSON.parse(highlightsRaw)
-      : highlightsRaw;
-  const projectHeadsRaw = formData.get("project_heads");
-  const projectHeads =
-    typeof projectHeadsRaw === "string"
-      ? JSON.parse(projectHeadsRaw)
-      : projectHeadsRaw;
-  // const externalLinksRaw = formData.get("external_links");
-  // const externalLinks = externalLinksRaw ? JSON.parse(externalLinksRaw as string) : [];
-
-  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
-
-  if (!image) {
-    const { data, error } = await supabase
-      .from("events")
-      .update({
-        title: title,
-        date: date,
-        academic_year: academicYear,
-        location: location,
-        project_heads: projectHeads,
-        album_link: albumLink,
-        highlights: highlights,
-        description: description,
-      })
-      .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-      .select();
-
-    return error
-      ? { success: false, message: error?.message }
-      : { success: true };
-  } else {
-    const { data, error } = await supabase
-      .from("events")
-      .update({
-        title: title,
-        image: image,
-        date: date,
-        academic_year: academicYear,
-        location: location,
-        project_heads: projectHeads,
-        album_link: albumLink,
-        highlights: highlights,
-        description: description,
-      })
-      .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-      .select();
-
-    return error
-      ? { success: false, message: error?.message }
-      : { success: true };
-  }
+  return updateDocument("events", formDataToObject(formData));
 }
 
 export async function editEventImagePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
+  const data = formDataToObject(formData);
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
+  if (typeof data.images_data === "string") {
+    try {
+      data.images = JSON.parse(data.images_data);
+    } catch {
+      data.images = data.images_data;
+    }
+  }
 
-  const id = formData.get("id");
-  const imagesRaw = formData.get("images_data");
-  const images = imagesRaw ? JSON.parse(imagesRaw as string) : [];
-
-  // const externalLinksRaw = formData.get("external_links");
-  // const externalLinks = externalLinksRaw ? JSON.parse(externalLinksRaw as string) : [];
-
-  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
-
-  const { data, error } = await supabase
-    .from("events")
-    .update({
-      images: images,
-    })
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return updateDocument("events", data);
 }
 
 export async function deleteEventPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-
-  const { error } = await supabase
-    .from("events")
-    .delete()
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return deleteDocument("events", formDataToObject(formData));
 }
 
-// IMAGES //
+// Slate
 export async function editImagePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const image = formData.get("image");
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        image: image,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  const data = formDataToObject(formData);
+  return updateDocument("slate", { ...data, image: data.image ?? "" });
 }
 
-// SLATE //
 export async function editAdviserPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-  const image = formData.get("image");
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        adviser: {
-          name: name,
-          image: image,
-        },
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  const data = formDataToObject(formData);
+  return updateDocument("slate", {
+    ...data,
+    adviser: {
+      name: data.name ?? "",
+      image: data.image ?? "",
+    },
+  });
 }
 
 export async function editGovernorPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-  const image = formData.get("image");
-  const responsibilitiesRaw = formData.get("responsibilities_data");
-  const responsibilities =
-    typeof responsibilitiesRaw === "string"
-      ? JSON.parse(responsibilitiesRaw)
-      : responsibilitiesRaw;
-  const contactRaw = formData.get("contact_data");
-  const contact =
-    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        governor: {
-          name: name,
-          image: image,
-          position: "Governor",
-          responsibilities: responsibilities,
-        },
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  const data = formDataToObject(formData);
+  return updateDocument("slate", {
+    ...data,
+    governor: {
+      name: data.name ?? "",
+      image: data.image ?? "",
+      position: "Governor",
+      responsibilities: data.responsibilities_data ?? data.responsibilities ?? [],
+    },
+  });
 }
 
 export async function editViceGovernorPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-  const image = formData.get("image");
-  const responsibilitiesRaw = formData.get("responsibilities_data");
-  const responsibilities =
-    typeof responsibilitiesRaw === "string"
-      ? JSON.parse(responsibilitiesRaw)
-      : responsibilitiesRaw;
-  const contactRaw = formData.get("contact_data");
-  const contact =
-    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        vice_governor: {
-          name: name,
-          image: image,
-          position: "Vice Governor",
-          responsibilities: responsibilities,
-        },
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
-}
-
-export async function deleteSlatePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-
-  const { error } = await supabase
-    .from("slate")
-    .delete()
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = formDataToObject(formData);
+  return updateDocument("slate", {
+    ...data,
+    vice_governor: {
+      name: data.name ?? "",
+      image: data.image ?? "",
+      position: "Vice Governor",
+      responsibilities: data.responsibilities_data ?? data.responsibilities ?? [],
+      contact_info: data.contact_data ?? data.contact_info ?? [],
+    },
+  });
 }
 
 export async function createSlatePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
+  return insertDocument("slate", { ...formDataToObject(formData), ...slateSeed(formData) });
+}
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const academic_year = formData.get("academic_year");
-
-  const { error } = await supabase
-    .from("slate")
-    .insert([
-      {
-        academic_year: academic_year,
-        adviser: {
-          name: "",
-          image: "",
-        },
-        governor: {
-          name: "",
-          image: "",
-        },
-        vice_governor: {
-          name: "",
-          image: "",
-        },
-      },
-    ])
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+export async function deleteSlatePOST(formData: FormData) {
+  return deleteDocument("slate", formDataToObject(formData));
 }
 
 export async function createOfficerPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-  const position = formData.get("position");
-  const image = formData.get("image");
-  const responsibilitiesRaw = formData.get("responsibilities_data");
-  const responsibilities =
-    typeof responsibilitiesRaw === "string"
-      ? JSON.parse(responsibilitiesRaw)
-      : responsibilitiesRaw;
-  const contactRaw = formData.get("contact_data");
-  const contact_info =
-    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
-
-  const { data } = await supabase
-    .from("slate")
-    .select("directorate")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const directorate = data?.[0]?.directorate || [];
-  directorate.push({ name, position, image, responsibilities });
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        directorate: directorate,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "directorate", officerPayload(data), "create");
 }
 
 export async function editOfficerPOST(formData: FormData) {
-  var filtered;
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const id_name = formData.get("id_name");
-  const name = formData.get("name");
-  const position = formData.get("position");
-  const image = formData.get("image");
-  const responsibilitiesRaw = formData.get("responsibilities_data");
-  const responsibilities =
-    typeof responsibilitiesRaw === "string"
-      ? JSON.parse(responsibilitiesRaw)
-      : responsibilitiesRaw;
-  const contactRaw = formData.get("contact_data");
-  const contact_info =
-    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
-
-  const { data } = await supabase
-    .from("slate")
-    .select("directorate")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const directorate = data?.[0]?.directorate || [];
-
-  filtered = directorate.map((item: any) =>
-    item.name === id_name ? { name, position, image, responsibilities } : item,
-  );
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        directorate: filtered,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "directorate", officerPayload(data), "edit");
 }
 
 export async function deleteOfficerPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-
-  const { data } = await supabase
-    .from("slate")
-    .select("directorate")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const directorate = data?.[0]?.directorate || [];
-  const filtered = directorate.filter(
-    (officer: { name: string }) => officer.name !== name,
-  );
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        directorate: filtered,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "directorate", officerPayload(data), "delete");
 }
 
 export async function createLegislativePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-  const image = formData.get("image");
-  const contactRaw = formData.get("contact_data");
-  const contact_info =
-    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
-
-  const { data } = await supabase
-    .from("slate")
-    .select("legislative")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const legislative = data?.[0]?.legislative || [];
-  legislative.push({ name, image });
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        legislative: legislative,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "legislative", officerPayload(data), "create");
 }
 
 export async function editLegislativePOST(formData: FormData) {
-  var filtered;
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const id_name = formData.get("id_name");
-  const name = formData.get("name");
-  const image = formData.get("image");
-  const contactRaw = formData.get("contact_data");
-  const contact_info =
-    typeof contactRaw === "string" ? JSON.parse(contactRaw) : contactRaw;
-
-  const { data } = await supabase
-    .from("slate")
-    .select("legislative")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const legislative = data?.[0]?.legislative || [];
-
-  filtered = legislative.map((item: any) =>
-    item.name === id_name ? { name, image } : item,
-  );
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        legislative: filtered,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "legislative", officerPayload(data), "edit");
 }
 
 export async function deleteLegislativePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-
-  const { data } = await supabase
-    .from("slate")
-    .select("legislative")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const legislative = data?.[0]?.legislative || [];
-  const filtered = legislative.filter(
-    (officer: { name: string }) => officer.name !== name,
-  );
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        legislative: filtered,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "legislative", officerPayload(data), "delete");
 }
 
 export async function createJuniorOfficerPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-  const position = formData.get("position");
-  const image = formData.get("image");
-  const responsibilitiesRaw = formData.get("responsibilities_data");
-  const responsibilities =
-    typeof responsibilitiesRaw === "string"
-      ? JSON.parse(responsibilitiesRaw)
-      : responsibilitiesRaw;
-
-  const { data } = await supabase
-    .from("slate")
-    .select("junior_officers")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const junior_officers = data?.[0]?.junior_officers || [];
-  junior_officers.push({ name, position, image, responsibilities });
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        junior_officers: junior_officers,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "junior_officers", officerPayload(data), "create");
 }
 
 export async function editJuniorOfficerPOST(formData: FormData) {
-  var filtered;
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const id_name = formData.get("id_name");
-  const name = formData.get("name");
-  const position = formData.get("position");
-  const image = formData.get("image");
-  const responsibilitiesRaw = formData.get("responsibilities_data");
-  const responsibilities =
-    typeof responsibilitiesRaw === "string"
-      ? JSON.parse(responsibilitiesRaw)
-      : responsibilitiesRaw;
-
-  const { data } = await supabase
-    .from("slate")
-    .select("junior_officers")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const junior_officers = data?.[0]?.junior_officers || [];
-
-  filtered = junior_officers.map((item: any) =>
-    item.name === id_name ? { name, position, image, responsibilities } : item,
-  );
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        junior_officers: filtered,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "junior_officers", officerPayload(data), "edit");
 }
 
 export async function deleteJuniorOfficerPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-
-  const { data } = await supabase
-    .from("slate")
-    .select("junior_officers")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const junior_officers = data?.[0]?.junior_officers || [];
-  const filtered = junior_officers.filter(
-    (officer: { name: string }) => officer.name !== name,
-  );
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        junior_officers: filtered,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "junior_officers", officerPayload(data), "delete");
 }
 
 export async function createCommitteePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const committee_name = formData.get("committee_name");
-  const head = formData.get("committee_head_list");
-  const committees = formData.get("committee_list");
-  const responsibilitiesRaw = formData.get("responsibilities_data");
-  const responsibilities =
-    typeof responsibilitiesRaw === "string"
-      ? JSON.parse(responsibilitiesRaw)
-      : responsibilitiesRaw;
-
-  const { data } = await supabase
-    .from("slate")
-    .select("committees")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const committee: { [key: string]: any } = data?.[0]?.committees || {};
-  if (typeof committee_name === "string") {
-    committee[committee_name] = {
-      head: JSON.parse(head as string) || [],
-      responsibilities: responsibilities,
-      committees: JSON.parse(committees as string) || [],
-    };
-  }
-
-  const sortedKeys = Object.keys(committee).sort();
-  const sortedCommittee: { [key: string]: any } = {};
-  sortedKeys.forEach((key) => {
-    sortedCommittee[key] = committee[key];
-  });
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        committees: sortedCommittee,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "committees", officerPayload(data), "create");
 }
 
 export async function editCommitteePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const id_committee_name = formData.get("id_committee_name");
-  const committee_name = formData.get("committee_name");
-  const head = formData.get("committee_head_list");
-  const committees = formData.get("committee_list");
-  const responsibilitiesRaw = formData.get("responsibilities_data");
-  const responsibilities =
-    typeof responsibilitiesRaw === "string"
-      ? JSON.parse(responsibilitiesRaw)
-      : responsibilitiesRaw;
-
-  const { data } = await supabase
-    .from("slate")
-    .select("committees")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const committee: { [key: string]: any } = data?.[0]?.committees || {};
-  if (
-    typeof id_committee_name === "string" &&
-    typeof committee_name === "string"
-  ) {
-    if (committee_name === id_committee_name) {
-      committee[id_committee_name] = {
-        head: JSON.parse(head as string) || [],
-        responsibilities: responsibilities,
-        committees: JSON.parse(committees as string) || [],
-      };
-    } else {
-      committee[committee_name] = {
-        head: JSON.parse(head as string) || [],
-        responsibilities: responsibilities,
-        committees: JSON.parse(committees as string) || [],
-      };
-      delete committee[id_committee_name];
-    }
-  }
-
-  const sortedKeys = Object.keys(committee).sort();
-  const sortedCommittee: { [key: string]: any } = {};
-  sortedKeys.forEach((key) => {
-    sortedCommittee[key] = committee[key];
-  });
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        committees: sortedCommittee,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "committees", officerPayload(data), "edit");
 }
 
 export async function deleteCommitteePOST(formData: FormData) {
-  console.log("delete committee post");
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const committee_name = formData.get("committee_name");
-
-  const { data } = await supabase
-    .from("slate")
-    .select("committees")
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  const committee: { [key: string]: any } = data?.[0]?.committees || {};
-  if (typeof committee_name === "string") {
-    delete committee[committee_name];
-  }
-
-  const sortedKeys = Object.keys(committee).sort();
-  const sortedCommittee: { [key: string]: any } = {};
-  sortedKeys.forEach((key) => {
-    sortedCommittee[key] = committee[key];
-  });
-
-  const { error } = await supabase
-    .from("slate")
-    .update([
-      {
-        committees: sortedCommittee,
-      },
-    ])
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = formDataToObject(formData);
+  return updateSlateSection(String(data.id), "committees", officerPayload(data), "delete");
 }
 
-// FACULTY //
+// Faculty and staff
 export async function createFacultyPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const name = formData.get("name");
-  const department = formData.get("department");
-  const work_type = formData.get("work_type");
-  const image = formData.get("image");
-  const specializationRaw = formData.get("specialization_data");
-  const specializations =
-    typeof specializationRaw === "string"
-      ? JSON.parse(specializationRaw)
-      : specializationRaw;
-
-  if (image != "") {
-    const { error } = await supabase
-      .from("faculty")
-      .insert([
-        {
-          name: name,
-          department: department,
-          work_type: work_type,
-          specialization: specializations,
-          image: image,
-        },
-      ])
-      .select();
-    return error
-      ? { success: false, message: error?.message }
-      : { success: true };
-  } else {
-    const { error } = await supabase
-      .from("faculty")
-      .insert([
-        {
-          name: name,
-          department: department,
-          work_type: work_type,
-          specialization: specializations,
-        },
-      ])
-      .select();
-    return error
-      ? { success: false, message: error?.message }
-      : { success: true };
-  }
+  return insertDocument("faculty", formDataToObject(formData));
 }
 
 export async function editFacultyPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-  const department = formData.get("department");
-  const work_type = formData.get("work_type");
-  const image = formData.get("image");
-  const specializationRaw = formData.get("specialization_data");
-  const specializations =
-    typeof specializationRaw === "string"
-      ? JSON.parse(specializationRaw)
-      : specializationRaw;
-  // const externalLinksRaw = formData.get("external_links");
-  // const externalLinks = externalLinksRaw ? JSON.parse(externalLinksRaw as string) : [];
-
-  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
-
-  if (!image) {
-    const { data, error } = await supabase
-      .from("faculty")
-      .update({
-        name: name,
-        department: department,
-        work_type: work_type,
-        specialization: specializations,
-      })
-      .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-      .select();
-
-    return error
-      ? { success: false, message: error?.message }
-      : { success: true };
-  } else {
-    const { data, error } = await supabase
-      .from("faculty")
-      .update({
-        name: name,
-        department: department,
-        work_type: work_type,
-        specialization: specializations,
-        image: image,
-      })
-      .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-      .select();
-
-    return error
-      ? { success: false, message: error?.message }
-      : { success: true };
-  }
+  return updateDocument("faculty", formDataToObject(formData));
 }
 
 export async function deleteFacultyPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-
-  const { error } = await supabase
-    .from("faculty")
-    .delete()
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return deleteDocument("faculty", formDataToObject(formData));
 }
 
-// ADMIN & STAFF //
 export async function editAdminStaffPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const dean_name = formData.get("dean_name");
-  const dean_image = formData.get("dean_image");
-  const assoc_dean_name = formData.get("assoc_dean_name");
-  const assoc_dean_image = formData.get("assoc_dean_image");
-  const staffRaw = formData.get("staff_data");
-  const staff = typeof staffRaw === "string" ? JSON.parse(staffRaw) : staffRaw;
-
-  const { data, error } = await supabase
-    .from("admin_staff")
-    .update({
-      dean: { name: dean_name, image: dean_image },
-      associate_dean: { name: assoc_dean_name, image: assoc_dean_image },
-      staff: staff,
-    })
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  console.log(id, staff);
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = formDataToObject(formData);
+  return updateDocument("admin_staff", {
+    ...data,
+    dean: data.dean ?? { name: data.dean_name ?? "", image: data.dean_image ?? "" },
+    associate_dean: data.associate_dean ?? {
+      name: data.assoc_dean_name ?? "",
+      image: data.assoc_dean_image ?? "",
+    },
+    staff: data.staff ?? [],
+  });
 }
 
-// QUICK ANNOUNCEMENT //
+// Alerts / campus / schedule
 export async function createQuickAnnouncementPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
+  const data = formDataToObject(formData);
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
+  const normalized: AnyRecord = { ...data };
 
-  const hasActiveAnnouncement = formData.get("active_announcement");
-  const announcement = formData.get("announcement");
-  const date = formData.get("date");
-  const button_text = formData.get("button_text");
-  const button_link = formData.get("button_link");
-  const timer_visibility = formData.get("timer_visible") == "on" ? true : false;
-  const button_visibility =
-    formData.get("button_visible") == "on" ? true : false;
-  const button_new_tab = formData.get("button_new_tab") == "on" ? true : false;
-
-  if (hasActiveAnnouncement == "false") {
-    const { data, error } = await supabase
-      .from("urgent_announcement")
-      .insert({
-        announcement: announcement,
-        date: date != "" ? date : null,
-        button_text: button_text,
-        button_link: button_link,
-        time_visibility: timer_visibility,
-        button_visibility: button_visibility,
-        button_new_tab: button_new_tab,
-      })
-      .select();
-
-    return error
-      ? { success: false, message: error?.message }
-      : { success: true };
-  } else {
-    var id: string = "0";
-
-    let { data: documents } = await supabase
-      .from("urgent_announcement")
-      .select("*")
-      .order("id", { ascending: false })
-      .limit(1);
-
-    if (documents && documents.length > 0) {
-      id = documents[0].id;
-    } else {
-      return {
-        success: false,
-        message: "No urgent announcement found to update.",
-      };
-    }
-
-    const {} = await supabase
-      .from("urgent_announcement")
-      .update({
-        visibility: false,
-      })
-      .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-      .select();
-
-    const { data, error } = await supabase
-      .from("urgent_announcement")
-      .insert({
-        announcement: announcement,
-        date: date != "" ? date : null,
-        button_text: button_text,
-        button_link: button_link,
-        time_visibility: timer_visibility,
-        button_visibility: button_visibility,
-        button_new_tab: button_new_tab,
-      })
-      .select();
-
-    console.log(error);
-    return error
-      ? { success: false, message: error?.message }
-      : { success: true };
+  if (data.timer_visible !== undefined) {
+    normalized.time_visibility =
+      data.timer_visible === "on" || data.timer_visible === true || data.timer_visible === "true";
+    delete normalized.timer_visible;
   }
+
+  if (data.button_visible !== undefined) {
+    normalized.button_visibility =
+      data.button_visible === "on" || data.button_visible === true || data.button_visible === "true";
+    delete normalized.button_visible;
+  }
+
+  if (data.button_new_tab !== undefined && typeof data.button_new_tab !== "boolean") {
+    normalized.button_new_tab = data.button_new_tab === "on" || data.button_new_tab === "true" || data.button_new_tab === true;
+  }
+
+  return insertDocument("urgent_announcement", normalized);
 }
 
 export async function editQuickAnnouncementPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
+  const data = formDataToObject(formData);
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
+  const normalized: AnyRecord = { ...data };
 
-  const id = formData.get("id");
-  const announcement = formData.get("announcement");
-  const date = formData.get("date");
-  const button_text = formData.get("button_text");
-  const button_link = formData.get("button_link");
-  const timer_visibility = formData.get("timer_visible") == "on" ? true : false;
-  const button_visibility =
-    formData.get("button_visible") == "on" ? true : false;
-  const button_new_tab = formData.get("button_new_tab") == "on" ? true : false;
+  if (data.timer_visible !== undefined) {
+    normalized.time_visibility =
+      data.timer_visible === "on" || data.timer_visible === true || data.timer_visible === "true";
+    delete normalized.timer_visible;
+  }
 
-  const { data, error } = await supabase
-    .from("urgent_announcement")
-    .update({
-      announcement: announcement,
-      date: date != "" ? date : null,
-      button_text: button_text,
-      button_link: button_link,
-      time_visibility: timer_visibility,
-      button_visibility: button_visibility,
-      button_new_tab: button_new_tab,
-    })
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
+  if (data.button_visible !== undefined) {
+    normalized.button_visibility =
+      data.button_visible === "on" || data.button_visible === true || data.button_visible === "true";
+    delete normalized.button_visible;
+  }
 
-  console.log(error);
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  if (data.button_new_tab !== undefined && typeof data.button_new_tab !== "boolean") {
+    normalized.button_new_tab = data.button_new_tab === "on" || data.button_new_tab === "true" || data.button_new_tab === true;
+  }
+
+  return updateDocument("urgent_announcement", normalized);
 }
 
 export async function endQuickAnnouncementPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
+  const data = formDataToObject(formData);
+  const collection = await getCollection("urgent_announcement");
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
+  const filter = idFilter(data);
 
-  const id = formData.get("id");
+  if (filter) {
+    await collection.updateOne(filter, { $set: { visibility: false } });
+    return { success: true };
+  }
 
-  const { data, error } = await supabase
-    .from("urgent_announcement")
-    .update({
-      visibility: false,
-    })
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  await collection.updateMany({ visibility: true }, { $set: { visibility: false } });
+  return { success: true };
 }
 
-// CAMPUS DATA //
 export async function createEastCampusPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const name = formData.get("name");
-  const number = formData.get("number");
-  const location = formData.get("location");
-  const description = formData.get("description");
-  const image = formData.get("image");
-  const servicesRaw = formData.get("services_data");
-  const services = servicesRaw ? JSON.parse(servicesRaw as string) : [];
-  const organizationRaw = formData.get("organizations_data");
-  const organization = organizationRaw
-    ? JSON.parse(organizationRaw as string)
-    : [];
-
-  const { error } = await supabase
-    .from("east_campus")
-    .insert([
-      {
-        name: name,
-        number: number,
-        location: location,
-        services: services,
-        organization: organization,
-        description: description,
-        image: image,
-      },
-    ])
-    .select();
-
-  console.log(error);
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-
-  // return {success: true}
-  // console.log(data)
+  return insertDocument("east_campus", formDataToObject(formData));
 }
 
 export async function editEastCampusPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-  const number = formData.get("number");
-  const location = formData.get("location");
-  const description = formData.get("description");
-  const image = formData.get("image");
-  const servicesRaw = formData.get("services_data");
-  const services = servicesRaw ? JSON.parse(servicesRaw as string) : [];
-  const organizationRaw = formData.get("organizations_data");
-  const organization = organizationRaw
-    ? JSON.parse(organizationRaw as string)
-    : [];
-
-  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
-  const { data, error } = await supabase
-    .from("east_campus")
-    .update({
-      name: name,
-      number: number,
-      location: location,
-      services: services,
-      organization: organization,
-      description: description,
-      image: image,
-    })
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  return updateDocument("east_campus", formDataToObject(formData));
 }
 
 export async function deleteEastCampusPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-
-  const { error } = await supabase
-    .from("east_campus")
-    .delete()
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return deleteDocument("east_campus", formDataToObject(formData));
 }
 
 export async function createWestCampusPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const name = formData.get("name");
-  const number = formData.get("number");
-  const location = formData.get("location");
-  const description = formData.get("description");
-  const image = formData.get("image");
-  const servicesRaw = formData.get("services_data");
-  const services = servicesRaw ? JSON.parse(servicesRaw as string) : [];
-  const organizationRaw = formData.get("organizations_data");
-  const organization = organizationRaw
-    ? JSON.parse(organizationRaw as string)
-    : [];
-
-  const { error } = await supabase
-    .from("west_campus")
-    .insert([
-      {
-        name: name,
-        number: number,
-        location: location,
-        services: services,
-        organization: organization,
-        description: description,
-        image: image,
-      },
-    ])
-    .select();
-
-  console.log(error);
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-
-  // return {success: true}
-  // console.log(data)
+  return insertDocument("west_campus", formDataToObject(formData));
 }
 
 export async function editWestCampusPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const name = formData.get("name");
-  const number = formData.get("number");
-  const location = formData.get("location");
-  const description = formData.get("description");
-  const image = formData.get("image");
-  const servicesRaw = formData.get("services_data");
-  const services = servicesRaw ? JSON.parse(servicesRaw as string) : [];
-  const organizationRaw = formData.get("organizations_data");
-  const organization = organizationRaw
-    ? JSON.parse(organizationRaw as string)
-    : [];
-
-  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
-  const { data, error } = await supabase
-    .from("west_campus")
-    .update({
-      name: name,
-      number: number,
-      location: location,
-      services: services,
-      organization: organization,
-      description: description,
-      image: image,
-    })
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  return updateDocument("west_campus", formDataToObject(formData));
 }
 
 export async function deleteWestCampusPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-
-  const { error } = await supabase
-    .from("west_campus")
-    .delete()
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return deleteDocument("west_campus", formDataToObject(formData));
 }
 
 export async function createPanimolaSchedulePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const title = formData.get("title");
-  const date = formData.get("date");
-  const description = formData.get("description");
-
-  const { error } = await supabase
-    .from("panimola_timeline")
-    .insert([
-      {
-        title: title,
-        date: date,
-        description: description,
-      },
-    ])
-    .select();
-
-  console.log(error);
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-
-  // return {success: true}
-  // console.log(data)
+  return insertDocument("panimola_timeline", formDataToObject(formData));
 }
 
 export async function editPanimolaSchedulePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const title = formData.get("title");
-  const date = formData.get("date");
-  const description = formData.get("description");
-
-  // console.log(id, title, date, documentType, description, author, postLink, image, externalLinks)
-  const { data, error } = await supabase
-    .from("panimola_timeline")
-    .update({
-      title: title,
-      date: date,
-      description: description,
-    })
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  return updateDocument("panimola_timeline", formDataToObject(formData));
 }
 
 export async function deletePanimolaSchedulePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-
-  const { error } = await supabase
-    .from("panimola_timeline")
-    .delete()
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return deleteDocument("panimola_timeline", formDataToObject(formData));
 }
 
-export async function checkFreeBwPages(studentNumber: string) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const getWeekRange = (dateString: string) => {
-    const baseDate = new Date(`${dateString}T00:00:00`);
-    const day = baseDate.getDay();
-    const mondayOffset = day === 0 ? -6 : 1 - day;
-    const weekStart = new Date(baseDate);
-    weekStart.setDate(baseDate.getDate() + mondayOffset);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    return {
-      start: weekStart.toISOString().split("T")[0],
-      end: weekEnd.toISOString().split("T")[0],
-    };
-  };
-
-  // Get current date in GMT+8 (UTC+8)
-  const now = new Date();
-  const gmt8Date = new Date(
-    now.getTime() + 8 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000,
-  );
-  const today = gmt8Date.toISOString().split("T")[0];
-  const { start, end } = getWeekRange(today);
-
-  const { data: weeklyRows, error: weeklyError } = await supabase
-    .from("fetchdesk")
-    .select("bw_page_count, print_type, page_count")
-    .eq("transaction_type", "printing")
-    .eq("student_number", studentNumber)
-    .gte("date", start)
-    .lte("date", end);
-
-  // console.log("Weekly Rows:", weeklyRows, studentNumber, start, end);
-  if (weeklyError) {
-    return { success: false, message: weeklyError?.message };
-  }
-
-  const usedBwPages = (weeklyRows || []).reduce((total: number, row: any) => {
-    const bwPages = Number(row?.bw_page_count ?? 0);
-    if (bwPages) return total + bwPages;
-    if (row?.print_type === "blackAndWhite") {
-      return total + Number(row?.page_count ?? 0);
-    }
-    return total;
-  }, 0);
-
-  const freePagesPerWeek = 5;
-  const remainingFree = Math.max(0, freePagesPerWeek - usedBwPages);
-
-  return {
-    success: true,
-    usedBwPages,
-    remainingFree,
-    weekStart: start,
-    weekEnd: end,
-  };
-}
-
+// FetchDesk
 export async function createFetchDeskPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const extractDataUrl = (value: FormDataEntryValue | null) => {
-    if (typeof value !== "string") return null;
-    if (!value.startsWith("data:image")) return null;
-    return value;
-  };
-
-  const getFileExtension = (mimeType: string) => {
-    if (mimeType === "image/jpeg") return "jpg";
-    if (mimeType === "image/png") return "png";
-    if (mimeType === "image/webp") return "webp";
-    return "png";
-  };
-
-  const uploadSignatureIfNeeded = async (
-    value: FormDataEntryValue | null,
-    filePrefix: string,
-  ) => {
-    const dataUrl = extractDataUrl(value);
-    if (!dataUrl) return value;
-
-    const [header, base64Data] = dataUrl.split(",");
-    if (!header || !base64Data) return value;
-
-    const mimeMatch = header.match(/data:(image\/[a-zA-Z0-9.+-]+);base64/);
-    const mimeType = mimeMatch?.[1] ?? "image/png";
-    const extension = getFileExtension(mimeType);
-    const buffer = Buffer.from(base64Data, "base64");
-    const filename = `fetchdesk/signatures/${filePrefix}-${Date.now()}.${extension}`;
-    const blob = await put(filename, buffer, {
-      access: "public",
-      contentType: mimeType,
-    });
-    return blob.url;
-  };
-
-  const transactionType = formData.get("transaction_type");
-  const studentNumber = formData.get("student_number");
-  const dateRaw = formData.get("date");
-
-  // Get current date in GMT+8 (UTC+8) as default
-  const now = new Date();
-  const gmt8Date = new Date(
-    now.getTime() + 8 * 60 * 60 * 1000 - now.getTimezoneOffset() * 60 * 1000,
-  );
-  const defaultDateGmt8 = gmt8Date.toISOString().split("T")[0];
-
-  const dateValue =
-    typeof dateRaw === "string" && dateRaw ? dateRaw : defaultDateGmt8;
-
-  const parseNumber = (value: FormDataEntryValue | null, fallback = 0) => {
-    if (value === null) return fallback;
-    const parsed = Number(value);
-    return Number.isFinite(parsed) ? parsed : fallback;
-  };
-  const parseJsonArray = (value: FormDataEntryValue | null) => {
-    if (!value) return null;
-    if (Array.isArray(value)) return value;
-    if (typeof value !== "string") return null;
-    try {
-      const parsed = JSON.parse(value);
-      return Array.isArray(parsed) ? parsed : null;
-    } catch {
-      return value
-        .split(",")
-        .map((item) => item.trim())
-        .filter(Boolean);
-    }
-  };
-
-  const getWeekRange = (dateString: string) => {
-    const baseDate = new Date(`${dateString}T00:00:00`);
-    const day = baseDate.getDay();
-    const mondayOffset = day === 0 ? -6 : 1 - day;
-    const weekStart = new Date(baseDate);
-    weekStart.setDate(baseDate.getDate() + mondayOffset);
-    const weekEnd = new Date(weekStart);
-    weekEnd.setDate(weekStart.getDate() + 6);
-    return {
-      start: weekStart.toISOString().split("T")[0],
-      end: weekEnd.toISOString().split("T")[0],
-    };
-  };
-
-  let calculatedPrice = parseNumber(formData.get("calculated_price"));
-  let freePagesAvailed = formData.get("free_pages_availed") === "true";
-
-  let bwPageCount = parseNumber(formData.get("bw_page_count"));
-  let coloredPageCount = parseNumber(formData.get("colored_page_count"));
-  const pageCount = parseNumber(formData.get("page_count"));
-  const printType = formData.get("print_type");
-  if (transactionType === "printing") {
-    if (!bwPageCount && !coloredPageCount && pageCount) {
-      if (printType === "colored") {
-        coloredPageCount = pageCount;
-      } else {
-        bwPageCount = pageCount;
-      }
-    }
-
-    const { start, end } = getWeekRange(dateValue);
-    const { data: weeklyRows, error: weeklyError } = await supabase
-      .from("fetchdesk")
-      .select("bw_page_count, print_type, page_count")
-      .eq("transaction_type", "printing")
-      .eq("student_number", studentNumber)
-      .gte("date", start)
-      .lte("date", end);
-
-    if (weeklyError) {
-      return { success: false, message: weeklyError?.message };
-    }
-    const usedBwPages = (weeklyRows || []).reduce((total, row: any) => {
-      const bwPages = Number(row?.bw_page_count ?? 0);
-      if (bwPages) return total + bwPages;
-      if (row?.print_type === "blackAndWhite") {
-        return total + Number(row?.page_count ?? 0);
-      }
-      return total;
-    }, 0);
-
-    const freePagesPerWeek = 5;
-    const remainingFree = Math.max(0, freePagesPerWeek - usedBwPages);
-    const freeApplied = Math.min(remainingFree, bwPageCount);
-    const chargeableBw = Math.max(0, bwPageCount - freeApplied);
-
-    calculatedPrice = chargeableBw * 2 + Math.max(0, coloredPageCount) * 5;
-    freePagesAvailed = usedBwPages >= freePagesPerWeek;
-  }
-  const rentalItems = parseJsonArray(formData.get("rental_items"));
-  const officerSignature = await uploadSignatureIfNeeded(
-    formData.get("officer_signature"),
-    `officer-${studentNumber ?? "unknown"}`,
-  );
-  const studentSignature = await uploadSignatureIfNeeded(
-    formData.get("student_signature"),
-    `student-${studentNumber ?? "unknown"}`,
-  );
-
-  const payload = {
-    student_name: formData.get("student_name"),
-    student_number: studentNumber,
-    cys: formData.get("cys"),
-    contact_details: formData.get("contact_details"),
-    transaction_type: transactionType,
-    print_type: formData.get("print_type"),
-    page_count: pageCount || bwPageCount + coloredPageCount,
-    bw_page_count: bwPageCount,
-    colored_page_count: coloredPageCount,
-    free_pages_availed: freePagesAvailed,
-    rental_item: formData.get("rental_item"),
-    rental_items: rentalItems ?? formData.get("rental_items"),
-    rental_time: formData.get("rental_time"),
-    return_time: formData.get("return_time"),
-    status: formData.get("status"),
-    calculated_price: calculatedPrice,
-    officer_signature: officerSignature,
-    student_signature: studentSignature,
-    date: dateValue,
-  };
-
-  const { error } = await supabase.from("fetchdesk").insert([payload]).select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return insertDocument("fetchdesk", formDataToObject(formData));
 }
 
 export async function editFetchDeskPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-
-  const uploadSignatureIfNeeded = async (
-    value: FormDataEntryValue | null,
-    filePrefix: string,
-  ) => {
-    if (typeof value !== "string") return value;
-    if (!value.startsWith("data:image")) return value;
-
-    const [header, base64Data] = value.split(",");
-    if (!header || !base64Data) return value;
-
-    const mimeMatch = header.match(/data:(image\/[a-zA-Z0-9.+-]+);base64/);
-    const mimeType = mimeMatch?.[1] ?? "image/png";
-    const extension = mimeType === "image/jpeg" ? "jpg" : "png";
-    const buffer = Buffer.from(base64Data, "base64");
-
-    const filename = `fetchdesk/signatures/${filePrefix}-${Date.now()}.${extension}`;
-    const blob = await put(filename, buffer, {
-      access: "public",
-      contentType: mimeType,
-    });
-
-    return blob.url;
-  };
-
-  const studentNumber = formData.get("student_number");
-  const officerSignature = await uploadSignatureIfNeeded(
-    formData.get("officer_signature"),
-    `officer-${studentNumber ?? "unknown"}`,
-  );
-  const studentSignature = await uploadSignatureIfNeeded(
-    formData.get("student_signature"),
-    `student-${studentNumber ?? "unknown"}`,
-  );
-  const returnOfficerSignature = await uploadSignatureIfNeeded(
-    formData.get("return_officer_signature"),
-    `return-officer-${studentNumber ?? "unknown"}`,
-  );
-  const returnStudentSignature = await uploadSignatureIfNeeded(
-    formData.get("return_student_signature"),
-    `return-student-${studentNumber ?? "unknown"}`,
-  );
-
-  const updateData: Record<string, FormDataEntryValue | null> = {};
-
-  const setIfPresent = (key: string) => {
-    if (formData.has(key)) {
-      updateData[key] = formData.get(key);
-    }
-  };
-
-  setIfPresent("student_name");
-  setIfPresent("student_number");
-  setIfPresent("cys");
-  setIfPresent("contact_details");
-  setIfPresent("transaction_type");
-  setIfPresent("print_type");
-  setIfPresent("page_count");
-  setIfPresent("bw_page_count");
-  setIfPresent("colored_page_count");
-  setIfPresent("free_pages_availed");
-  setIfPresent("rental_item");
-  setIfPresent("rental_items");
-  setIfPresent("rental_time");
-  setIfPresent("return_time");
-  setIfPresent("penalty_amount");
-  setIfPresent("status");
-  setIfPresent("calculated_price");
-  setIfPresent("notes");
-  setIfPresent("date");
-
-  if (officerSignature) updateData.officer_signature = officerSignature;
-  if (studentSignature) updateData.student_signature = studentSignature;
-  if (returnOfficerSignature)
-    updateData.return_officer_signature = returnOfficerSignature;
-  if (returnStudentSignature)
-    updateData.return_student_signature = returnStudentSignature;
-
-  const { data, error } = await supabase
-    .from("fetchdesk")
-    .update(updateData)
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-  // console.log(data)
+  return updateDocument("fetchdesk", formDataToObject(formData));
 }
 
 export async function deleteFetchDeskPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-
-  const { error } = await supabase
-    .from("fetchdesk")
-    .delete()
-    .eq("id", id !== null ? parseInt(id as string, 10) : undefined);
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return deleteDocument("fetchdesk", formDataToObject(formData));
 }
 
-export async function getUser(studentNumber: string, date?: string) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const baseDate = new Date();
-  const day = baseDate.getDate();
-
-  let { data: documents } = await supabase
-    .from("fetchdesk")
-    .select("*", { count: "exact", head: false })
-    .eq("student_number", studentNumber);
-
-  if (!documents || documents.length === 0) {
-    // console.log("No user found with student number:", studentNumber);
-    return { success: true, data: documents, count: 0, type: "userAccount" };
-  }
-
-  return { success: true, data: documents, count: documents.length, type: "userAccount" };
+export async function getFetchDeskOrders() {
+  return { documents: await findAll("fetchdesk", {}, { date: -1 }) };
 }
 
-export async function getAttendance(studentNumber: string, date?: string) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+export async function checkFreeBwPages(studentNumber: string) {
+  const orders = await findAll(
+    "fetchdesk",
+    { student_number: studentNumber, print_type: { $in: ["blackAndWhite", "mixed"] } },
+    { date: -1 },
   );
 
-  const baseDate = new Date();
-  const day = baseDate.getDate();
+  const usedBwPages = orders.reduce((total: number, order: AnyRecord) => {
+    return total + Number(order.bw_page_count ?? order.page_count ?? 0);
+  }, 0);
 
-  let { data: documents } = await supabase
-    .from("attendance_users")
-    .select("*", { count: "exact", head: false })
-    .eq("student_id", studentNumber);
-
-  if (!documents || documents.length === 0) {
-    // console.log("No user found with student number:", studentNumber);
-    return { success: true, data: documents, count: 0, type: "userAccount" };
-  }
-
-  let { data: attendance, count } = await supabase
-    .from("attendance")
-    .select("*", { count: "exact", head: false })
-    .or('student_id.eq.' + studentNumber + ',student_name.eq.' + studentNumber)
-    .eq('date', date ? date : baseDate.toISOString().split("T")[0]);
-
-  // console.log("Attendance Records:", attendance);
-
-  return { success: true, data: attendance, userData: documents[0], count: count || 0, type: "attendanceRecords" };
+  const freePagesPerWeek = 5;
+  return { success: true, usedBwPages, remainingFree: Math.max(0, freePagesPerWeek - usedBwPages) };
 }
 
+export async function getUser(studentNumber: string) {
+  const data = await findAll("attendance_users", { student_number: studentNumber }, { created_at: 1 });
+  return { success: true, count: data.length, data };
+}
+
+// Attendance
 export async function createAttendanceUserPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const student_name = formData.get("student_name");
-  const student_number = formData.get("student_number");
-  const role = formData.get("role");
-
-  // console.log(student_name, student_number, role);
-  const { data, error } = await supabase
-    .from("attendance_users")
-    .insert([
-      {
-        student_name: student_name,
-        student_id: student_number,
-        role: role,
-      },
-    ])
-    .select();
-
-  // console.log(data, error);
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  const data = coerceNumericStudentId(formDataToObject(formData));
+  const now = new Date().toISOString();
+  data.created_at = data.created_at ?? now;
+  data.updated_at = data.updated_at ?? now;
+  return insertDocument("attendance_users", data);
 }
 
 export async function createAttendancePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
+  const data = await uploadSignatureIfNeeded(
+    coerceNumericStudentId(formDataToObject(formData)),
   );
+  if (!data.date) {
+    data.date = new Date().toISOString().split("T")[0];
+  }
 
-  const extractDataUrl = (value: FormDataEntryValue | null) => {
-    if (typeof value !== "string") return null;
-    if (!value.startsWith("data:image")) return null;
-    return value;
-  };
+  const now = new Date().toISOString();
+  data.created_at = data.created_at ?? now;
+  data.updated_at = data.updated_at ?? now;
 
-  const getFileExtension = (mimeType: string) => {
-    if (mimeType === "image/jpeg") return "jpg";
-    if (mimeType === "image/png") return "png";
-    if (mimeType === "image/webp") return "webp";
-    return "png";
-  };
-
-  const uploadSignatureIfNeeded = async (
-    value: FormDataEntryValue | null,
-    filePrefix: string,
-  ) => {
-    const dataUrl = extractDataUrl(value);
-    if (!dataUrl) return value;
-
-    const [header, base64Data] = dataUrl.split(",");
-    if (!header || !base64Data) return value;
-
-    const mimeMatch = header.match(/data:(image\/[a-zA-Z0-9.+-]+);base64/);
-    const mimeType = mimeMatch?.[1] ?? "image/png";
-    const extension = getFileExtension(mimeType);
-    const buffer = Buffer.from(base64Data, "base64");
-    const filename = `attendance/signatures/${filePrefix}-${Date.now()}.${extension}`;
-    const blob = await put(filename, buffer, {
-      access: "public",
-      contentType: mimeType,
-    });
-    return blob.url;
-  };
-
-
-  const student_name = formData.get("student_name");
-  const student_id = formData.get("student_id");
-  const time_in = formData.get("time_in");
-  const additional = formData.get("additional");
-  const signature = formData.get("signature");
-  const role = formData.get("role");
-
-
-  const signatureUrl = await uploadSignatureIfNeeded(
-    signature,
-    `attendance-${student_id ?? "unknown"}`,
-  );
-
-  const { data, error } = await supabase
-    .from("attendance")
-    .insert([
-      {
-        student_name: student_name,
-        student_id: student_id,
-        date: new Date().toISOString().split("T")[0],
-        time_in: time_in,
-        additional: additional,
-        type: role,
-        time_in_signature: signatureUrl,
-      },
-    ])
-    .select();
-
-  // console.log(data, error);
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  return insertDocument("attendance", data);
 }
 
 export async function updateAttendancePOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const extractDataUrl = (value: FormDataEntryValue | null) => {
-    if (typeof value !== "string") return null;
-    if (!value.startsWith("data:image")) return null;
-    return value;
-  };
-
-  const getFileExtension = (mimeType: string) => {
-    if (mimeType === "image/jpeg") return "jpg";
-    if (mimeType === "image/png") return "png";
-    if (mimeType === "image/webp") return "webp";
-    return "png";
-  };
-
-  const uploadSignatureIfNeeded = async (
-    value: FormDataEntryValue | null,
-    filePrefix: string,
-  ) => {
-    const dataUrl = extractDataUrl(value);
-    if (!dataUrl) return value;
-
-    const [header, base64Data] = dataUrl.split(",");
-    if (!header || !base64Data) return value;
-
-    const mimeMatch = header.match(/data:(image\/[a-zA-Z0-9.+-]+);base64/);
-    const mimeType = mimeMatch?.[1] ?? "image/png";
-    const extension = getFileExtension(mimeType);
-    const buffer = Buffer.from(base64Data, "base64");
-    const filename = `attendance/signatures/${filePrefix}-${Date.now()}.${extension}`;
-    const blob = await put(filename, buffer, {
-      access: "public",
-      contentType: mimeType,
-    });
-    return blob.url;
-  };
-
-  const document_id = formData.get("document_id");
-  const student_name = formData.get("student_name");
-  const student_id = formData.get("student_id");
-  const time_out = formData.get("time_out");
-  const signature = formData.get("signature");
-
-
-  const signatureUrl = await uploadSignatureIfNeeded(
-    signature,
-    `attendance-${student_id ?? "unknown"}`,
-  );
-
-  const { data, error } = await supabase
-    .from("attendance")
-    .update([
-      {
-        student_name: student_name,
-        student_id: student_id,
-        time_out: time_out,
-        time_out_signature: signatureUrl,
-        updated_at: new Date().toISOString(),
-      },
-    ])
-    .eq("id", document_id !== null ? parseInt(document_id as string, 10) : undefined)
-    .select();
-
-  // console.log(data, error);
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
-}
-
-export async function updateAttendanceAdminPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const id = formData.get("id");
-  const date = formData.get("date");
-  const timeIn = formData.get("time_in");
-  const timeOut = formData.get("time_out");
-
-  const parsedId = id !== null ? parseInt(id as string, 10) : NaN;
-  if (!Number.isFinite(parsedId)) {
-    return { success: false, message: "Invalid attendance record id." };
+  const data = coerceNumericStudentId(formDataToObject(formData));
+  if (!data.id && data.document_id) {
+    data.id = String(data.document_id);
   }
-
-  const updatePayload = {
-    date: date,
-    time_in: timeIn,
-    time_out: typeof timeOut === "string" && timeOut.length === 0 ? null : timeOut,
-    updated_at: new Date().toISOString(),
-  };
-
-  const { error } = await supabase
-    .from("attendance")
-    .update(updatePayload)
-    .eq("id", parsedId)
-    .select();
-
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true };
+  data.updated_at = new Date().toISOString();
+  return updateDocument("attendance", data);
 }
 
 export async function createAttendanceAdminPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
+  return createAttendancePOST(formData);
+}
 
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
+export async function updateAttendanceAdminPOST(formData: FormData) {
+  return updateAttendancePOST(formData);
+}
 
-  const studentId = formData.get("student_id");
-  const studentName = formData.get("student_name");
-  const date = formData.get("date");
-  const timeIn = formData.get("time_in");
-  const timeOut = formData.get("time_out");
+export async function lookupAttendanceUserPOST(studentIdOrFormData: string | FormData) {
+  const studentId =
+    typeof studentIdOrFormData === "string"
+      ? studentIdOrFormData
+      : String(studentIdOrFormData.get("student_id") ?? "");
 
-  const insertPayload = {
-    student_id: studentId,
-    student_name: studentName,
-    date: date,
-    time_in: timeIn,
-    time_out: typeof timeOut === "string" && timeOut.length === 0 ? null : timeOut,
-    type: "admin",
-    additional: "Manual entry",
-    updated_at: new Date().toISOString(),
+  return getAttendance(studentId);
+}
+
+export async function getAttendance(
+  studentId: string | number,
+): Promise<{
+  success: true;
+  message: string;
+  type: "userAccount";
+  count: number;
+  userData: { student_id: number; student_name?: string } & AnyRecord;
+  data: AnyRecord[];
+}> {
+  const collection = await getCollection("attendance_users");
+  const rawId = typeof studentId === "number" ? studentId : String(studentId ?? "").trim();
+  const numericId = typeof rawId === "number" ? rawId : /^[0-9]+$/.test(rawId) ? Number(rawId) : null;
+
+  const userData = (numericId !== null ? await collection.findOne({ student_id: numericId }) : null) ?? (await findById("attendance_users", String(studentId)));
+  const today = new Date().toISOString().split("T")[0];
+  const dateObj = new Date(today);
+
+  // Match date stored as a plain string ("YYYY-MM-DD"), a JS Date object, or an imported/exported $date wrapper
+  const dateMatchers = [today, dateObj, dateObj.toISOString()];
+
+  const activeAttendanceFilter = {
+    $and: [
+      { $or: [{ date: { $in: dateMatchers } }, { "date.$date": dateObj.toISOString() }] },
+      numericId === null
+        ? {}
+        : { $or: [{ student_id: numericId }, { student_id: String(numericId) }] },
+      {
+        time_in: { $exists: true, $nin: [null, ""] },
+        $or: [{ time_out: { $exists: false } }, { time_out: null }, { time_out: "" }],
+      },
+    ],
   };
+  const data = await findAll("attendance", activeAttendanceFilter, { time_in: -1 });
 
-  const { data, error } = await supabase
-    .from("attendance")
-    .insert([insertPayload])
-    .select();
+  // console.log(data)
 
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true, data };
-}
-
-export async function lookupAttendanceUserPOST(formData: FormData) {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  const studentId = formData.get("student_id");
-  if (!studentId) {
-    return { success: false, message: "Student ID is required." };
+  // console.log("Lookup attendance for student_id:", studentId, "Found user:", userData, "Today's attendance records:", data);
+  if (!userData) {
+    return {
+      success: true,
+      message: "",
+      type: "userAccount",
+      count: 0,
+      userData: { student_id: numericId ?? (typeof studentId === "number" ? studentId : Number(String(studentId))), student_name: "" },
+      data: [],
+    };
   }
 
-  const { data, error } = await supabase
-    .from("attendance_users")
-    .select("student_name, student_id")
-    .eq("student_id", studentId)
-    .limit(1);
+  const plainUserData = serializeRecord(userData) as { student_id: number; student_name?: string } & AnyRecord;
+  const plainData = data.map((record) => serializeRecord(record) ?? record);
 
-  return error
-    ? { success: false, message: error?.message }
-    : { success: true, data };
-}
-
-// FETCHDESK REPORT //
-export async function getFetchDeskOrders() {
-  const { getToken } = await auth();
-  const accessToken = await getToken({ template: "supabase" });
-
-  const supabase = createClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL!,
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-    { global: { headers: { Authorization: `Bearer ${accessToken}` } } },
-  );
-
-  try {
-    const { data, error } = await supabase
-      .from("fetchdesk")
-      .select("*")
-      .order("date", { ascending: false });
-
-    if (error) {
-      return { success: false, message: error.message, data: [] };
-    }
-
-    return { success: true, message: "Orders fetched successfully", data: data || [] };
-  } catch (err) {
-    return { success: false, message: "Unexpected error fetching orders", data: [] };
-  }
+  return {
+    success: true,
+    message: "",
+    type: "userAccount",
+    count: userData ? 1 : 0,
+    userData: ((): { student_id: number; student_name?: string } & AnyRecord => {
+      const existing = plainUserData as AnyRecord;
+      const resolved = existing.student_id ?? existing.student_number ?? existing.id ?? numericId ?? "";
+      const student_id = Number(resolved);
+      return {
+        ...existing,
+        student_id: Number.isFinite(student_id) ? student_id : NaN,
+        student_name: existing.student_name ?? existing.name ?? "",
+      } as { student_id: number; student_name?: string } & AnyRecord;
+    })(),
+    data: plainData,
+  };
 }

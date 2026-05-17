@@ -60,7 +60,7 @@ async function NavLinksAdmin() {
           )}
           {user?.publicMetadata.role == "office" && (
             <>
-              <li>
+              {/* <li>
                 <Link
                   href="/admin/fetchdesk"
                   className="flex w-fit flex-nowrap items-center gap-2"
@@ -70,7 +70,7 @@ async function NavLinksAdmin() {
                     FetchDesk
                   </span>
                 </Link>
-              </li>
+              </li> */}
               <li>
                 <Link
                   href="/admin/attendance"

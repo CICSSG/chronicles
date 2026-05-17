@@ -1,36 +1,102 @@
-import { createClient } from "@supabase/supabase-js";
 import { getPagination } from "../pagination";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 const ITEMS_PER_PAGE = 9;
 
+type AdminDataResponse<T> = {
+  documents: T[] | null;
+  count?: number;
+  pagination?: number;
+  error?: string;
+};
+
+async function fetchAdminData<T>(searchParams: Record<string, string | number | undefined>) {
+  const params = new URLSearchParams();
+
+  Object.entries(searchParams).forEach(([key, value]) => {
+    if (value != null && value !== "") {
+      params.set(key, String(value));
+    }
+  });
+
+  const response = await fetch(`/api/public-data?${params.toString()}`);
+  const result = (await response.json().catch(() => null)) as AdminDataResponse<T> | null;
+
+  if (!response.ok || !result) {
+    throw new Error(result?.error ?? "Request failed");
+  }
+
+  return result;
+}
+
+function buildSearchParams(
+  collectionName: string,
+  page: number | null | undefined,
+  itemsPerPage: number,
+  filter?: Record<string, any>,
+) {
+  const searchParams: Record<string, string | number | undefined> = {
+    collection: collectionName,
+    page: page ?? 1,
+    limit: itemsPerPage,
+    count: 1,
+  };
+
+  if (!filter) {
+    return searchParams;
+  }
+
+  Object.entries(filter).forEach(([key, value]) => {
+    if (value == null || value === "") return;
+
+    if (key.endsWith("_ilike")) {
+      const field = key.replace(/_ilike$/, "");
+      searchParams.search_field = field;
+      searchParams.search_term = String(value).replace(/^%|%$/g, "");
+      return;
+    }
+
+    if (key.endsWith("_in")) {
+      const field = key.replace(/_in$/, "");
+      if (field === "id" && Array.isArray(value)) {
+        searchParams.ids = value.join(",");
+      }
+      return;
+    }
+
+    searchParams[key] = value;
+  });
+
+  return searchParams;
+}
+
+async function queryCollectionPaginated(
+  collectionName: string,
+  select: string | undefined,
+  page: number | null | undefined,
+  itemsPerPage: number,
+  filter?: any,
+  sort?: any,
+) {
+  const result = await fetchAdminData<any>(buildSearchParams(collectionName, page, itemsPerPage, filter));
+  return {
+    documents: result.documents,
+    count: result.count ?? result.documents?.length ?? 0,
+  };
+}
+
+async function queryCollectionById(collectionName: string, select: string | undefined, id?: string) {
+  const result = await fetchAdminData<any>({ collection: collectionName, id });
+  return { documents: result.documents };
+}
+
 export default async function DocumentData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("documents")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("documents", "*", page, ITEMS_PER_PAGE, undefined, { id: -1 });
+    const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("documents")
-      .select("*")
-      .eq("id", parseInt(id));
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    const { documents } = await queryCollectionById("documents", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
@@ -40,264 +106,90 @@ export async function DocumentSearch(
   documentType?: string,
   page?: number,
 ) {
-  title == "" || title == null
-    ? (title = undefined)
-    : (title = "%" + title + "%");
-  documentType == "" || documentType == null
-    ? (documentType = undefined)
-    : null;
+  title == "" || title == null ? (title = undefined) : (title = "%" + title + "%");
+  documentType == "" || documentType == null ? (documentType = undefined) : null;
 
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
+  const filter: any = {};
+  if (title != undefined) filter["title_ilike"] = title;
+  if (documentType != undefined) filter["document_type"] = documentType;
 
-  if (title != undefined && documentType != undefined) {
-    let { data: documents, count } = await supabase
-      .from("documents")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .eq("document_type", documentType)
-      .ilike("title", title)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  if (title != undefined) {
-    let { data: documents, count } = await supabase
-      .from("documents")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .ilike("title", title)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  if (documentType != undefined) {
-    let { data: documents, count } = await supabase
-      .from("documents")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .eq("document_type", documentType)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
-    return { documents, pagination };
-  }
-
-  let { data: documents, count } = await supabase
-    .from("documents")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("id", { ascending: false });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const { documents, count } = await queryCollectionPaginated("documents", "*", page, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined, { id: -1 });
+  const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function AnnouncementData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("announcements")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("announcements", "*", page, ITEMS_PER_PAGE, undefined, { id: -1 });
+    const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("announcements")
-      .select("*")
-      .eq("id", parseInt(id));
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    const { documents } = await queryCollectionById("announcements", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
 
 export async function AnnouncementSearch(title?: string, page?: number) {
-  title == "" || title == null
-    ? (title = undefined)
-    : (title = "%" + title + "%");
+  title == "" || title == null ? (title = undefined) : (title = "%" + title + "%");
+  const filter: any = {};
+  if (title != undefined) filter["title_ilike"] = title;
 
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
-  if (title != undefined) {
-    let { data: documents, count } = await supabase
-      .from("announcements")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .ilike("title", title)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  let { data: documents, count } = await supabase
-    .from("announcements")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("id", { ascending: false });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const { documents, count } = await queryCollectionPaginated("announcements", "*", page, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined, { id: -1 });
+  const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function EventsData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("events")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("events", "*", page, ITEMS_PER_PAGE, undefined, { id: -1 });
+    const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("events")
-      .select("*")
-      .eq("id", parseInt(id));
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    const { documents } = await queryCollectionById("events", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
 
 export async function EventsSearch(title?: string, page?: number) {
-  title == "" || title == null
-    ? (title = undefined)
-    : (title = "%" + title + "%");
-
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
-  if (title != undefined) {
-    let { data: documents, count } = await supabase
-      .from("events")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .ilike("title", title)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  let { data: documents, count } = await supabase
-    .from("events")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("id", { ascending: false });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  title == "" || title == null ? (title = undefined) : (title = "%" + title + "%");
+  const filter: any = {};
+  if (title != undefined) filter["title_ilike"] = title;
+  const { documents, count } = await queryCollectionPaginated("events", "*", page, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined, { id: -1 });
+  const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function SlatesData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("slate")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("slate", "*", page, ITEMS_PER_PAGE, undefined, { id: -1 });
+    const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("slate")
-      .select("*")
-      .eq("id", parseInt(id));
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    const { documents } = await queryCollectionById("slate", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
 
 export async function SlatesSearch(title?: string, page?: number) {
-  title == "" || title == null
-    ? (title = undefined)
-    : (title = "%" + title + "%");
-
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
-  if (title != undefined) {
-    let { data: documents, count } = await supabase
-      .from("slate")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .ilike("title", title)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  let { data: documents, count } = await supabase
-    .from("slate")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("id", { ascending: false });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  title == "" || title == null ? (title = undefined) : (title = "%" + title + "%");
+  const filter: any = {};
+  if (title != undefined) filter["title_ilike"] = title;
+  const { documents, count } = await queryCollectionPaginated("slate", "*", page, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined, { id: -1 });
+  const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function AdminStaffData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("admin_staff")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("admin_staff", "*", page, ITEMS_PER_PAGE, undefined, { id: -1 });
+    const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("admin_staff")
-      .select("*")
-      .eq("id", parseInt(id));
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    const { documents } = await queryCollectionById("admin_staff", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
@@ -310,56 +202,22 @@ export async function AdminStaffSearch(title?: string, page?: number) {
   if (page == null) page = 1;
   const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
 
-  if (title != undefined) {
-    let { data: documents, count } = await supabase
-      .from("admin_staff")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .ilike("title", title)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  let { data: documents, count } = await supabase
-    .from("admin_staff")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("id", { ascending: false });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const filter: any = {};
+  if (title != undefined) filter["title_ilike"] = title;
+  const { documents, count } = await queryCollectionPaginated("admin_staff", "*", page, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined, { id: -1 });
+  const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function FacultyData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("faculty")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("department", { ascending: true })
-      .order("work_type", {ascending: true})
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
+    const sort = { department: 1, work_type: 1, id: -1 };
+    const { documents, count } = await queryCollectionPaginated("faculty", "*", page, ITEMS_PER_PAGE, undefined, sort);
+    const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("faculty")
-      .select("*")
-      .order("department", { ascending: false })
-      .order("work_type", {ascending: true})
-      .eq("id", parseInt(id));
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    const { documents } = await queryCollectionById("faculty", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
@@ -372,93 +230,39 @@ export async function FacultySearch(title?: string, page?: number) {
   if (page == null) page = 1;
   const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
 
-  if (title != undefined) {
-    let { data: documents, count } = await supabase
-      .from("faculty")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .ilike("name", title)
-      .order("department", { ascending: true })
-      .order("work_type", {ascending: true})
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  let { data: documents, count } = await supabase
-    .from("faculty")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("department", { ascending: true })
-    .order("work_type", {ascending: true})
-    .order("id", { ascending: false });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const filter: any = {};
+  if (title != undefined) filter["name_ilike"] = title;
+  const sort = { department: 1, work_type: 1, id: -1 };
+  const { documents, count } = await queryCollectionPaginated("faculty", "*", page, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined, sort);
+  const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function UrgentAnnouncementData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("urgent_announcement")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("urgent_announcement", "*", page, ITEMS_PER_PAGE, undefined, { id: -1 });
+    const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("urgent_announcement")
-      .select("*")
-      .order("id", { ascending: false })
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    const { documents } = await queryCollectionById("urgent_announcement", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
 
 export async function UrgentAnnouncementDataSingle() {
-  let { data: documents } = await supabase
-    .from("urgent_announcement")
-    .select("*")
-    .order("id", { ascending: false })
-    .limit(1);
-
+  const { documents } = await queryCollectionPaginated("urgent_announcement", "*", 1, 1, undefined, { id: -1 });
   return { documents };
 }
 
 export async function EastCampusData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("east_campus")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("id", { ascending: true });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("east_campus", "*", page, ITEMS_PER_PAGE, undefined, { id: 1 });
+    const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("east_campus")
-      .select("*")
-      .eq("id", parseInt(id));
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    const { documents } = await queryCollectionById("east_campus", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
@@ -474,52 +278,21 @@ export async function EastCampusSearch(
   if (page == null) page = 1;
   const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
 
-  if (name != undefined) {
-    let { data: documents, count } = await supabase
-      .from("east_campus")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .ilike("name", name)
-      .order("id", { ascending: true });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  let { data: documents, count } = await supabase
-    .from("east_campus")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("id", { ascending: true });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const filter: any = {};
+  if (name != undefined) filter["name_ilike"] = name;
+  const { documents, count } = await queryCollectionPaginated("east_campus", "*", page, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined, { id: 1 });
+  const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function WestCampusData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("west_campus")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("id", { ascending: true });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("west_campus", "*", page, ITEMS_PER_PAGE, undefined, { id: 1 });
+    const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("west_campus")
-      .select("*")
-      .eq("id", parseInt(id));
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    const { documents } = await queryCollectionById("west_campus", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
@@ -535,52 +308,21 @@ export async function WestCampusSearch(
   if (page == null) page = 1;
   const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
 
-  if (name != undefined) {
-    let { data: documents, count } = await supabase
-      .from("west_campus")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .ilike("name", name)
-      .order("id", { ascending: true });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  let { data: documents, count } = await supabase
-    .from("west_campus")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("id", { ascending: true });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const filter: any = {};
+  if (name != undefined) filter["name_ilike"] = name;
+  const { documents, count } = await queryCollectionPaginated("west_campus", "*", page, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined, { id: 1 });
+  const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function PanimolaData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("panimola_timeline")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("id", { ascending: true });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("panimola_timeline", "*", page, ITEMS_PER_PAGE, undefined, { id: 1 });
+    const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("panimola_timeline")
-      .select("*")
-      .eq("id", parseInt(id));
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+    const { documents } = await queryCollectionById("panimola_timeline", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (ITEMS_PER_PAGE + 1)) : 1;
     return { documents, pagination };
   }
 }
@@ -596,104 +338,55 @@ export async function PanimolaSearch(
   if (page == null) page = 1;
   const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
 
-  if (name != undefined) {
-    let { data: documents, count } = await supabase
-      .from("panimola_timeline")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .ilike("name", name)
-      .order("id", { ascending: true });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  let { data: documents, count } = await supabase
-    .from("panimola_timeline")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("id", { ascending: true });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const filter: any = {};
+  if (name != undefined) filter["name_ilike"] = name;
+  const { documents, count } = await queryCollectionPaginated("panimola_timeline", "*", page, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined, { id: 1 });
+  const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function SulongData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, 12);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("anonymous")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("updated_at", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (12 + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("anonymous", "*", page, 12, undefined, { updated_at: -1 });
+    const pagination = count != null ? Math.ceil(count / (12 + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("anonymous")
-      .select("*")
-      .eq("id", id);
-
-    let pagination =
-      count != null ? Math.ceil(count / (12 + 1)) : 1;
+    const { documents } = await queryCollectionById("anonymous", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (12 + 1)) : 1;
     return { documents, pagination };
   }
 }
 
 export async function SulongSearch(page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, 12);
-
-  let { data: documents, count } = await supabase
-    .from("anonymous")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("updated_at", { ascending: false });
-
-  let pagination =
-    count != null ? Math.ceil(count / (12 + 1)) : 1;
+  const { documents, count } = await queryCollectionPaginated("anonymous", "*", page, 12, undefined, { updated_at: -1 });
+  const pagination = count != null ? Math.ceil(count / (12 + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function SendReply(id: string, messages: any[]) {
-  const { data: documents } = await supabase
-    .from("anonymous")
-    .update({ messages: messages, updated_at: new Date().toISOString() })
-    .eq("id", id)
-    .select();
+  const normalizedId = id.replace(/^Pioneer-/i, "");
+  const response = await fetch("/api/anonymous", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ action: "message", id: normalizedId, messages }),
+  });
 
-  return documents && documents.length > 0 ? { success: true, documents } : { success: false, documents: null }
+  const result = await response.json().catch(() => null);
+  return response.ok && result
+    ? result
+    : { success: false, documents: null, error: result?.error ?? "Request failed" };
 }
 
 export async function FetchDeskData(id?: string, page?: number) {
-  if (page == null) page = 1;
-  const { from, to } = getPagination(page - 1, 12);
-
   if (id == null) {
-    let { data: documents, count } = await supabase
-      .from("fetchdesk")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .order("date", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (12 + 1)) : 1;
-
+    const { documents, count } = await queryCollectionPaginated("fetchdesk", "*", page, 12, undefined, { date: -1 });
+    const pagination = count != null ? Math.ceil(count / (12 + 1)) : 1;
     return { documents, pagination };
   } else {
-    let { data: documents, count } = await supabase
-      .from("fetchdesk")
-      .select("*")
-      .eq("id", id);
-
-    let pagination =
-      count != null ? Math.ceil(count / (12 + 1)) : 1;
+    const { documents } = await queryCollectionById("fetchdesk", "*", id);
+    const pagination = documents?.length != null ? Math.ceil(documents.length / (12 + 1)) : 1;
     return { documents, pagination };
   }
 }
@@ -706,34 +399,53 @@ export async function FetchDeskSearch(title?: string, page?: number) {
   if (page == null) page = 1;
   const { from, to } = getPagination(page - 1, ITEMS_PER_PAGE);
 
-  if (title != undefined) {
-    let { data: documents, count } = await supabase
-      .from("fetchdesk")
-      .select("*", { count: "exact", head: false })
-      .range(from, to)
-      .ilike("student_number", title)
-      .order("id", { ascending: false });
-
-    let pagination =
-      count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
-    return { documents, pagination };
-  }
-
-  let { data: documents, count } = await supabase
-    .from("fetchdesk")
-    .select("*", { count: "exact", head: false })
-    .range(from, to)
-    .order("id", { ascending: false });
-
-  let pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
+  const filter: any = {};
+  if (title != undefined) filter["student_number_ilike"] = title;
+  const { documents, count } = await queryCollectionPaginated("fetchdesk", "*", page, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined, { id: -1 });
+  const pagination = count != null ? Math.ceil(count / (ITEMS_PER_PAGE + 1)) : 1;
   return { documents, pagination };
 }
 
 export async function GetAttendanceList() {
-  let { data: documents } = await supabase
-    .from("attendance")
-    .select("*")
-    .order("date", { ascending: false });
+  const result = await fetchAdminData<any>({ collection: "attendance" });
+  const documents = [...(result.documents ?? [])].sort((a, b) => {
+    const aTime = new Date(a.date ?? a.updated_at ?? 0).getTime();
+    const bTime = new Date(b.date ?? b.updated_at ?? 0).getTime();
+    return bTime - aTime;
+  });
+  return { documents };
+}
 
+export async function DocumentsAll(title?: string, documentType?: string): Promise<{ documents: any[] | null }> {
+  title == "" || title == null ? (title = undefined) : (title = "%" + title + "%");
+  documentType == "" || documentType == null ? (documentType = undefined) : null;
+
+  const filter: any = {};
+  if (title != undefined) filter["title_ilike"] = title;
+  if (documentType != undefined) filter["document_type"] = documentType;
+
+  const params = buildSearchParams("documents", 1, ITEMS_PER_PAGE, Object.keys(filter).length ? filter : undefined);
+  // request all matching documents from server
+  const result = await fetchAdminData<any>({ collection: "documents", all: 1, ...params });
+  const documents = result.documents ?? null;
+  return { documents };
+}
+
+export async function CollectionAll(
+  collectionName: string,
+  filter?: Record<string, any>,
+): Promise<{ documents: any[] | null }> {
+  const params = buildSearchParams(
+    collectionName,
+    1,
+    ITEMS_PER_PAGE,
+    filter,
+  );
+  const result = await fetchAdminData<any>({
+    collection: collectionName,
+    all: 1,
+    ...params,
+  });
+  const documents = result.documents ?? null;
   return { documents };
 }

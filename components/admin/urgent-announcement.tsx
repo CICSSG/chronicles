@@ -11,7 +11,6 @@ import {
 import clsx from "clsx";
 import { useEffect, useState } from "react";
 import { UrgentAnnouncementDocumentData } from "../urgent-announcement";
-import { UrgentAnnouncementDataSingle } from "./documents-data";
 import { CreatePopup } from "./alert-fragment";
 import {
   createQuickAnnouncementPOST,
@@ -19,12 +18,6 @@ import {
   endQuickAnnouncementPOST,
 } from "@/app/actions";
 import { DocumentIcon } from "@heroicons/react/24/outline";
-import { createClient } from "@supabase/supabase-js";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 import { useUser } from "@clerk/nextjs";
 
@@ -52,28 +45,14 @@ export default function QuickUrgentAnnouncementAdmin() {
   const [isEdit, setIsEdit] = useState(false);
 
   useEffect(() => {
-    UrgentAnnouncementDataSingle().then(({ documents }) => {
-      setDocuments(documents ?? null);
-    });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "urgent_announcement" },
-        (payload) => {
-          UrgentAnnouncementDataSingle().then(({ documents }) => {
-            setDocuments(documents ?? null);
-            CreatePopup("Data updated");
-          });
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
+    const fetchData = async () => {
+      const res = await fetch(`/api/public-data?collection=urgent_announcement&limit=1`);
+      if (res.ok) {
+        const json = await res.json();
+        setDocuments(json.documents ?? null);
+      }
     };
+    fetchData();
   }, []);
 
   useEffect(() => {

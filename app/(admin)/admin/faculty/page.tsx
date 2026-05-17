@@ -22,16 +22,10 @@ import {
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
-import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
 import DynamicInputFieldsSpecialization from "@/components/admin/dynamic-input-field-specialization";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 import Image from "next/image";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export default function Faculty() {
   const pathname = usePathname();
@@ -80,38 +74,20 @@ export default function Faculty() {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "faculty" },
-        (payload) => {
-          FacultySearch(title ?? undefined, page ?? undefined).then(
-            ({ documents, pagination }) => {
-              setDocuments(documents ?? null);
-              setPagination(pagination);
-              CreatePopup("Data updated");
-            },
-          );
-        },
-      )
-      .subscribe();
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, []);
 
   useEffect(() => {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
-  }, [editDocument]);
+  }, [editFormId]);
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (isImageUploading) {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
-      formData.set("image", image ?? "");
+      if (!formData.get("id") && formData.get("_id")) {
+        formData.set("id", String(formData.get("_id")));
+      }
       const result = await createFacultyPOST(formData);
       setImage("");
       setIsImageUploading(false);
@@ -129,7 +105,9 @@ export default function Faculty() {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
-      formData.set("image", image ?? "");
+      if (!formData.get("id") && formData.get("_id")) {
+        formData.set("id", String(formData.get("_id")));
+      }
       const result = await editFacultyPOST(formData);
       setEditForm(false);
       setImage("");
@@ -147,7 +125,9 @@ export default function Faculty() {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
-      formData.set("image", image ?? "");
+      if (!formData.get("id") && formData.get("_id")) {
+        formData.set("id", String(formData.get("_id")));
+      }
       const result = await deleteFacultyPOST(formData);
       setImage("");
       setIsImageUploading(false);
@@ -285,14 +265,14 @@ export default function Faculty() {
                 <td className="">{data.specialization.length}</td>
                 <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                   <Button
-                    onClick={() => handleEditDocument(data.id)}
+                    onClick={() => handleEditDocument(data._id || data.id)}
                     className="grow-1 basis-0 bg-amber-200 text-black hover:cursor-pointer hover:bg-amber-100"
                   >
                     Edit
                   </Button>
                   <Button
                     onClick={() =>
-                      handleDeleteDocument(data.id, data.title, true)
+                      handleDeleteDocument(data._id || data.id, data.title, true)
                     }
                     className="grow-1 basis-0 bg-red-400 text-black"
                   >
@@ -607,8 +587,8 @@ export default function Faculty() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={editDocument && editDocument[0].id}
-                              name="id"
+                              defaultValue={editDocument?.[0]?._id}
+                              name="_id"
                             ></Input>
                           </Field>
                         </div>
@@ -625,9 +605,7 @@ export default function Faculty() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].name
-                              }
+                              defaultValue={editDocument?.[0]?.name}
                               name="name"
                             ></Input>
                           </Field>
@@ -645,9 +623,7 @@ export default function Faculty() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 "scheme-light",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].department
-                              }
+                              defaultValue={editDocument?.[0]?.department}
                             >
                               <option value="" disabled selected>
                                 ---Select Department---
@@ -670,9 +646,7 @@ export default function Faculty() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 "scheme-light",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].work_type
-                              }
+                              defaultValue={editDocument?.[0]?.work_type}
                             >
                               <option value="" disabled selected>
                                 ---Select Work Type---
@@ -725,9 +699,7 @@ export default function Faculty() {
                               Specialization/s
                             </Label>
                             <DynamicInputFieldsSpecialization
-                              data={
-                                editDocument && editDocument[0].specialization
-                              }
+                              data={editDocument?.[0]?.specialization}
                             />
                           </Field>
                         </div>
@@ -782,7 +754,7 @@ export default function Faculty() {
               >
                 <input
                   type="text"
-                  name="id"
+                  name="_id"
                   className="hidden"
                   defaultValue={deleteDocumentId}
                 />

@@ -17,6 +17,7 @@ import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
 import DocumentData, {
   DocumentSearch,
+  DocumentsAll,
 } from "@/components/admin/documents-data";
 import {
   createNewDocument,
@@ -26,13 +27,7 @@ import {
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
-import { createClient } from "@supabase/supabase-js";
 import { CreatePopup } from "@/components/admin/alert-fragment";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 const options = [
   { option: "Executive Order", value: "executive-order" },
@@ -50,11 +45,13 @@ export default function Documents() {
   const [deleteForm, setDeleteForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
   const [documents, setDocuments] = useState<any[] | null>(null);
+  const [allDocuments, setAllDocuments] = useState<any[] | null>(null);
   const [editFormId, setEditFormId] = useState("");
   const [editDocument, setEditDocument] = useState<any | null>(null);
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
   const [pagination, setPagination] = useState(1);
+  const ITEMS_PER_PAGE = 10;
 
   const pages = [
     (page ?? 1) <= 3
@@ -89,44 +86,38 @@ export default function Documents() {
   };
 
   useEffect(() => {
-    DocumentData().then(({ documents, pagination }) => {
-      setDocuments(documents ?? null);
-      setPagination(pagination);
+    // fetch all documents once and slice client-side
+    DocumentsAll().then(({ documents }) => {
+      const docs = documents ?? [];
+      setAllDocuments(docs);
+      const total = docs.length;
+      setPagination(Math.max(1, Math.ceil(total / ITEMS_PER_PAGE)));
+      setDocuments(docs.slice(0, ITEMS_PER_PAGE));
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "documents" },
-        (payload) => {
-          DocumentData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
-            setPagination(pagination);
-            setPage(1);
-            setTitle(null);
-            setDocumentType(null);
-            CreatePopup("Data updated");
-          });
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, []);
+
+  const refreshDocuments = async () => {
+    const { documents } = await DocumentsAll(title ?? undefined, documentType ?? undefined);
+    const docs = documents ?? [];
+    setAllDocuments(docs);
+    const total = docs.length;
+    setPagination(Math.max(1, Math.ceil(total / ITEMS_PER_PAGE)));
+    const currentPage = page ?? 1;
+    const from = (currentPage - 1) * ITEMS_PER_PAGE;
+    const to = from + ITEMS_PER_PAGE;
+    setDocuments(docs.slice(from, to));
+  };
 
   useEffect(() => {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
-  }, [editDocument]);
+  }, [editFormId]);
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
     const result = await createNewDocument(formData);
-    setCreateForm(false);
     if (result.success) {
+      await refreshDocuments();
+      setCreateForm(false);
       CreatePopup("Successfully created document", "success");
     } else {
       CreatePopup("Failed to create document", "error");
@@ -135,6 +126,10 @@ export default function Documents() {
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    // ensure server-side actions receive legacy `id` field when form uses `_id`
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
     const result = await editDocumentPOST(formData);
     setEditForm(false);
     handleEditDocument("");
@@ -146,6 +141,9 @@ export default function Documents() {
   };
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
     const result = await deleteDocumentPOST(formData);
     setDeleteForm(false);
     if (result.success) {
@@ -178,20 +176,26 @@ export default function Documents() {
     setTitle(null);
     setDocumentType(null);
 
-    DocumentData().then(({ documents, pagination }) => {
-      setDocuments(documents ?? null);
-      setPagination(pagination);
+    DocumentsAll().then(({ documents }) => {
+      const docs = documents ?? [];
+      setAllDocuments(docs);
+      const total = docs.length;
+      setPagination(Math.max(1, Math.ceil(total / ITEMS_PER_PAGE)));
+      setDocuments(docs.slice(0, ITEMS_PER_PAGE));
     });
   };
 
   useEffect(() => {
-    DocumentSearch(
-      title ?? undefined,
-      documentType ?? undefined,
-      page ?? undefined,
-    ).then(({ documents, pagination }) => {
-      setDocuments(documents);
-      setPagination(pagination);
+    // fetch all matching documents then slice for current page
+    DocumentsAll(title ?? undefined, documentType ?? undefined).then(({ documents }) => {
+      const docs = documents ?? [];
+      setAllDocuments(docs);
+      const total = docs.length;
+      setPagination(Math.max(1, Math.ceil(total / ITEMS_PER_PAGE)));
+      const p = page ?? 1;
+      const from = (p - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE;
+      setDocuments(docs.slice(from, to));
     });
   }, [page, title, documentType]);
 
@@ -307,14 +311,14 @@ export default function Documents() {
                 <td className="max-w-2xl truncate">{data.description}</td>
                 <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                   <Button
-                    onClick={() => handleEditDocument(data.id)}
+                    onClick={() => handleEditDocument(data._id || data.id)}
                     className="grow-1 basis-0 bg-amber-200 text-black hover:cursor-pointer hover:bg-amber-100"
                   >
                     Edit
                   </Button>
                   <Button
                     onClick={() =>
-                      handleDeleteDocument(data.id, data.title, true)
+                      handleDeleteDocument(data._id || data.id, data.title, true)
                     }
                     className="grow-1 basis-0 bg-red-400 text-black"
                   >
@@ -416,7 +420,7 @@ export default function Documents() {
                         className="size-6 text-green-600"
                       />
                     </div>
-                    <div className="mt-3 w-full overflow-y-scroll text-center sm:mt-0 sm:ml-4 sm:text-left">
+                    <div className="mt-3 w-full overflow-y-auto text-center sm:mt-0 sm:ml-4 sm:text-left">
                       <DialogTitle
                         as="h3"
                         className="text-base font-semibold text-gray-900"
@@ -579,8 +583,8 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={editDocument && editDocument[0].id}
-                              name="id"
+                              defaultValue={editDocument?.[0]?._id}
+                              name="_id"
                             ></Input>
                           </Field>
                         </div>
@@ -597,9 +601,7 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].title
-                              }
+                              defaultValue={editDocument?.[0]?.title}
                               name="title"
                             ></Input>
                           </Field>
@@ -616,9 +618,7 @@ export default function Documents() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 "scheme-light",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].date
-                              }
+                              defaultValue={editDocument?.[0]?.date}
                               name="date"
                             />
                           </Field>
@@ -628,9 +628,7 @@ export default function Documents() {
                           <Field className="flex flex-row items-center gap-4">
                             <DocumentRadioDropdown
                               left={true}
-                              value={
-                                editDocument && editDocument[0].document_type
-                              }
+                              value={editDocument?.[0]?.document_type}
                             />
                           </Field>
                         </div>
@@ -646,9 +644,7 @@ export default function Documents() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
                               rows={8}
-                              defaultValue={
-                                editDocument && editDocument[0].description
-                              }
+                              defaultValue={editDocument?.[0]?.description}
                               name="description"
                             />
                           </Field>
@@ -665,9 +661,7 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].author
-                              }
+                              defaultValue={editDocument?.[0]?.author}
                               name="author"
                             />
                           </Field>
@@ -684,9 +678,7 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].link
-                              }
+                              defaultValue={editDocument?.[0]?.link}
                               name="file_link"
                             />
                           </Field>
@@ -743,7 +735,7 @@ export default function Documents() {
               >
                 <input
                   type="text"
-                  name="id"
+                  name="_id"
                   className="hidden"
                   defaultValue={deleteDocumentId}
                 />

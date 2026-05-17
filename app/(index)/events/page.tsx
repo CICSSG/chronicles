@@ -62,11 +62,11 @@ const Events = () => {
             {isLoaded ? (
               documents?.map((data) => (
                 <EventCard
-                  key={data.id}
+                  key={data._id}
                   Title={data.title}
                   Date={data.date}
                   AcademicYear={data.academic_year}
-                  URL={"/events/" + data.id}
+                  URL={"/events/" + data._id}
                   ImageLink={data.image}
                   Location={data.location}
                 />

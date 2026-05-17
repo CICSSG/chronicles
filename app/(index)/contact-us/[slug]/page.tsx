@@ -8,13 +8,9 @@ import {
 } from "@/components/public-documents-data";
 import Link from "next/link";
 import { ArrowLeftCircleIcon } from "@heroicons/react/24/outline";
-import { createClient } from "@supabase/supabase-js";
+// Supabase realtime removed — using polling instead
 import { sendAnonymousEmail } from "@/utils/send-email";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 const easterEggMessage = {
   updated_at: new Date().toISOString(),
@@ -65,30 +61,27 @@ export default function Page() {
     }
     return [];
   });
-  const [submissionData, setSubmissionData] = useState<AnonymousData[]>(() => {
-    if (typeof window !== "undefined") {
-      const formattedIds = submissionIds.map((id: string) =>
-        id.replace("Pioneer-", ""),
-      );
+
+  const [submissionData, setSubmissionData] = useState<AnonymousData[]>([]);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+
+    const formattedIds = submissionIds.map((id: string) => id.replace("Pioneer-", ""));
+
+    GetAnonymousSubmissions(formattedIds).then((data) => {
+      setSubmissionData(data && data.documents ? data.documents : []);
+    });
+
+    const POLL_INTERVAL_MS = 3000;
+    const interval = setInterval(() => {
       GetAnonymousSubmissions(formattedIds).then((data) => {
         setSubmissionData(data && data.documents ? data.documents : []);
       });
+    }, POLL_INTERVAL_MS);
 
-      const taskListener = supabase
-        .channel("public:data")
-        .on(
-          "postgres_changes",
-          { event: "*", schema: "public", table: "anonymous" },
-          (payload) => {
-            GetAnonymousSubmissions(formattedIds).then((data) => {
-              setSubmissionData(data && data.documents ? data.documents : []);
-            });
-          },
-        )
-        .subscribe();
-    }
-    return [];
-  });
+    return () => clearInterval(interval);
+  }, [submissionIds]);
   const [currentSubmission, setCurrentSubmission] =
     useState<AnonymousData | null>(null);
 

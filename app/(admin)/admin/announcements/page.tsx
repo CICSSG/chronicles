@@ -16,6 +16,7 @@ import clsx from "clsx";
 import {
   AnnouncementData,
   AnnouncementSearch,
+  CollectionAll,
 } from "@/components/admin/documents-data";
 import {
   createAnnouncementPOST,
@@ -25,14 +26,8 @@ import {
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
-import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
 import { CreatePopup } from "@/components/admin/alert-fragment";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export default function Documents() {
   const pathname = usePathname();
@@ -42,11 +37,13 @@ export default function Documents() {
   const [deleteForm, setDeleteForm] = useState(false);
   const [editForm, setEditForm] = useState(false);
   const [documents, setDocuments] = useState<any[] | null>(null);
+  const [allDocuments, setAllDocuments] = useState<any[] | null>(null);
   const [editFormId, setEditFormId] = useState("");
   const [editDocument, setEditDocument] = useState<any | null>(null);
   const [deleteDocumentId, setDeleteDocumentId] = useState("");
   const [deleteDocumentName, setDeleteDocumentName] = useState("");
   const [pagination, setPagination] = useState(1);
+  const ITEMS_PER_PAGE = 9;
   const [base64Image, setBase64Image] = useState<string>("");
   const [image, setImage] = useState<string>("");
 
@@ -78,41 +75,27 @@ export default function Documents() {
   };
 
   useEffect(() => {
-    AnnouncementData().then(({ documents, pagination }) => {
-      setDocuments(documents ?? null);
-      setPagination(pagination);
+    CollectionAll("announcements").then(({ documents }) => {
+      const docs = documents ?? [];
+      setAllDocuments(docs);
+      const total = docs.length;
+      setPagination(Math.max(1, Math.ceil(total / ITEMS_PER_PAGE)));
+      setDocuments(docs.slice(0, ITEMS_PER_PAGE));
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "announcements" },
-        (payload) => {
-          AnnouncementData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
-            setPagination(pagination);
-            CreatePopup("Data updated");
-          });
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, []);
 
   useEffect(() => {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
-  }, [editDocument]);
+  }, [editFormId]);
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     if (image == "" && base64Image != "") {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
+      if (!formData.get("id") && formData.get("_id")) {
+        formData.set("id", String(formData.get("_id")));
+      }
       formData.set("image", image ?? "");
       const result = await createAnnouncementPOST(formData);
       setBase64Image("");
@@ -131,6 +114,9 @@ export default function Documents() {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
+      if (!formData.get("id") && formData.get("_id")) {
+        formData.set("id", String(formData.get("_id")));
+      }
       formData.set("image", image ?? "");
       const result = await editAnnouncementPOST(formData);
       setEditForm(false);
@@ -150,6 +136,9 @@ export default function Documents() {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
+      if (!formData.get("id") && formData.get("_id")) {
+        formData.set("id", String(formData.get("_id")));
+      }
       formData.set("image", image ?? "");
       const result = await deleteAnnouncementPOST(formData);
       setBase64Image("");
@@ -186,18 +175,28 @@ export default function Documents() {
     setPage(1);
     setTitle(null);
 
-    AnnouncementData().then(({ documents, pagination }) => {
-      setDocuments(documents ?? null);
-      setPagination(pagination);
+    CollectionAll("announcements").then(({ documents }) => {
+      const docs = documents ?? [];
+      setAllDocuments(docs);
+      const total = docs.length;
+      setPagination(Math.max(1, Math.ceil(total / ITEMS_PER_PAGE)));
+      setDocuments(docs.slice(0, ITEMS_PER_PAGE));
     });
   };
 
   useEffect(() => {
-    AnnouncementSearch(title ?? undefined, page ?? undefined).then(
-      ({ documents }) => {
-        setDocuments(documents ?? null);
-      },
-    );
+    const filter: any = {};
+    if (title != null && title !== "") filter["title_ilike"] = "%" + title + "%";
+    CollectionAll("announcements", filter).then(({ documents }) => {
+      const docs = documents ?? [];
+      setAllDocuments(docs);
+      const total = docs.length;
+      setPagination(Math.max(1, Math.ceil(total / ITEMS_PER_PAGE)));
+      const p = page ?? 1;
+      const from = (p - 1) * ITEMS_PER_PAGE;
+      const to = from + ITEMS_PER_PAGE;
+      setDocuments(docs.slice(from, to));
+    });
   }, [page, title]);
 
   return (
@@ -270,14 +269,14 @@ export default function Documents() {
                 <td className="max-w-2xl truncate">{data.description}</td>
                 <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                   <Button
-                    onClick={() => handleEditDocument(data.id)}
+                    onClick={() => handleEditDocument(data._id || data.id)}
                     className="grow-1 basis-0 bg-amber-200 text-black hover:cursor-pointer hover:bg-amber-100"
                   >
                     Edit
                   </Button>
                   <Button
                     onClick={() =>
-                      handleDeleteDocument(data.id, data.title, true)
+                      handleDeleteDocument(data._id || data.id, data.title, true)
                     }
                     className="grow-1 basis-0 bg-red-400 text-black"
                   >
@@ -584,8 +583,8 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={editDocument && editDocument[0].id}
-                              name="id"
+                              defaultValue={editDocument?.[0]?._id}
+                              name="_id"
                             ></Input>
                           </Field>
                         </div>
@@ -602,9 +601,7 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].title
-                              }
+                              defaultValue={editDocument?.[0]?.title}
                               name="title"
                             ></Input>
                           </Field>
@@ -621,9 +618,7 @@ export default function Documents() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 "scheme-light",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].date
-                              }
+                              defaultValue={editDocument?.[0]?.date}
                               name="date"
                             />
                           </Field>
@@ -640,9 +635,7 @@ export default function Documents() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
                               rows={8}
-                              defaultValue={
-                                editDocument && editDocument[0].description
-                              }
+                              defaultValue={editDocument?.[0]?.description}
                               name="description"
                             />
                           </Field>
@@ -659,9 +652,7 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].link
-                              }
+                              defaultValue={editDocument?.[0]?.link}
                               name="post_link"
                             />
                           </Field>
@@ -753,7 +744,7 @@ export default function Documents() {
               >
                 <input
                   type="text"
-                  name="id"
+                  name="_id"
                   className="hidden"
                   defaultValue={deleteDocumentId}
                 />

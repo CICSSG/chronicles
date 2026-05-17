@@ -43,6 +43,7 @@ const Attendance = () => {
   const [timeIn, setTimeIn] = useState<string>("");
   const [timeOut, setTimeOut] = useState<string>("");
   const [currentTime, setCurrentTime] = useState(new Date());
+  const [isLookingUpStudent, setIsLookingUpStudent] = useState(false);
 
   useEffect(() => {
     const timer = setInterval(() => {
@@ -65,24 +66,32 @@ const Attendance = () => {
   };
 
   const handleSubmitIdentity = async () => {
-    const response = await getAttendance(studentId);
+    setIsLookingUpStudent(true);
 
-    if (response.type === "userAccount" && response.count == 0) {
-      setForm("registration");
-      return;
-    }
+    try {
+      const response = await getAttendance(studentId);
 
-    const hasTimedIn = response.count > 0;
-    setHasTimedInToday(hasTimedIn);
-    setStudentName(response.userData.student_name);
-    setDocumentId(response.data?.[response.data.length - 1]?.id || "");
-    setTimeIn(response.data?.[response.data.length - 1]?.time_in || "");
-    setTimeOut(response.data?.[response.data.length - 1]?.time_out || "");
 
-    if (hasTimedIn) {
-      setTimeOutModal(true);
-    } else {
-      setTimeInModal(true);
+      console.log(response);
+      if (response.type === "userAccount" && response.count == 0) {
+        setForm("registration");
+        return;
+      }
+
+      const hasTimedIn = response.data.length > 0;
+      setHasTimedInToday(hasTimedIn);
+      setStudentName(response.userData.student_name || "");
+      setDocumentId(response.data?.[response.data.length - 1]?.id || "");
+      setTimeIn(response.data?.[response.data.length - 1]?.time_in || "");
+      setTimeOut(response.data?.[response.data.length - 1]?.time_out || "");
+
+      if (hasTimedIn) {
+        setTimeOutModal(true);
+      } else {
+        setTimeInModal(true);
+      }
+    } finally {
+      setIsLookingUpStudent(false);
     }
   };
 
@@ -278,7 +287,7 @@ const Attendance = () => {
                 disabled={!studentId.trim()}
                 className="flex-1 rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white transition-colors hover:bg-blue-500 disabled:cursor-not-allowed disabled:opacity-50"
               >
-                Continue
+                {isLookingUpStudent ? "Checking..." : "Continue"}
               </Button>
             </div>
           </div>

@@ -20,13 +20,7 @@ import {
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
-import { createClient } from "@supabase/supabase-js";
 import { CreatePopup } from "@/components/admin/alert-fragment";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export default function Slate() {
   const pathname = usePathname();
@@ -49,26 +43,6 @@ export default function Slate() {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "slate" },
-        (payload) => {
-          SlatesData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
-            setPagination(pagination);
-            CreatePopup("Data updated");
-          });
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, []);
 
   const handleViewDocument = (id: string) => {
@@ -101,6 +75,9 @@ export default function Slate() {
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
     formData.set("image", image ?? "");
     const result = await createSlatePOST(formData);
     setImage("");
@@ -114,6 +91,9 @@ export default function Slate() {
 
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
     const result = await deleteSlatePOST(formData);
     setImage("");
     setDeleteForm(false);
@@ -399,7 +379,7 @@ export default function Slate() {
               >
                 <input
                   type="text"
-                  name="id"
+                  name="_id"
                   className="hidden"
                   defaultValue={deleteDocumentId}
                 />

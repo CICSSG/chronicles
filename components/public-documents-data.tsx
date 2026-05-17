@@ -27,8 +27,8 @@ const fetchPublicData = async <T,>(searchParams: Record<string, string | number 
   return result;
 };
 
-const ITEMS_PER_PAGE = 8;
-const ANNOUNCEMENT_ITEMS_PER_PAGE = 7;
+const ITEMS_PER_PAGE = 9;
+const ANNOUNCEMENT_ITEMS_PER_PAGE = 8;
 
 export async function PublicDocumentData(
   document_type: string,
@@ -107,6 +107,7 @@ export async function PublicSlateDataByID(id?: string) {
 export async function PublicAdminStaffData() {
   const { documents } = await fetchPublicData<any>({
     collection: "admin_staff",
+    all: 1,
   });
 
   return { documents };
@@ -116,6 +117,7 @@ export async function PublicFacultyData(department: string) {
   const { documents } = await fetchPublicData<any>({
     collection: "faculty",
     department,
+    all: 1,
   });
 
   return { documents };
@@ -175,10 +177,12 @@ export async function PublicUrgentAnnounementData() {
 export async function CampusInfo() {
   const { documents: east_documents } = await fetchPublicData<any>({
     collection: "east_campus",
+    all: 1,
   });
 
   const { documents: west_documents } = await fetchPublicData<any>({
     collection: "west_campus",
+    all: 1,
   });
 
   return { east_documents, west_documents };
@@ -187,6 +191,7 @@ export async function CampusInfo() {
 export async function PanimolaTimelineData() {
   const { documents } = await fetchPublicData<any>({
     collection: "panimola_timeline",
+    all: 1,
   });
 
   return { documents };
@@ -228,12 +233,13 @@ export async function AddAnonymousSubmission(data: any) {
 }
 
 export async function SendMessage(id: string, messages: any[]) {
+  const normalizedId = id.replace(/^Pioneer-/i, "");
   const response = await fetch("/api/anonymous", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
     },
-    body: JSON.stringify({ action: "message", id, messages }),
+    body: JSON.stringify({ action: "message", id: normalizedId, messages }),
   });
 
   const result = await response.json().catch(() => null);

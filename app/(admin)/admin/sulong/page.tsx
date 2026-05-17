@@ -5,14 +5,7 @@ import { redirect, usePathname } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { SlatesData, SulongData, SulongSearch } from "@/components/admin/documents-data";
 import { parseAsInteger, useQueryState } from "nuqs";
-
-import { createClient } from "@supabase/supabase-js";
 import { CreatePopup } from "@/components/admin/alert-fragment";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export default function Contacts() {
   const pathname = usePathname();
@@ -29,25 +22,6 @@ export default function Contacts() {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "anonymous" },
-        (payload) => {
-          SulongData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
-            setPagination(pagination);
-            CreatePopup("Data updated");
-          });
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, []);
 
   const handleViewDocument = (id: string) => {

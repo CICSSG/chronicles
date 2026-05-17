@@ -8,14 +8,6 @@ import React, { useEffect, useState } from "react";
 import { SlatesData } from "@/components/admin/documents-data";
 import { parseAsInteger, useQueryState } from "nuqs";
 
-import { createClient } from "@supabase/supabase-js";
-import { CreatePopup } from "@/components/admin/alert-fragment";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
-
 export default function Contacts() {
   const pathname = usePathname();
   const [page, setPage] = useQueryState("page", parseAsInteger);
@@ -31,26 +23,6 @@ export default function Contacts() {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "slate" },
-        (payload) => {
-          SlatesData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
-            setPagination(pagination);
-            CreatePopup("Data updated");
-          });
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, []);
 
   const handleViewDocument = (id: string) => {

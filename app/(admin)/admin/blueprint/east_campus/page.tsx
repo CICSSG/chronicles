@@ -27,16 +27,10 @@ import {
 } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
-import { createClient } from "@supabase/supabase-js";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 import DynamicInputFieldsServices from "@/components/admin/dynamic-input-field-services";
 import DynamicInputFieldsOrganizations from "@/components/admin/dynamic-input-field-organization";
 import { imgurUpload } from "@/utils/imgur-upload";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export default function Documents() {
   const [page, setPage] = useQueryState("page", parseAsInteger);
@@ -114,28 +108,6 @@ export default function Documents() {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "east_campus" },
-        (payload) => {
-          EastCampusData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
-            setPagination(pagination);
-            setPage(1);
-            setName(null);
-            CreatePopup("Data updated");
-          });
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, []);
 
   useEffect(() => {
@@ -144,6 +116,9 @@ export default function Documents() {
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
     formData.set("image", image ?? "");
     const result = await createEastCampusPOST(formData);
     setCreateForm(false);
@@ -159,6 +134,9 @@ export default function Documents() {
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
     formData.set("image", image ?? "");
     const result = await editEastCampusPOST(formData);
     setEditForm(false);
@@ -174,6 +152,9 @@ export default function Documents() {
 
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
     const result = await deleteEastCampusPOST(formData);
     setDeleteForm(false);
     if (result.success) {
@@ -304,14 +285,14 @@ export default function Documents() {
                 <td className="max-w-2xl truncate">{data.description}</td>
                 <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                   <Button
-                    onClick={() => handleEditDocument(data.id)}
+                    onClick={() => handleEditDocument(data._id || data.id)}
                     className="grow-1 basis-0 bg-amber-200 text-black hover:cursor-pointer hover:bg-amber-100"
                   >
                     Edit
                   </Button>
                   <Button
                     onClick={() =>
-                      handleDeleteDocument(data.id, data.name, true)
+                      handleDeleteDocument(data._id || data.id, data.name, true)
                     }
                     className="grow-1 basis-0 bg-red-400 text-black"
                   >
@@ -609,8 +590,8 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={editDocument && editDocument[0].id}
-                              name="id"
+                              defaultValue={editDocument?.[0]?._id}
+                              name="_id"
                             ></Input>
                           </Field>
                         </div>
@@ -627,9 +608,7 @@ export default function Documents() {
                                 "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].name
-                              }
+                              defaultValue={editDocument?.[0]?.name}
                               name="name"
                             ></Input>
                           </Field>
@@ -646,9 +625,7 @@ export default function Documents() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 "scheme-light",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].number
-                              }
+                              defaultValue={editDocument?.[0]?.number}
                               name="number"
                             />
                           </Field>
@@ -666,9 +643,7 @@ export default function Documents() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 "scheme-light",
                               )}
-                              defaultValue={
-                                editDocument && editDocument[0].location
-                              }
+                              defaultValue={editDocument?.[0]?.location}
                               name="location"
                             />
                           </Field>
@@ -685,9 +660,7 @@ export default function Documents() {
                                 "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                               )}
                               rows={8}
-                              defaultValue={
-                                editDocument && editDocument[0].description
-                              }
+                              defaultValue={editDocument?.[0]?.description}
                               name="description"
                             />
                           </Field>
@@ -733,7 +706,7 @@ export default function Documents() {
                               Services
                             </Label>
                             <DynamicInputFieldsServices
-                              data={editDocument && editDocument[0].services}
+                              data={editDocument?.[0]?.services}
                             />
                           </Field>
                         </div>
@@ -744,9 +717,7 @@ export default function Documents() {
                               Organizations
                             </Label>
                             <DynamicInputFieldsOrganizations
-                              data={
-                                editDocument && editDocument[0].organization
-                              }
+                              data={editDocument?.[0]?.organization}
                             />
                           </Field>
                         </div>
@@ -802,7 +773,7 @@ export default function Documents() {
               >
                 <input
                   type="text"
-                  name="id"
+                  name="_id"
                   className="hidden"
                   defaultValue={deleteDocumentId}
                 />

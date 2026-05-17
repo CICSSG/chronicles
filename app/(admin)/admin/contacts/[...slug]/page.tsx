@@ -2,15 +2,8 @@
 import { useParams } from "next/navigation";
 import React, { useEffect, useState } from "react";
 import { SlatesData } from "@/components/admin/documents-data";
-import { createClient } from "@supabase/supabase-js";
-import { CreatePopup } from "@/components/admin/alert-fragment";
 import { Button, Dialog, DialogPanel, DialogTitle } from "@headlessui/react";
 import { InformationCircleIcon } from "@heroicons/react/24/outline";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export default function Page() {
   const params = useParams();
@@ -39,25 +32,6 @@ export default function Page() {
     SlatesData(slug[0]).then(({ documents }) => {
       setDocument(documents && documents[0] ? documents[0] : null);
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "slate" },
-        (payload) => {
-          SlatesData(slug[0]).then(({ documents }) => {
-            setDocument(documents && documents[0] ? documents[0] : null);
-            CreatePopup("Data updated");
-          });
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, [slug]);
 
   const handleCloseDialog = () => {

@@ -224,7 +224,7 @@ const AttendanceList = () => {
     GetAttendanceList()
       .then(({ documents }) => {
         if (!isActive) return;
-        const mapped = (documents ?? []).map((record: AttendanceDocument) => {
+        const mapped = (documents ?? []).map((record) => {
           const fallbackDate = record.date ? `${record.date}T00:00:00` : "";
           return {
             id: String(

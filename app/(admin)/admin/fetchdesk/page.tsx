@@ -33,16 +33,10 @@ import {
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
-import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 import { off } from "process";
 import { set } from "react-hook-form";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 // Pricing constants
 const PRICING = {
@@ -185,31 +179,11 @@ const FetchDesk = () => {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "fetchdesk" },
-        (payload) => {
-          FetchDeskData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
-            setPagination(pagination);
-            CreatePopup("Data updated");
-          });
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, []);
 
   useEffect(() => {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
-  }, [editDocument]);
+  }, [editFormId]);
 
   const formatPrintSummary = (data: any) => {
     const bw = Number(
@@ -258,6 +232,9 @@ const FetchDesk = () => {
 
   const handleCreateSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
     formData.set("transaction_type", selectedTransactionType);
     formData.set("calculated_price", calculatedPrice.toString());
     formData.set(
@@ -348,6 +325,9 @@ const FetchDesk = () => {
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
     setEditForm(false);
     handleEditDocument("");
     const result = await editFetchDeskPOST(formData);
@@ -361,6 +341,9 @@ const FetchDesk = () => {
 
   const handleDeleteSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
     const result = await deleteFetchDeskPOST(formData);
     setDeleteForm(false);
 
@@ -601,29 +584,29 @@ const FetchDesk = () => {
                 </td>
                 <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                   <Button
-                    onClick={() => handleViewDocument(data.id)}
+                    onClick={() => handleViewDocument(data._id || data.id)}
                     className="grow-1 basis-0 bg-blue-200 text-black hover:cursor-pointer hover:bg-blue-100"
                   >
                     View
                   </Button>
                   {data.transaction_type === "rental" &&
                     data.status === "rented" && (
-                      <Button
-                        onClick={() => handleReturnItem(data.id)}
+                        <Button
+                        onClick={() => handleReturnItem(data._id || data.id)}
                         className="grow-1 basis-0 bg-green-200 text-black hover:cursor-pointer hover:bg-green-100"
                       >
                         Return
                       </Button>
                     )}
                   <Button
-                    onClick={() => handleEditDocument(data.id)}
+                    onClick={() => handleEditDocument(data._id || data.id)}
                     className="grow-1 basis-0 bg-amber-200 text-black hover:cursor-pointer hover:bg-amber-100"
                   >
                     Edit
                   </Button>
                   <Button
                     onClick={() =>
-                      handleDeleteDocument(data.id, data.student_name, true)
+                      handleDeleteDocument(data._id || data.id, data.student_name, true)
                     }
                     className="grow-1 basis-0 bg-red-400 text-black"
                   >
@@ -1538,8 +1521,8 @@ const FetchDesk = () => {
               >
                 <input
                   type="hidden"
-                  name="id"
-                  value={returnDocument && returnDocument[0]?.id}
+                  name="_id"
+                  value={returnDocument && returnDocument[0]?._id}
                 />
                 <div className="bg-white px-4 pt-5 pb-4 sm:p-6 sm:pb-4">
                   <div className="sm:flex sm:items-start">
@@ -1800,8 +1783,8 @@ const FetchDesk = () => {
 
                       <input
                         type="hidden"
-                        name="id"
-                        value={editDocument && editDocument[0]?.id}
+                        name="_id"
+                        value={editDocument && editDocument[0]?._id}
                       />
 
                       <div className="mt-4 flex w-full flex-col gap-4">
@@ -1893,7 +1876,7 @@ const FetchDesk = () => {
               >
                 <input
                   type="text"
-                  name="id"
+                  name="_id"
                   className="hidden"
                   defaultValue={deleteDocumentId}
                 />

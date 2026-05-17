@@ -75,16 +75,18 @@ export default function UrgentAnnouncement() {
         <div className={`${!timeVisibility && "hidden"}`}>
           {Countdown(time)}
         </div>
-        <Link
-          href={documents ? documents[0].button_link : ""}
-          target={documents && documents[0].button_new_tab ? "_blank" : "_self"}
-          className={`flex flex-row items-center rounded-lg bg-black/90 px-3 py-2 text-white hover:bg-black/80 ${!buttonVisibility && "hidden"}`}
-        >
-          <span className="text-sm font-semibold">
-            {documents && documents[0].button_text}
-          </span>
-          <ChevronRightIcon className="size-6 animate-pulse animate-infinite animate-duration-[2000ms] animate-ease-linear" />
-        </Link>
+        {documents?.[0]?.button_link && (
+          <Link
+            href={documents[0].button_link}
+            target={documents[0].button_new_tab ? "_blank" : "_self"}
+            className={`flex flex-row items-center rounded-lg bg-black/90 px-3 py-2 text-white hover:bg-black/80 ${!buttonVisibility && "hidden"}`}
+          >
+            <span className="text-sm font-semibold">
+              {documents[0].button_text ?? ""}
+            </span>
+            <ChevronRightIcon className="size-6 animate-pulse animate-infinite animate-duration-[2000ms] animate-ease-linear" />
+          </Link>
+        )}
         <Button
           className="absolute right-2 text-black hover:cursor-pointer"
           onClick={(e) => setVisibility(false)}

@@ -18,17 +18,11 @@ import { createEventPOST, deleteEventPOST, editEventImagePOST, editEventPOST } f
 import { ExclamationTriangleIcon } from "@heroicons/react/24/outline";
 import { parseAsInteger, useQueryState } from "nuqs";
 
-import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
 import DynamicInputFieldsProjectHead from "@/components/admin/dynamic-input-field-project-head";
 import DynamicInputFieldsHighlights from "@/components/admin/dynamic-input-field-highlights";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 import DynamicInputFieldsEventImages from "@/components/admin/dynamic-input-field-event-images";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export default function Events() {
   const pathname = usePathname();
@@ -80,31 +74,11 @@ export default function Events() {
       setDocuments(documents ?? null);
       setPagination(pagination);
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "events" },
-        (payload) => {
-          EventsData().then(({ documents, pagination }) => {
-            setDocuments(documents ?? null);
-            setPagination(pagination);
-            CreatePopup("Data updated");
-          });
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, []);
 
   useEffect(() => {
     editFormId != "" ? setEditForm(true) : setEditForm(false);
-  }, [editDocument]);
+  }, [editFormId]);
 
   useEffect(() => {
     editImageFormId != "" ? setEditImageForm(true) : setEditImageForm(false);
@@ -115,6 +89,9 @@ export default function Events() {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
+      if (!formData.get("id") && formData.get("_id")) {
+        formData.set("id", String(formData.get("_id")));
+      }
       formData.set("image", image ?? "");
       const result = await createEventPOST(formData);
       setImage("");
@@ -133,6 +110,9 @@ export default function Events() {
       CreatePopup("Image was not uploaded yet. Please wait", "error");
     } else {
       const formData = new FormData(e.currentTarget);
+      if (!formData.get("id") && formData.get("_id")) {
+        formData.set("id", String(formData.get("_id")));
+      }
       formData.set("image", image ?? "");
       const result = await editEventPOST(formData);
       setEditForm(false);
@@ -149,6 +129,9 @@ export default function Events() {
 
   const handleImageEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
     const formData = new FormData(e.currentTarget);
+    if (!formData.get("id") && formData.get("_id")) {
+      formData.set("id", String(formData.get("_id")));
+    }
 
     const minimalFormData = new FormData();
     const idValue = formData.get("id");
@@ -309,20 +292,20 @@ export default function Events() {
                 <td className="max-w-2xl truncate">{data.description}</td>
                 <td className="flex flex-row gap-2 text-center font-semibold *:rounded-xl *:px-4 *:py-2">
                   <Button
-                    onClick={() => handleEditDocument(data.id)}
+                    onClick={() => handleEditDocument(data._id || data.id)}
                     className="grow-1 basis-0 bg-amber-200 text-black hover:cursor-pointer hover:bg-amber-100"
                   >
                     Edit
                   </Button>
                   <Button
-                    onClick={() => handleEditImages(data.id)}
+                    onClick={() => handleEditImages(data._id || data.id)}
                     className="grow-1 basis-0 bg-blue-200 text-black hover:cursor-pointer hover:bg-blue-100"
                   >
                     Images
                   </Button>
                   <Button
                     onClick={() =>
-                      handleDeleteDocument(data.id, data.title, true)
+                      handleDeleteDocument(data._id || data.id, data.title, true)
                     }
                     className="grow-1 basis-0 bg-red-400 text-black"
                   >
@@ -686,10 +669,8 @@ export default function Events() {
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].id
-                                }
-                                name="id"
+                                defaultValue={editDocument?.[0]?._id}
+                                name="_id"
                               ></Input>
                             </Field>
                           </div>
@@ -707,9 +688,7 @@ export default function Events() {
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].title
-                                }
+                                defaultValue={editDocument?.[0]?.title}
                                 required
                               />
                             </Field>
@@ -728,9 +707,7 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                   "scheme-light",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].date
-                                }
+                                defaultValue={editDocument?.[0]?.date}
                               />
                             </Field>
                           </div>
@@ -748,9 +725,7 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                   "scheme-light",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].academic_year
-                                }
+                                defaultValue={editDocument?.[0]?.academic_year}
                               />
                             </Field>
                           </div>
@@ -768,9 +743,7 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                   "scheme-light",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].location
-                                }
+                                defaultValue={editDocument?.[0]?.location}
                               />
                             </Field>
                           </div>
@@ -787,9 +760,7 @@ export default function Events() {
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
                                 rows={8}
-                                defaultValue={
-                                  editDocument && editDocument[0].description
-                                }
+                                defaultValue={editDocument?.[0]?.description}
                               />
                             </Field>
                           </div>
@@ -806,9 +777,7 @@ export default function Events() {
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
-                                defaultValue={
-                                  editDocument && editDocument[0].album_link
-                                }
+                                defaultValue={editDocument?.[0]?.album_link}
                               />
                             </Field>
                           </div>
@@ -853,9 +822,7 @@ export default function Events() {
                                 Project Head/s
                               </Label>
                               <DynamicInputFieldsProjectHead
-                                data={
-                                  editDocument && editDocument[0].project_heads
-                                }
+                                data={editDocument?.[0]?.project_heads}
                               />
                             </Field>
                           </div>
@@ -866,9 +833,7 @@ export default function Events() {
                                 Highlight Information
                               </Label>
                               <DynamicInputFieldsHighlights
-                                data={
-                                  editDocument && editDocument[0].highlights
-                                }
+                                data={editDocument?.[0]?.highlights}
                               />
                             </Field>
                           </div>
@@ -942,8 +907,8 @@ export default function Events() {
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
-                                defaultValue={editImage && editImage[0].id}
-                                name="id"
+                                defaultValue={editImage?.[0]?._id}
+                                name="_id"
                               ></Input>
                             </Field>
                           </div>
@@ -1009,7 +974,7 @@ export default function Events() {
               >
                 <input
                   type="text"
-                  name="id"
+                  name="_id"
                   className="hidden"
                   defaultValue={deleteDocumentId}
                 />

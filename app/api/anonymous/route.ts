@@ -1,12 +1,25 @@
 import { type NextRequest, NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { MongoClient, Db, ObjectId } from "mongodb";
 import nodemailer from "nodemailer";
 import Mail from "nodemailer/lib/mailer";
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
+const MONGODB_URI = process.env.MONGODB_URI!;
+const MONGODB_DB = process.env.MONGODB_DB ?? process.env.MONGODB_DATABASE ?? "chronicles";
+
+const globalWithMongo = globalThis as typeof globalThis & {
+  __mongoClient?: MongoClient;
+};
+
+globalWithMongo.__mongoClient = globalWithMongo.__mongoClient ?? new MongoClient(MONGODB_URI);
+
+async function getDb(): Promise<Db> {
+  const client = globalWithMongo.__mongoClient!;
+  // `client.connect()` is safe to call multiple times (idempotent)
+  // and avoids relying on internal `topology` properties that differ
+  // between driver versions.
+  await client.connect();
+  return client.db(MONGODB_DB);
+}
 
 type RateLimitBucket = {
   count: number;
@@ -51,6 +64,12 @@ function allowRequest(bucketKey: string, limit: number, windowMs: number) {
   return { allowed: true };
 }
 
+function normalizeAnonymousId(value: unknown) {
+  const raw = String(value ?? "").trim();
+  if (!raw) return "";
+  return raw.replace(/^Pioneer-/i, "");
+}
+
 export async function GET(request: NextRequest) {
   return NextResponse.json({ message: "Hello from the anonymous API route!" });
 }
@@ -81,19 +100,42 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: documents, error } = await supabase
-      .from("anonymous")
-      .insert(data)
-      .select();
+    try {
+      const db = await getDb();
 
-    if (error) {
+      const now = new Date().toISOString();
+      if (Array.isArray(data)) {
+        const docsToInsert = data.map((d: any) => ({
+          ...d,
+          created_at: d?.created_at ?? now,
+          updated_at: d?.updated_at ?? now,
+        }));
+        const result = await db.collection("anonymous").insertMany(docsToInsert);
+        const ids = Object.values(result.insertedIds) as ObjectId[];
+        const documents = await db
+          .collection("anonymous")
+          .find({ _id: { $in: ids } })
+          .toArray();
+        return NextResponse.json({ success: true, documents });
+      } else {
+        const doc = {
+          ...(data ?? {}),
+          created_at: data?.created_at ?? now,
+          updated_at: data?.updated_at ?? now,
+        };
+        const result = await db.collection("anonymous").insertOne(doc);
+        const documents = await db
+          .collection("anonymous")
+          .find({ _id: result.insertedId })
+          .toArray();
+        return NextResponse.json({ success: true, documents });
+      }
+    } catch (err: any) {
       return NextResponse.json(
-        { success: false, documents: null, error: error.message },
+        { success: false, documents: null, error: err?.message ?? String(err) },
         { status: 500 },
       );
     }
-
-    return NextResponse.json({ success: true, documents });
   }
 
   if (action === "message") {
@@ -117,25 +159,33 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    const { data: documents, error } = await supabase
-      .from("anonymous")
-      .update({ messages: messages, updated_at: new Date().toISOString() })
-      .eq("id", id)
-      .select();
+    try {
+      const db = await getDb();
+      const normalizedId = normalizeAnonymousId(id);
+      const numericId = Number(normalizedId);
+      const filter = Number.isFinite(numericId)
+        ? { $or: [{ id: numericId }, { id: normalizedId }] }
+        : { $or: [{ id: normalizedId }, { id: String(id ?? "") }] };
+      const updateResult = await db.collection("anonymous").updateOne(
+        filter,
+        { $set: { messages, updated_at: new Date().toISOString() } },
+      );
 
-    if (error) {
+      if (updateResult.matchedCount === 0) {
+        return NextResponse.json(
+          { success: false, documents: null, error: "Submission not found" },
+          { status: 404 },
+        );
+      }
+
+      const documents = await db.collection("anonymous").find(filter).toArray();
+      return NextResponse.json({ success: true, documents }, { status: 200 });
+    } catch (err: any) {
       return NextResponse.json(
-        { success: false, documents: null, error: error.message },
+        { success: false, documents: null, error: err?.message ?? String(err) },
         { status: 500 },
       );
     }
-
-    return NextResponse.json(
-      documents && documents.length > 0
-        ? { success: true, documents }
-        : { success: false, documents: null, error: "Submission not found" },
-      { status: documents && documents.length > 0 ? 200 : 404 },
-    );
   }
 
   const check = allowRequest(

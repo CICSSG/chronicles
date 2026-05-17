@@ -6,14 +6,8 @@ import OfficersOverview from "@/components/admin/officers/overview";
 import ExecutiveOverview from "@/components/admin/officers/executive";
 import LegislativeOverview from "@/components/admin/officers/legislative";
 import JuniorOfficerOverview from "@/components/admin/officers/junior-officer";
-import { createClient } from "@supabase/supabase-js";
 import CommitteesOverview from "@/components/admin/officers/committees";
 import { CreatePopup } from "@/components/admin/alert-fragment";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export default function Page() {
   const params = useParams();
@@ -31,25 +25,6 @@ export default function Page() {
     SlatesData(slug[0]).then(({ documents }) => {
       setDocument(documents && documents[0] ? documents[0] : null);
     });
-
-    const taskListener = supabase
-          .channel("public:data")
-          .on(
-            "postgres_changes",
-            { event: "*", schema: "public", table: "slate" },
-            (payload) => {
-              SlatesData(slug[0]).then(({ documents }) => {
-                setDocument(documents && documents[0] ? documents[0] : null);
-                CreatePopup("Data updated");
-              });
-              // console.log("Change received!", payload);
-            },
-          )
-          .subscribe();
-    
-        return () => {
-          taskListener.unsubscribe();
-        };
   }, [slug]);
 
   if (slug.length === 1) {

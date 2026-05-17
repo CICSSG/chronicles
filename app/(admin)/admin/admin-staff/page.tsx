@@ -12,17 +12,11 @@ import { Field, Input, Label } from "@headlessui/react";
 import clsx from "clsx";
 import { AdminStaffData } from "@/components/admin/documents-data";
 
-import { createClient } from "@supabase/supabase-js";
 import { imgurUpload } from "@/utils/imgur-upload";
 import Image from "next/image";
 import DynamicInputFieldsStaff from "@/components/admin/dynamic-input-field-staff";
 import { CreatePopup } from "@/components/admin/alert-fragment";
 import { editAdminStaffPOST } from "@/app/actions";
-
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
-);
 
 export interface AdminStaffDocumentData {
   id: number;
@@ -105,30 +99,6 @@ export default function AdminStaff() {
       setId(documents && documents[0].id);
       setAssociateDeanImage(documents && documents[0].associate_dean.image);
     });
-
-    const taskListener = supabase
-      .channel("public:data")
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "admin_staff" },
-        (payload) => {
-          AdminStaffData().then(({ documents, pagination }) => {
-            setDocuments(documents && documents[0] ? documents[0] : null);
-            setDeanImage(documents && documents[0].dean.image);
-            setAssociateDeanImage(
-              documents && documents[0].associate_dean.image,
-            );
-            setId(documents && documents[0].id);
-            CreatePopup("Data updated");
-          });
-          // console.log("Change received!", payload);
-        },
-      )
-      .subscribe();
-
-    return () => {
-      taskListener.unsubscribe();
-    };
   }, []);
 
   const handleEditSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
@@ -286,8 +256,8 @@ export default function AdminStaff() {
                                   "block w-full rounded-lg border-none bg-black/5 px-3 py-1.5 text-sm/6 text-black",
                                   "focus:not-data-focus:outline-none data-focus:outline-2 data-focus:-outline-offset-2 data-focus:outline-black/25",
                                 )}
-                                defaultValue={documents?.id}
-                                name="id"
+                                defaultValue={(documents as any)?._id ?? documents?.id}
+                                name="_id"
                               ></Input>
                             </Field>
                           </div>
