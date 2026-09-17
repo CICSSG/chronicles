@@ -240,6 +240,7 @@ export async function GET(request: NextRequest) {
 
   if (!listCollections.has(collection)) {
     const documents = await mongoCollection.find(filter, { projection }).sort(sort).toArray();
+    console.log(documents);
     return NextResponse.json({ documents });
   }
 
