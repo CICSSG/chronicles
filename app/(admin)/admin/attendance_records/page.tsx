@@ -239,6 +239,7 @@ const AttendanceList = () => {
             timeOutSignature: record.time_out_signature ?? null,
           };
         });
+        console.log(mapped);
         setAttendanceList(mapped);
       })
       .catch(() => {
