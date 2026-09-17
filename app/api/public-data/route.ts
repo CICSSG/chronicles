@@ -37,7 +37,6 @@ function toNumber(value: string | null, fallback: number) {
 }
 
 function buildProjection(collection: string, isSingle = false) {
-  console.log(collection);
   if (collection === "documents") {
     return {
       _id: 1,
@@ -171,7 +170,8 @@ function buildProjection(collection: string, isSingle = false) {
       type: 1,
       time_in: 1,
       time_out: 1,
-      student_name:1,
+      student_name: 1,
+      student_id: 1,
       date: 1,
       time_in_signature: 1,
       time_out_signature: 1,
@@ -255,11 +255,9 @@ export async function GET(request: NextRequest) {
   const sort = buildSort(collection);
   const shouldReturnAll = searchParams.get("all") === "1";
 
-  console.log(filter, projection, sort, shouldReturnAll);
 
   if (!listCollections.has(collection)) {
     const documents = await mongoCollection.find(filter, { projection }).sort(sort).toArray();
-    console.log(documents);
     return NextResponse.json({ documents });
   }
 
