@@ -238,6 +238,8 @@ export async function GET(request: NextRequest) {
   const sort = buildSort(collection);
   const shouldReturnAll = searchParams.get("all") === "1";
 
+  console.log(filter, projection, sort, shouldReturnAll);
+
   if (!listCollections.has(collection)) {
     const documents = await mongoCollection.find(filter, { projection }).sort(sort).toArray();
     console.log(documents);
